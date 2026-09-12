@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dealer Simulator | ブラックジャック</title>
+<style>
+:root{
+  --room:#28323D;--room2:#1E262E;--felt:#0F4D3C;--felt2:#17624C;--rail:#4B2E1F;
+  --brass:#C9A24B;--ivory:#FAF7EF;--ink:#1D232B;--panel:#E7EAED;
+  --ok:#2F8F5B;--ng:#C43D33;--muted:#5B6570;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--room);color:var(--ink);font-family:"BIZ UDPGothic","Meiryo","Hiragino Sans","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.6}
+button{font:inherit}
+.topbar{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--room2);color:#E9EDF1;border-bottom:1px solid #3A4652;position:relative}
+.brand-main{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;color:var(--brass)}
+.brand-sub{margin-left:10px;font-size:13px;color:#AEB8C2}
+.meta{margin-left:auto;display:flex;gap:18px;font-size:13px;color:#C2CBD3;flex-wrap:wrap;justify-content:flex-end}
+.meta b{color:#fff;font-size:15px;margin-left:4px;font-weight:bold}
+.btn-ghost{background:transparent;border:1px solid #56626E;color:#E9EDF1;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.btn-ghost:hover{border-color:#fff}
+.btn-ghost:focus-visible,.act:focus-visible,.seat:focus-visible,.hand:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+
+.settings{position:absolute;right:20px;top:100%;z-index:20;background:#fff;color:var(--ink);border-radius:10px;padding:16px 18px;width:320px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.settings h3{margin:0 0 10px;font-size:15px}
+.settings .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #EEF0F2;font-size:14px}
+.settings select{font:inherit;padding:3px 6px}
+.settings .note{font-size:12px;color:var(--muted);margin:8px 0 10px}
+.settings .danger{background:#fff;border:1px solid var(--ng);color:var(--ng);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px}
+
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;padding:16px 20px;max-width:1300px;margin:0 auto}
+.main-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+
+.felt{position:relative;background:radial-gradient(ellipse at 50% 25%,var(--felt2),var(--felt) 72%);border:12px solid var(--rail);border-top:none;border-radius:0 0 50% 50% / 0 0 30% 30%;padding:14px 18px 56px;min-height:460px;box-shadow:inset 0 0 50px rgba(0,0,0,.35)}
+.cap-voice{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:1px solid #56626E;color:#9AA7B3;border-radius:14px;padding:3px 10px;font-size:12px;cursor:pointer}
+.cap-voice.on{border-color:var(--brass);color:var(--brass)}
+.caption{padding-right:96px !important}
+.mob-signal{display:none}
+.meta i{font-style:normal}.meta .sm{display:none}.meta span{white-space:nowrap}
+.table-next{position:absolute;left:18px;top:12px;z-index:5;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.shoe-info{position:absolute;right:16px;top:10px;font-size:11.5px;color:rgba(250,247,239,.6)}
+.dealer-zone{display:flex;flex-direction:column;align-items:center;gap:4px}
+.zone-label{color:rgba(250,247,239,.75);font-size:12px}
+.cards{display:flex;align-items:center;min-height:64px;padding:0 8px}
+.card{width:44px;height:62px;flex:none;background:var(--ivory);border-radius:5px;border:1px solid #CFC8B6;display:flex;flex-direction:column;justify-content:space-between;padding:3px 5px;color:#1B1B1B;font-family:Georgia,"Times New Roman",serif;box-shadow:0 1px 3px rgba(0,0,0,.4);margin-left:-16px}
+.card:first-child{margin-left:0}
+.card .cr{font-size:17px;font-weight:bold;line-height:1}
+.card .cs{font-size:18px;line-height:1;align-self:flex-end}
+.card.red{color:#B3261E}
+.card.back{background:repeating-linear-gradient(45deg,#7A1F2B 0 5px,#922E3A 5px 10px);border:3px solid var(--ivory)}
+.card.side{transform:rotate(90deg);margin-left:0;margin-right:-6px}
+.cards.many5 .card:not(:first-child){margin-left:-22px}
+.card.new{animation:deal .22s ease-out}
+.card.side.new{animation:none}
+@keyframes deal{from{transform:translateY(-16px);opacity:0}to{transform:none;opacity:1}}
+.dtotal{font-size:12.5px;color:#fff;background:rgba(0,0,0,.35);border-radius:9px;padding:0 10px;min-height:19px}
+
+.print{text-align:center;margin:12px 0 4px;color:var(--brass);font-family:Georgia,"Times New Roman",serif}
+.print-main{font-size:21px;letter-spacing:.05em}
+.print-sub{font-size:12.5px;font-style:italic;color:rgba(224,194,122,.85)}
+.print-ins{display:inline-block;margin-top:6px;padding:1px 22px;border-top:1px solid rgba(201,162,75,.55);border-bottom:1px solid rgba(201,162,75,.55);font-size:12px;letter-spacing:.06em}
+
+.seats{display:flex;flex-direction:row-reverse;justify-content:center;gap:8px;margin-top:8px}
+.seat{transform:translateY(var(--dy,0));flex:1 1 0;max-width:180px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 10px;border-radius:12px;border:2px solid transparent}
+.seat.active{border-color:var(--brass);background:rgba(0,0,0,.16)}
+.seat.clickable,.hand.clickable{cursor:pointer}
+.seat.clickable:hover,.hand.clickable:hover{background:rgba(255,255,255,.09)}
+.seat-no{color:#F1EBDC;font-size:13px;text-align:center;line-height:1.3}
+.seat-no small{display:block;font-size:10.5px;color:rgba(241,235,220,.6)}
+.hands{display:flex;gap:4px;justify-content:center;max-width:100%}
+.hand{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;border-radius:8px;border:1.5px dashed transparent;min-width:0}
+.hand.active{border-color:rgba(255,211,77,.9)}
+.hand.resolved .cards{opacity:.4}
+.htotal{font-size:12px;color:#fff;background:rgba(0,0,0,.35);border-radius:9px;padding:0 8px;min-height:18px}
+.bet-spot{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(250,247,239,.45);display:flex;align-items:center;justify-content:center;gap:2px}
+.chip{width:40px;height:40px;border-radius:50%;border:4px dashed rgba(255,255,255,.9);color:#fff;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.chip.c-red{background:#B83A3A}.chip.c-green{background:#2E7D4F}.chip.c-orange{background:#C7711E}.chip.c-dbl{background:#3B4B8C}
+.hstatus{font-size:11px;color:#FFE08A;text-align:center;min-height:16px;line-height:1.35}
+.ins-chip{font-size:10.5px;color:var(--ivory);border:1px solid var(--brass);border-radius:10px;padding:0 7px}
+.signal{background:var(--ivory);color:var(--ink);font-size:12px;border-radius:8px;padding:5px 8px;max-width:170px;text-align:center;line-height:1.45;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.signal b{display:block;color:var(--felt);font-size:12.5px}
+.empty-seat{color:rgba(250,247,239,.45);font-size:12px;padding:30px 0}
+
+.caption{position:relative;background:#11171C;color:#fff;border-radius:8px;padding:10px 16px 10px 96px;min-height:64px;display:flex;flex-direction:column;justify-content:center;border-left:4px solid var(--brass)}
+.caption .who{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--brass)}
+.caption .en{font-family:Georgia,"Times New Roman",serif;font-size:22px;line-height:1.3}
+.caption .ja{font-size:13px;color:#B8C2CB}
+.caption.flash .en,.caption.flash .ja{animation:capin .3s ease-out}
+@keyframes capin{from{opacity:.15}to{opacity:1}}
+.entry .callja{display:block;color:#A99060;font-size:12px}
+.console{background:var(--panel);border-radius:10px;padding:14px 16px 16px;border-top:4px solid var(--brass)}
+.phase{font-size:12.5px;color:var(--muted)}
+.prompt{font-size:16px;font-weight:bold;margin:2px 0 10px}
+.fb{padding:8px 12px;border-radius:6px;font-size:14px;margin-bottom:10px;line-height:1.55}
+.fb.ok{background:#DDF0E4;color:#1E5E3B}
+.fb.err{background:#F8DEDB;color:#8A231B}
+.fb.info{background:#DDE3EA;color:#2E3A46}
+.fb.warn{background:#FBEFD0;color:#6B4E0E}
+.tray{display:flex;flex-wrap:wrap;gap:10px;padding:12px;background:#3A2A20;border-radius:10px;box-shadow:inset 0 2px 8px rgba(0,0,0,.45);margin-bottom:10px}
+.tray-chip{width:62px;height:62px;border-radius:50%;border:5px dashed rgba(255,255,255,.85);font-family:Georgia,serif;font-weight:bold;font-size:15px;cursor:pointer;box-shadow:0 2px 3px rgba(0,0,0,.5);color:#fff}
+.tray-chip:hover{transform:translateY(-2px)}
+.tray-chip:active{transform:translateY(1px)}
+.tray-chip:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+.ch-1{background:#F2F2EE;color:#222 !important;border-color:#7A7A7A !important}
+.ch-5{background:#B83A3A}.ch-10{background:#2F5FB3}.ch-25{background:#2E7D4F}.ch-50{background:#D08A1E}.ch-100{background:#1C1C1C}
+.stack{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1.5px dashed #9AA5B0;border-radius:10px;padding:8px 12px;margin-bottom:10px;min-height:56px}
+.stack-row{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+.mini-chip{width:32px;height:32px;border-radius:50%;border:3px dashed rgba(255,255,255,.85);color:#fff;font-size:10.5px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif}
+.stack-empty{font-size:13px;color:var(--muted)}
+.stack-total{font-size:14px;white-space:nowrap}
+.stack-total b{font-family:Georgia,serif;font-size:18px}
+.next-top{margin-bottom:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.act{font-size:14px;padding:9px 14px;border-radius:8px;border:1.5px solid #9AA5B0;background:#fff;color:var(--ink);cursor:pointer;min-height:44px}
+.act:hover{border-color:var(--ink)}
+.act.primary{background:var(--felt);color:#fff;border-color:var(--felt)}
+.act.primary:hover{background:#0B3B2E}
+.act.amount{font-family:Georgia,serif;font-size:17px;min-width:100px}
+.group-label{width:100%;font-size:12px;color:var(--muted);margin-top:2px}
+.summary h3{margin:0 0 6px;font-size:16px}
+.summary ul{margin:6px 0 12px;padding-left:20px;font-size:13.5px}
+.summary li{margin-bottom:4px}
+.stat-table{border-collapse:collapse;font-size:13px;margin:6px 0 12px;width:100%;max-width:520px}
+.stat-table th,.stat-table td{border-bottom:1px solid #CDD3D9;padding:4px 8px;text-align:right}
+.stat-table th:first-child,.stat-table td:first-child{text-align:left}
+
+.log{background:#222B34;color:#D8DEE4;border-radius:10px;padding:12px 14px;max-height:calc(100vh - 100px);overflow:auto;position:sticky;top:12px;align-self:start}
+.log h2{font-size:14px;margin:0 0 6px;color:#fff}
+.entry{padding:7px 0;border-bottom:1px solid #33404B;font-size:13px;line-height:1.5}
+.entry .el{color:#fff}
+.entry.err .el{color:#FF8A80}
+.entry .call{display:block;color:var(--brass);font-size:12.5px}
+.entry .why{display:block;color:#C9D1D8;font-size:12.5px}
+.entry.info{color:#93A1AE}
+.log-empty{font-size:13px;color:#8B98A5}
+
+@media (max-width:960px){.wrap{grid-template-columns:1fr}.log{position:static;max-height:320px}}
+@media (max-width:600px){
+  .tray-chip{width:50px;height:50px;font-size:13px;border-width:4px}
+  .topbar{flex-wrap:wrap;padding:8px 12px}.meta{margin-left:0;gap:10px;justify-content:flex-start}
+  .wrap{padding:10px}.felt{padding:10px 6px 40px;border-width:8px;min-height:380px}
+  .card{width:32px;height:46px;margin-left:-14px;padding:2px 3px}.card .cr{font-size:12px}.card .cs{font-size:13px}
+  .seat-no small{display:none}.bet-spot{width:42px;height:42px}.chip{width:32px;height:32px;font-size:9.5px;border-width:3px}
+  .signal{font-size:11px}.caption{padding:8px 12px}.caption .who{display:none}.caption .en{font-size:18px}.shoe-info{top:auto;bottom:12px;right:0;left:0;text-align:center}.print-main{font-size:16px}.settings{right:8px;width:calc(100% - 16px)}
+}
+
+@media (max-width:600px){
+  body{font-size:14px}
+  .topbar{flex-wrap:nowrap;gap:8px;padding:6px 10px}
+  .brand-main{font-size:16px}.brand-sub{display:none}
+  .meta{margin-left:auto;gap:8px;font-size:11px;flex-wrap:nowrap}
+  .meta b{font-size:13px;margin-left:2px}
+  .btn-ghost{padding:4px 8px;font-size:12px;white-space:nowrap}
+  .wrap{padding:6px;gap:6px}
+  .main-col{gap:6px}
+  .felt{min-height:0;padding:6px 4px 16px;border-width:6px;border-radius:0 0 50% 50% / 0 0 16% 16%}
+  .zone-label{display:none}
+  .dealer-zone{gap:2px}
+  .cards{min-height:46px;padding:0 4px}
+  .dtotal,.htotal{font-size:11px;min-height:16px;padding:0 6px;line-height:16px}
+  .print{margin:2px 0 0}
+  .print-main{font-size:12.5px}
+  .print-sub{font-size:9.5px;line-height:1.3}
+  .print-ins{display:none}
+  .seats{gap:2px;margin-top:0}
+  .seat{transform:translateY(calc(var(--dy,0px) * .3));padding:3px 1px;gap:1px;border-radius:8px}
+  .seat-no{font-size:11px;line-height:1.2}
+  .hand{padding:2px 1px;gap:1px}
+  .bet-spot{width:34px;height:34px}
+  .chip{width:28px;height:28px;font-size:8px;border-width:3px}
+  .hstatus{font-size:9px;min-height:11px;line-height:1.2}
+  .ins-chip{font-size:9px;padding:0 4px;line-height:1.4}
+  .seat .signal{display:none}
+  .empty-seat{padding:12px 0}
+  .shoe-info{position:static;text-align:center;font-size:9.5px;margin-top:2px;color:rgba(250,247,239,.5)}
+  .table-next{left:4px;top:4px;font-size:12.5px;padding:5px 10px;min-height:34px}
+  .caption{padding:5px 10px !important;padding-right:74px !important;min-height:0;border-left-width:3px}
+  .caption .en{font-size:14.5px;line-height:1.3}
+  .caption .ja{font-size:10.5px;line-height:1.35}
+  .cap-voice{font-size:10.5px;padding:2px 7px;right:6px}
+  .console{padding:7px 8px 8px;border-top-width:3px}
+  .phase{display:none}
+  .prompt{font-size:13px;margin:0 0 5px;line-height:1.45}
+  .mob-signal{display:block;font-weight:normal;font-size:12.5px;background:var(--ivory);border-left:3px solid var(--felt);padding:3px 8px;margin-top:4px;border-radius:4px}
+  .mob-signal b{color:var(--felt)}
+  .fb{font-size:11.5px;padding:4px 8px;margin-bottom:5px;line-height:1.45}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .actions.chip-acts{grid-template-columns:1fr 1fr 1.3fr}
+  .act{font-size:12px;padding:4px 5px;min-height:38px;line-height:1.3}
+  .tray{gap:4px;padding:6px;justify-content:space-between;margin-bottom:5px;flex-wrap:nowrap}
+  .tray-chip{width:46px;height:46px;font-size:11.5px;border-width:4px;flex:none}
+  .stack{padding:3px 8px;min-height:36px;margin-bottom:5px;gap:8px}
+  .mini-chip{width:22px;height:22px;font-size:8px;border-width:2px}
+  .stack-total{font-size:12px}.stack-total b{font-size:15px}
+  .summary h3{font-size:13.5px;margin-bottom:2px}
+  .summary ul{margin:2px 0 6px;font-size:12px}
+  .summary p{margin:2px 0 6px;font-size:12.5px}
+  .summary .stat-table,.summary .stats-label{display:none}
+  .next-top{display:none}
+  .meta .lg,.btn-ghost .lg,.act .sub{display:none}.meta .sm{display:inline}
+  .brand-main{white-space:nowrap;font-size:15px}
+  .felt{display:flex;flex-direction:column}
+  .shoe-info{order:9}
+  .fb.ok,.fb.info{display:none}
+  .hand .cards.many3 .card{margin-left:-20px}.hand .cards.many4 .card{margin-left:-23px}.hand .cards.many5 .card{margin-left:-25px}
+  .hand .cards .card:first-child{margin-left:0}
+  .hand .cards .card.side{margin-left:-12px}
+  .htotal{white-space:nowrap}.htotal .sub,.hstatus .sub{display:none}
+  .actions.chip-acts{grid-template-columns:1fr 1fr 1.3fr}
+  .actions{grid-template-columns:1fr 1fr 1fr}
+  .act{min-height:36px}
+  .log{max-height:none}
+}
+@media (prefers-reduced-motion:reduce){.card.new,.caption.flash .en,.caption.flash .ja{animation:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div><span class="brand-main">Dealer Simulator</span><span class="brand-sub">ブラックジャック</span></div>
+  <div class="meta" id="meta"></div>
+  <button class="btn-ghost" data-act="toggleSettings" aria-expanded="false" id="btnSettings">設定<span class="lg">・成績</span></button>
+  <div class="settings" id="settings" hidden></div>
+</header>
+<main class="wrap">
+  <div class="main-col">
+    <section class="felt" id="table" aria-label="テーブル"></section>
+    <div class="caption" id="caption" aria-live="polite"></div>
+    <section class="console" id="console"></section>
+  </div>
+  <aside class="log" id="log" aria-label="進行ログ"></aside>
+</main>
+
+<script>
+/*ENGINE_START*/
+const SUITS=['♠','♥','♦','♣'];
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const BETS=[10,12,16,20,24,30,36,40,50,60,70,80,100];
+const CHIPS=[100,50,25,10,5,1];
+function minChips(x){const r=[];for(const d of CHIPS){while(x>=d-1e-9){r.push(d);x-=d;}}return r;}
+function chipsText(arr){const m={};arr.forEach(d=>m[d]=(m[d]||0)+1);return CHIPS.filter(d=>m[d]).map(d=>`$${d}×${m[d]}`).join('＋')||'なし';}
+const MAX_HANDS=4;
+const CAT_NAME={deal:'配布手順',check:'ピーク・インシュアランス',play:'プレイヤー対応',dealer:'ディーラードロー',settle:'精算',pay:'配当計算'};
+const SIG={
+  hit:{name:'ヒット',text:'指でテーブルを軽く叩く'},
+  stand:{name:'スタンド',text:'手のひらを下に向けて横に振る'},
+  double:{name:'ダブルダウン',text:'ベットと同額のチップを横に置き、指を1本立てる'},
+  split:{name:'スプリット',text:'ベットと同額のチップを横に置き、指を2本立てる'},
+  surrender:{name:'サレンダー',text:'「サレンダー」と宣言し、ベットの後ろを指で横になぞる'}
+};
+const LABEL={start:'ラウンド開始',closeBets:'ベット締切',burn:'バーンカードを1枚捨てる',deal:'カード配布',offerIns:'インシュアランスを募る',payEven:'イーブンマネーを支払う',peek:'ホールカードを確認（ピーク）',reveal:'ホールカードを開く',collectIns:'インシュアランスを回収',payIns:'インシュアランスを支払う',toPlayers:'プレイヤーのアクションへ進む',hit:'ヒット（1枚配る）',stand:'スタンド（次の手へ）',double:'ダブルダウン（1枚のみ配る）',split:'スプリット（手を分ける）',surrender:'サレンダー（半額回収）',bust:'バスト（回収）',payBJ:'ブラックジャック配当を支払う',dealerHit:'ディーラーがヒット',dealerEnd:'ドロー終了（精算へ）',select:'精算する手を選択',pay:'支払う（1:1）',collect:'回収する',push:'プッシュ（据え置き）'};
+const RANK_EN={A:'aces','2':'twos','3':'threes','4':'fours','5':'fives','6':'sixes','7':'sevens','8':'eights','9':'nines','10':'tens',J:'jacks',Q:'queens',K:'kings'};
+
+function C(en,ja){return{en,ja};}
+function rankVal(c){if(c.r==='A')return 11;if(c.r==='10'||c.r==='J'||c.r==='Q'||c.r==='K')return 10;return +c.r;}
+function handValue(cards){let t=0,a=0;for(const c of cards){t+=rankVal(c);if(c.r==='A')a++;}while(t>21&&a>0){t-=10;a--;}return{total:t,soft:a>0};}
+function isBJ(h){return h.cards.length===2&&!h.fromSplit&&handValue(h.cards).total===21;}
+function fmt$(x){x=Math.round(x*100)/100;return '$'+(Number.isInteger(x)?x.toLocaleString('en-US'):x.toFixed(2));}
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+function shuffleArr(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function newShoe(decks){const s=[];for(let d=0;d<decks;d++)for(const su of SUITS)for(const r of RANKS)s.push({r,s:su});return shuffleArr(s);}
+function newHand(bet,cards,extra){return Object.assign({cards:cards||[],bet,fromSplit:false,splitAces:false,doubled:false,status:'active',decision:null,result:null,paid:0},extra||{});}
+function softText(cards){const v=handValue(cards);return v.soft&&v.total<21?`ソフト${v.total}`:`${v.total}`;}
+function softEn(cards){const v=handValue(cards);return v.soft&&v.total<21?`soft ${v.total}`:`${v.total}`;}
+
+function createGame(opts){
+  return{opts:Object.assign({players:3,rule:'S17',showTotals:true,showSignalNames:true,voice:true},opts||{}),
+    decks:6,shoe:newShoe(6),needBurn:true,burned:0,cardSeq:0,lastCard:0,roundNo:0,rule:'S17',
+    seats:[],dealer:{cards:[],holeUp:false},phase:'idle',dealSeq:[],dealIdx:0,
+    flags:{},turn:{s:0,h:0},settle:null,pending:null,round:null,log:[],lastFb:null,
+    caption:C('','ラウンドを開始すると、ディーラーの発声がここに表示されます'),capSeq:0,capQueue:[]};
+}
+function setCaption(G,cap){if(cap&&cap.en){G.caption=cap;G.capSeq++;G.capQueue.push(cap);if(G.capQueue.length>20)G.capQueue.shift();}}
+function draw(G){if(G.shoe.length===0)G.shoe=newShoe(G.decks);const c=G.shoe.pop();c.id=++G.cardSeq;G.lastCard=c.id;return c;}
+function addLog(G,e){G.log.unshift(Object.assign({round:G.roundNo},e));if(G.log.length>80)G.log.length=80;}
+function seatName(n,i){let tag='';if(i===0)tag='ファーストベース';else if(i===n-1&&n>1)tag='サードベース';return{no:`${i+1}番席`,tag};}
+function handName(G,si,hi){const s=G.seats[si];return `${si+1}番席${s.hands.length>1?`（スプリット${hi+1}手目）`:''}`;}
+
+function startRound(G){
+  if(G.shoe.length<G.decks*52*0.25){G.shoe=newShoe(G.decks);G.needBurn=true;G.burned=0;addLog(G,{t:'info',el:'カットカードが出たため、シャッフルして新しいシューに交換しました。'});}
+  G.roundNo++;G.rule=G.opts.rule;
+  G.seats=[];for(let i=0;i<G.opts.players;i++)G.seats.push({ins:0,insResult:null,even:false,hands:[newHand(rnd(BETS))]});
+  G.dealer={cards:[],holeUp:false};
+  G.dealSeq=[];for(let p=0;p<2;p++){for(let i=0;i<G.seats.length;i++)G.dealSeq.push('s'+i);G.dealSeq.push(p===0?'dUp':'dDown');}
+  G.dealIdx=0;G.phase='bet';G.flags={insOffered:false,evenPaid:false,peeked:false,insResolved:false,dealerBJ:false};
+  G.turn={s:0,h:0};G.settle=null;G.pending=null;G.lastCard=0;
+  G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[]};
+  const cap=C('Place your bets, please.','ベットをお願いします');setCaption(G,cap);
+  addLog(G,{t:'info',el:`ラウンド${G.roundNo}開始（${G.seats.length}人・${G.rule}）`,call:cap});
+}
+
+function decide(G,s,h,up){
+  const u=rankVal(up),c=h.cards,two=c.length===2,v=handValue(c);
+  const canSplit=two&&rankVal(c[0])===rankVal(c[1])&&s.hands.length<MAX_HANDS&&!h.splitAces;
+  const canSurr=two&&!h.fromSplit&&s.hands.length===1;
+  if(canSplit){
+    const p=rankVal(c[0]);
+    if(p===11||p===8)return 'split';
+    if(p===9&&[2,3,4,5,6,8,9].includes(u))return 'split';
+    if(p===7&&u<=7)return 'split';
+    if(p===6&&u<=6)return 'split';
+    if(p===4&&(u===5||u===6))return 'split';
+    if((p===2||p===3)&&u<=7)return 'split';
+  }
+  const t=v.total;
+  if(canSurr&&!v.soft){
+    if(t===16&&u>=9)return 'surrender';
+    if(t===15&&(u===10||(u===11&&G.rule==='H17')))return 'surrender';
+    if(t===17&&u===11&&G.rule==='H17')return 'surrender';
+  }
+  if(v.soft){
+    if(t>=19)return 'stand';
+    if(t===18){if(two&&u>=3&&u<=6)return 'double';return u<=8?'stand':'hit';}
+    if(t===17)return(two&&u>=3&&u<=6)?'double':'hit';
+    if(t===15||t===16)return(two&&u>=4&&u<=6)?'double':'hit';
+    if(t===13||t===14)return(two&&u>=5&&u<=6)?'double':'hit';
+    return 'hit';
+  }
+  let d;
+  if(t>=17)d='stand';
+  else if(t>=13)d=u<=6?'stand':'hit';
+  else if(t===12)d=(u>=4&&u<=6)?'stand':'hit';
+  else if(t===11)d=two?'double':'hit';
+  else if(t===10)d=(two&&u<=9)?'double':'hit';
+  else if(t===9)d=(two&&u>=3&&u<=6)?'double':'hit';
+  else d='hit';
+  if(t>=12&&t<=16&&Math.random()<0.1)d=d==='hit'?'stand':'hit';
+  return d;
+}
+
+function E(key,cat,why,call,extra){return Object.assign({key,cat,why,call:call||C('','')},extra||{});}
+function curHand(G){const s=G.seats[G.turn.s];return s?s.hands[G.turn.h]:null;}
+function liveHands(G){const r=[];G.seats.forEach(s=>s.hands.forEach(h=>{if(h.status==='stand')r.push(h);}));return r;}
+function anyIns(G){return G.seats.some(s=>s.ins>0);}
+function insPayTotal(G){return G.seats.reduce((a,s)=>a+s.ins*2,0);}
+
+function expected(G){
+  const up=G.dealer.cards[0];
+  switch(G.phase){
+    case 'idle':case 'done':return{key:'start',unscored:true};
+    case 'bet':return E('closeBets','deal','全員のベットが揃ったら、カードを配る前にベットの締め切りを宣言します。これ以降のベット変更は受け付けません。',C('No more bets.','ベットを締め切ります'));
+    case 'deal':{
+      if(G.needBurn)return E('burn','deal','新しいシューの最初のラウンドです。配布の前にバーンカードを1枚、表を見せずに捨て札トレイへ置きます。');
+      const t=G.dealSeq[G.dealIdx];
+      const lbl=t==='dUp'?'ディーラー（表向き）':t==='dDown'?'ディーラー（裏向き＝ホールカード）':`${+t.slice(1)+1}番席`;
+      const n=G.seats.length;
+      return E('deal','deal',`配布は「1番席（ディーラーから見て左端）→…→${n}番席→ディーラー表向き」、2周目も同じ順で最後にディーラー裏向き（ホールカード）です。次は${lbl}です。`,null,{arg:t});
+    }
+    case 'check':{
+      const F=G.flags,uv=rankVal(up);
+      if(up.r==='A'){
+        if(!F.insOffered)return E('offerIns','check','ディーラーのアップカードがAです。ピークの前にインシュアランスを募ります（ブラックジャックの席にはイーブンマネーを確認します）。',C('Insurance? Insurance is open.','インシュアランスはいかがですか'));
+        const ev=G.seats.map((s,i)=>({s,i})).filter(x=>x.s.even);
+        if(ev.length&&!F.evenPaid){
+          const amt=ev.reduce((a,x)=>a+x.s.hands[0].bet,0),names=ev.map(x=>`${x.i+1}番席`).join('・');
+          return E('payEven','check',`${names}がイーブンマネーを選択しました。ピークの前にベットに対して1:1で支払い、そのハンドは終了です：${fmt$(amt)}。`,C('Even money.','イーブンマネーでお支払いします'),{amount:amt,hint:'イーブンマネーはブラックジャックのベットに対して1:1（複数席なら合計）',amountLabel:'支払う金額'});
+        }
+        if(!F.peeked)return E('peek','check','インシュアランス（イーブンマネー）の処理が終わったら、ホールカードを確認（ピーク）してブラックジャックの有無を判定します。');
+      }else if(uv===10){
+        if(!F.peeked)return E('peek','check','アップカードが10点札です。プレイヤーのアクション前にピークしてブラックジャックの有無を確認します。');
+      }else{
+        return E('toPlayers','check','アップカードが2〜9のためピークは不要です。1番席からプレイヤーのアクションに進みます。',null);
+      }
+      if(F.dealerBJ){
+        if(!G.dealer.holeUp)return E('reveal','check','ピークでディーラーのブラックジャックを確認しました。ホールカードを開いて見せてから精算します。',C('Dealer has blackjack.','ディーラー、ブラックジャックです'));
+        return E('payIns','check','ディーラーがブラックジャックのため、インシュアランスは2:1で支払います（保険額×2の合計）。',C('Insurance pays two to one.','インシュアランスを2:1でお支払いします'),{amount:insPayTotal(G),hint:'インシュアランスは2:1（保険額×2）。全席分の合計です',amountLabel:'支払う金額'});
+      }
+      if(anyIns(G)&&!F.insResolved)return E('collectIns','check','ディーラーはブラックジャックではありません。インシュアランスは負けのため、回収してからゲームを進めます。',C('No blackjack. Insurance loses.','ブラックジャックはありません。インシュアランスは回収します'));
+      return E('toPlayers','check','ディーラーはブラックジャックではありません。最初の席からプレイヤーのアクションに進みます。',C('No blackjack.','ブラックジャックはありません'));
+    }
+    case 'play':{
+      const s=G.seats[G.turn.s],h=curHand(G),lbl=handName(G,G.turn.s,G.turn.h),v=handValue(h.cards);
+      if(h.cards.length===1)return E('hit','play',`${lbl}はスプリット直後の手です。まず2枚目を1枚配ります。`,C('Card.','カードをお配りします'));
+      if(isBJ(h)){const amt=h.bet*1.5;return E('payBJ','play',`${lbl}は最初の2枚でブラックジャック（ディーラーのBJなしは確認済み）。3:2で即時支払います：${fmt$(h.bet)}×1.5＝${fmt$(amt)}。`,C('Blackjack. Pays three to two.','ブラックジャック、3:2でお支払いします'),{amount:amt,hint:'ブラックジャックは3:2（ベット×1.5）',amountLabel:'支払う金額'});}
+      if(v.total>21)return E('bust','play',`${lbl}は合計${v.total}でバストです。ディーラーのターンを待たず、その場でチップとカードを回収します。`,C('Too many.','22以上、バストです'));
+      if(!h.decision)h.decision=decide(G,s,h,up);
+      const d=h.decision,base=`${lbl}の合図は「${SIG[d].text}」＝${SIG[d].name}です。`;
+      if(d==='hit')return E('hit','play',base,C('Hit.','ヒットですね'));
+      if(d==='stand')return E('stand','play',base,C(`Stay on ${softEn(h.cards)}.`,`${softText(h.cards)}でステイですね`));
+      if(d==='double')return E('double','play',base+'ベットを倍にし、カードは1枚のみ（横向き）で配ります。',C('Double down. One card only.','ダブルダウン、カードは1枚のみです'));
+      if(d==='split'){
+        const re=h.fromSplit?`リスプリットです（最大${MAX_HANDS}手まで、Aのリスプリットは不可）。`:'';
+        return E('split','play',base+re+'同額のベットで手を分け、左側の手から1枚ずつ配ります。',C(`Splitting ${RANK_EN[h.cards[0].r]}.`,'スプリットします'));
+      }
+      return E('surrender','play',base+`レイトサレンダー（ピーク後・最初の2枚のみ）として、ベットの半分${fmt$(h.bet/2)}を回収し、残りを返却します。`,C('Surrender. Half your bet back.','サレンダーですね。半額をお返しします'),{amount:h.bet/2,hint:'サレンダーはベットの半分を回収し、半分を返却',amountLabel:'回収する金額'});
+    }
+    case 'dealer':{
+      const dv=handValue(G.dealer.cards);
+      if(!G.dealer.holeUp)return E('reveal','dealer','プレイヤー全員のアクションが終わりました。ディーラーはホールカードを開きます。',C(`Dealer has ${softEn(G.dealer.cards)}.`,`ディーラーは${softText(G.dealer.cards)}です`));
+      if(dv.total>21)return E('dealerEnd','dealer',`ディーラーは合計${dv.total}でバストです。これ以上引かず、残っているハンドの精算に進みます。`,C('Dealer busts.','ディーラー、バストです'));
+      if(liveHands(G).length===0)return E('dealerEnd','dealer','残っているプレイヤーのハンドがありません（全員バスト・BJ精算済み・サレンダー等）。ディーラーはカードを引かずに終了します。',C(`Dealer ${dv.total}.`,`ディーラーは${dv.total}です`));
+      const s17=dv.total===17&&dv.soft;
+      if(dv.total<17)return E('dealerHit','dealer',`ディーラー合計${softText(G.dealer.cards)}。16以下は必ずヒットです。`,C(`Dealer ${softEn(G.dealer.cards)}, taking a card.`,`ディーラー${softText(G.dealer.cards)}、1枚引きます`));
+      if(s17&&G.rule==='H17')return E('dealerHit','dealer','ディーラー合計ソフト17。H17ルールではソフト17もヒットです。',C('Dealer soft 17, taking a card.','ディーラーソフト17、1枚引きます'));
+      return E('dealerEnd','dealer',`ディーラー合計${softText(G.dealer.cards)}。${s17?'S17ルールではソフト17でスタンド':'17以上はスタンド'}のため、ドロー終了です。`,C(`Dealer stands on ${dv.total}.`,`ディーラーは${dv.total}でスタンドです`));
+    }
+    case 'settle':{
+      const q=G.settle.queue[G.settle.idx],h=G.seats[q.s].hands[q.h],lbl=handName(G,q.s,q.h);
+      if(!G.settle.selected)return E('select','settle',`精算はサードベース側（ディーラーから見て右端）から順に行います。次は${lbl}です。`,null,{arg:`s${q.s}h${q.h}`});
+      return settleOutcome(G,h,lbl);
+    }
+  }
+  return null;
+}
+function settleOutcome(G,h,lbl){
+  const pv=handValue(h.cards).total,dv=handValue(G.dealer.cards).total;
+  const dbl=h.doubled?`（ダブルダウン後のベット${fmt$(h.bet)}）`:'';
+  const payHint='ベットに対して1:1（ダブルダウン時は増額後のベット）';
+  const WIN=C('Winner.','お客様の勝ちです'),LOSE=C('Dealer wins.','ディーラーの勝ちです'),PUSH=C('Push.','引き分けです');
+  if(G.flags.dealerBJ){
+    if(isBJ(h))return E('push','settle',`${lbl}：プレイヤーもブラックジャックのため、プッシュ（元金返還）です。`,PUSH);
+    return E('collect','settle',`${lbl}：ディーラーがブラックジャックのため、ベットを回収します。`,LOSE);
+  }
+  if(dv>21)return E('pay','settle',`${lbl}：ディーラーがバスト。残っているハンドは1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額'});
+  if(pv>dv)return E('pay','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}でプレイヤーの勝ち。1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額'});
+  if(pv<dv)return E('collect','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}でディーラーの勝ち。ベットを回収します。`,LOSE);
+  return E('push','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}で同点。プッシュ（ベットはそのまま）です。`,PUSH);
+}
+
+function seekTurn(G,s,h){
+  while(true){
+    if(s>=G.seats.length){G.phase='dealer';return;}
+    const hs=G.seats[s].hands;
+    if(h<hs.length){
+      if(hs[h].status==='active'){
+        G.turn={s,h};const hh=hs[h];
+        if(hh.cards.length>=2&&!isBJ(hh)){
+          const multi=hs.length>1;
+          setCaption(G,C(`Seat ${s+1}${multi?`, hand ${h+1}`:''}, ${softEn(hh.cards)}.`,`${s+1}番席${multi?`（${h+1}手目）`:''}、${softText(hh.cards)}です`));
+        }
+        return;
+      }
+      h++;continue;
+    }
+    s++;h=0;
+  }
+}
+function nextHand(G){seekTurn(G,G.turn.s,G.turn.h+1);}
+const NO_SETTLE=['bust','bjpaid','evenpaid','surrender'];
+function goSettle(G){
+  const queue=[];
+  for(let s=G.seats.length-1;s>=0;s--){const hs=G.seats[s].hands;for(let h=hs.length-1;h>=0;h--){if(!NO_SETTLE.includes(hs[h].status))queue.push({s,h});}}
+  G.phase='settle';G.settle={queue,idx:0,selected:false};
+  if(queue.length===0)finishRound(G);
+}
+function settleNext(G){G.settle.idx++;G.settle.selected=false;if(G.settle.idx>=G.settle.queue.length)finishRound(G);}
+function finishRound(G){
+  G.phase='done';G.lastFb=null;
+  addLog(G,{t:'info',el:`ラウンド${G.roundNo}終了（正解${G.round.ok}／ミス${G.round.err}）`});
+}
+
+function apply(G,ex,amount){
+  const k=ex.key;let extra='',cap=ex.call;
+  const done=()=>{addLog(G,okEntry(G,ex,amount,extra,cap));};
+  switch(k){
+    case 'start':startRound(G);return;
+    case 'closeBets':G.phase='deal';break;
+    case 'burn':draw(G);G.burned++;G.needBurn=false;G.lastCard=0;done();return;
+    case 'deal':{
+      const t=ex.arg,c=draw(G);
+      if(t==='dUp'||t==='dDown')G.dealer.cards.push(c);else G.seats[+t.slice(1)].hands[0].cards.push(c);
+      G.dealIdx++;
+      if(G.dealIdx>=G.dealSeq.length){G.phase='check';addLog(G,{t:'info',el:'配布完了'});}
+      return;
+    }
+    case 'offerIns':{
+      G.flags.insOffered=true;const took=[];
+      G.seats.forEach((s,i)=>{const h=s.hands[0];
+        if(isBJ(h)){if(Math.random()<0.5){s.even=true;took.push(`${i+1}番席 イーブンマネー`);}}
+        else if(Math.random()<0.35){s.ins=h.bet/2;took.push(`${i+1}番席 保険${fmt$(s.ins)}`);}});
+      extra=took.length?`（${took.join('、')}）`:'（希望する席はありません）';break;
+    }
+    case 'payEven':G.flags.evenPaid=true;G.seats.forEach(s=>{if(s.even){const h=s.hands[0];h.status='evenpaid';h.result='even';h.paid=h.bet;}});break;
+    case 'peek':G.flags.peeked=true;G.flags.dealerBJ=handValue(G.dealer.cards).total===21;extra=G.flags.dealerBJ?'→ ブラックジャックです':'→ ブラックジャックではありません';break;
+    case 'reveal':G.dealer.holeUp=true;G.lastCard=G.dealer.cards[1].id;
+      if(G.phase==='check'&&!anyIns(G)){done();goSettle(G);return;}break;
+    case 'payIns':G.flags.insResolved=true;G.seats.forEach(s=>{if(s.ins>0)s.insResult='win';});done();goSettle(G);return;
+    case 'collectIns':G.flags.insResolved=true;G.seats.forEach(s=>{if(s.ins>0)s.insResult='lose';});break;
+    case 'toPlayers':done();G.phase='play';seekTurn(G,0,0);return;
+    case 'hit':{
+      const h=curHand(G);h.cards.push(draw(G));h.decision=null;const v=handValue(h.cards);
+      extra=`→ ${softText(h.cards)}`;cap=C(`${cap.en} ${v.total>21?v.total:softEn(h.cards)}.`,`${cap.ja}（${softText(h.cards)}）`);done();
+      if(v.total>21)return;
+      if(h.splitAces&&h.cards.length===2){h.status='stand';addLog(G,{t:'info',el:'スプリットしたAには1枚のみ。次の手へ進みます。'});nextHand(G);return;}
+      if(v.total===21){h.status='stand';addLog(G,{t:'info',el:'21のため自動的に次の手へ進みます。'});nextHand(G);}
+      return;
+    }
+    case 'stand':curHand(G).status='stand';done();nextHand(G);return;
+    case 'double':{
+      const h=curHand(G);h.bet*=2;h.doubled=true;h.cards.push(draw(G));h.decision=null;
+      extra=`→ ${softText(h.cards)}`;cap=C(`${cap.en} ${softEn(h.cards)}.`,`${cap.ja}（${softText(h.cards)}）`);done();
+      if(handValue(h.cards).total<=21){h.status='stand';nextHand(G);}
+      return;
+    }
+    case 'split':{
+      const s=G.seats[G.turn.s],h=curHand(G),aces=h.cards[0].r==='A';
+      s.hands.splice(G.turn.h,1,newHand(h.bet,[h.cards[0]],{fromSplit:true,splitAces:aces}),newHand(h.bet,[h.cards[1]],{fromSplit:true,splitAces:aces}));
+      break;
+    }
+    case 'surrender':{const h=curHand(G);h.status='surrender';h.result='surrender';h.paid=amount;done();nextHand(G);return;}
+    case 'bust':{const h=curHand(G);h.status='bust';h.result='lose';done();nextHand(G);return;}
+    case 'payBJ':{const h=curHand(G);h.status='bjpaid';h.paid=amount;h.result='bj';done();nextHand(G);return;}
+    case 'dealerHit':{G.dealer.cards.push(draw(G));extra=`→ ${softText(G.dealer.cards)}`;cap=C(`${cap.en} ${softEn(G.dealer.cards)}.`,`${cap.ja}（${softText(G.dealer.cards)}）`);break;}
+    case 'dealerEnd':done();goSettle(G);return;
+    case 'select':G.settle.selected=true;return;
+    case 'pay':case 'collect':case 'push':{
+      const q=G.settle.queue[G.settle.idx],h=G.seats[q.s].hands[q.h];
+      h.result=k==='pay'?'win':k==='collect'?'lose':'push';if(k==='pay')h.paid=amount;h.status='settled';
+      done();settleNext(G);return;
+    }
+  }
+  done();
+}
+function okEntry(G,ex,amount,extra,cap){
+  setCaption(G,cap);
+  return{t:'ok',el:LABEL[ex.key]+(amount!==undefined?`：${fmt$(amount)}`:'')+(extra?` ${extra}`:''),call:cap&&cap.en?cap:null};
+}
+function recordErr(G,cat,why,fbText){
+  G.round.err++;G.round.errors.push({cat,why});
+  G.lastFb={t:'err',text:fbText||('ミス：'+why)};
+  addLog(G,{t:'err',el:`ミス（${CAT_NAME[cat]}）`,why:fbText||why});
+}
+/* 戻り値：{cat, ok} 採点対象外は null */
+function act(G,key,arg){
+  if(G.pending){
+    const p=G.pending;
+    if(key==='chip'){const d=+arg;if(CHIPS.includes(d)&&p.chips.length<200)p.chips.push(d);return null;}
+    if(key==='chipUndo'){p.chips.pop();return null;}
+    if(key==='chipClear'){p.chips=[];return null;}
+    if(key!=='chipPay')return null;
+    const sum=p.chips.reduce((a,b)=>a+b,0);
+    if(Math.abs(sum-p.ex.amount)<0.001){
+      const min=minChips(p.ex.amount),used=p.chips.slice();
+      G.pending=null;G.round.ok++;
+      apply(G,p.ex,sum);
+      if(used.length>min.length){
+        const note=`${LABEL[p.ex.key]} ${fmt$(sum)}：金額は正解。ただし最少枚数は${min.length}枚（${chipsText(min)}）。今回は${used.length}枚（${chipsText(used)}）。`;
+        G.round.notes.push(note);G.lastFb={t:'warn',text:note};
+      }else{
+        G.lastFb=G.phase==='done'?null:{t:'ok',text:`正解：${fmt$(sum)}（${chipsText(used)}）`};
+      }
+      return{cat:'pay',ok:true};
+    }
+    recordErr(G,'pay',p.ex.why,`金額が違います（出したチップ：${fmt$(sum)}）。${p.ex.hint}。`);
+    return{cat:'pay',ok:false};
+  }
+  const ex=expected(G);if(!ex)return null;
+  if(ex.unscored){if(key==='start'){apply(G,ex);G.lastFb=null;}return null;}
+  if(key===ex.key&&(ex.arg===undefined||ex.arg===arg)){
+    G.round.ok++;
+    if(ex.amount!==undefined){
+      G.pending={ex,chips:[]};
+      G.lastFb={t:'info',text:`${LABEL[ex.key]}：チップトレイから${ex.amountLabel==='回収する金額'?'回収する':'支払う'}チップを出して確定してください。`};
+      return{cat:ex.cat,ok:true};
+    }
+    G.lastFb=(ex.key==='deal'||ex.key==='select')?null:{t:'ok',text:`正解：${LABEL[ex.key]}`};
+    apply(G,ex);
+    return{cat:ex.cat,ok:true};
+  }
+  recordErr(G,ex.cat,ex.why);
+  return{cat:ex.cat,ok:false};
+}
+/*ENGINE_END*/
+
+/* ===== UI ===== */
+const STORE_OPTS='dsim_bj_opts',STORE_STATS='dsim_bj_stats';
+function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d;}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function emptyStats(){const c={};Object.keys(CAT_NAME).forEach(k=>c[k]={ok:0,ng:0});return{rounds:0,cats:c};}
+let STATS=load(STORE_STATS,emptyStats());
+Object.keys(CAT_NAME).forEach(k=>{if(!STATS.cats[k])STATS.cats[k]={ok:0,ng:0};});
+const G=createGame(load(STORE_OPTS,{}));
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function cardHTML(c,o){
+  o=o||{};const nw=c.id===G.lastCard?' new':'';
+  if(o.back)return `<div class="card back${nw}" aria-label="裏向きのカード"></div>`;
+  const red=c.s==='♥'||c.s==='♦';
+  return `<div class="card${red?' red':''}${o.side?' side':''}${nw}" aria-label="${c.s}${c.r}"><span class="cr">${c.r}</span><span class="cs">${c.s}</span></div>`;
+}
+function totalLabel(cards,h){
+  if(!cards.length)return '';
+  if(h&&isBJ(h))return 'BJ';
+  const v=handValue(cards);
+  if(v.soft&&v.total<21)return `${v.total-10} / ${v.total}`;
+  return v.total>21?`${v.total}<span class="sub"> バスト</span>`:String(v.total);
+}
+function chipClass(x){return x>=50?'c-orange':x>=25?'c-green':'c-red';}
+
+function renderMeta(){
+  const t=Object.values(STATS.cats).reduce((a,c)=>({ok:a.ok+c.ok,ng:a.ng+c.ng}),{ok:0,ng:0});
+  const pct=t.ok+t.ng?Math.round(t.ok/(t.ok+t.ng)*100)+'%':'—';
+  $('meta').innerHTML=`<span><i class="lg">ラウンド</i><i class="sm">R</i><b>${G.roundNo}</b></span><span><i class="lg">今回の</i>ミス<b>${G.round?G.round.err:0}</b></span><span><i class="lg">通算</i>正答率<b>${pct}</b></span>`;
+}
+
+function renderTable(){
+  const ex=G.pending?null:expected(G);
+  const dc=G.dealer.cards;
+  const dCards=dc.map((c,i)=>i===1&&!G.dealer.holeUp?cardHTML(c,{back:true}):cardHTML(c)).join('');
+  let dTotal='';
+  if(G.opts.showTotals&&dc.length)dTotal=G.dealer.holeUp?totalLabel(dc):`アップ ${totalLabel([dc[0]])}`;
+  const rule=G.phase==='idle'?G.opts.rule:G.rule;
+  const ruleSub=rule==='H17'?'Dealer must hit soft 17':'Dealer must draw to 16 and stand on all 17s';
+  const n=G.seats.length||G.opts.players;
+  let seatsHTML='';
+  for(let i=0;i<n;i++){
+    const mid=(n-1)/2,d=mid?((i-mid)/mid):0,dy=Math.round((1-d*d)*26);
+    const s=G.seats[i],nm=seatName(n,i);
+    const head=`<div class="seat-no">${nm.no}<small>${nm.tag||'&nbsp;'}</small></div>`;
+    if(!s){seatsHTML+=`<div class="seat" style="--dy:${dy}px">${head}<div class="empty-seat">ベット待ち</div></div>`;continue;}
+    const seatActive=G.phase==='play'&&G.turn.s===i;
+    const seatClick=G.phase==='deal';
+    let hands='';
+    s.hands.forEach((h,j)=>{
+      const sq=G.phase==='settle'&&G.settle.selected?G.settle.queue[G.settle.idx]:null;
+      const active=(seatActive&&G.turn.h===j)||(sq&&sq.s===i&&sq.h===j);
+      const handClick=G.phase==='settle'&&!G.pending;
+      const resolved=['bust','bjpaid','settled','evenpaid','surrender'].includes(h.status);
+      const cards=h.cards.map((c,ci)=>cardHTML(c,{side:h.doubled&&ci===h.cards.length-1})).join('');
+      let st='';
+      if(h.status==='bust')st='バスト（回収済み）';
+      else if(h.status==='bjpaid')st=`BJ ${fmt$(h.paid)} 支払済み`;
+      else if(h.status==='evenpaid')st=`イーブンマネー ${fmt$(h.paid)} 支払済み`;
+      else if(h.status==='surrender')st=`サレンダー ${fmt$(h.paid)} 回収`;
+      else if(h.result==='win')st=`勝ち ${fmt$(h.paid)} 支払済み`;
+      else if(h.result==='lose')st='回収済み';
+      else if(h.result==='push')st='プッシュ';
+      else if(h.status==='stand')st=h.doubled?'ダブル済み':'スタンド';
+      const chip=`<div class="bet-spot"><div class="chip ${h.doubled?'c-dbl':chipClass(h.bet)}">${fmt$(h.bet)}</div></div>`;
+      const tot=G.opts.showTotals&&h.cards.length?`<div class="htotal">${totalLabel(h.cards,h)}</div>`:'<div class="htotal" style="background:none"></div>';
+      const attrs=handClick?` data-act="select" data-arg="s${i}h${j}" tabindex="0" role="button" aria-label="${i+1}番席${s.hands.length>1?`の${j+1}手目`:''}を精算"`:'';
+      const nc=h.cards.length,many=nc>=5?' many5':nc>=4?' many4':nc>=3?' many3':'';
+      st=st.replace(/（(.+?)）/,'<span class="sub">（$1）</span>');
+      hands+=`<div class="hand${active?' active':''}${handClick?' clickable':''}${resolved?' resolved':''}"${attrs}><div class="cards${many}">${cards}</div>${tot}${chip}<div class="hstatus">${st}</div></div>`;
+    });
+    let signal='';
+    if(seatActive&&ex&&SIG[ex.key]&&curHand(G).decision===ex.key){
+      signal=`<div class="signal">${G.opts.showSignalNames?`<b>${SIG[ex.key].name}</b>`:''}${SIG[ex.key].text}</div>`;
+    }
+    let side='';
+    if(s.ins>0)side+=`<div class="ins-chip">保険 ${fmt$(s.ins)}${s.insResult==='win'?' 支払済み':s.insResult==='lose'?' 回収済み':''}</div>`;
+    if(s.even&&s.hands[0].status!=='evenpaid')side+=`<div class="ins-chip">イーブンマネー希望</div>`;
+    const sAttrs=seatClick?` data-act="deal" data-arg="s${i}" tabindex="0" role="button" aria-label="${i+1}番席に配る"`:'';
+    seatsHTML+=`<div class="seat${seatActive?' active':''}${seatClick?' clickable':''}" style="--dy:${dy}px"${sAttrs}>${head}<div class="hands">${hands}</div>${side}${signal}</div>`;
+  }
+  $('table').innerHTML=`
+    ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
+    <div class="shoe-info">シュー残り ${G.shoe.length}枚／バーン ${G.burned}枚</div>
+    <div class="dealer-zone"><div class="zone-label">ディーラー</div><div class="cards">${dCards}</div><div class="dtotal"${dTotal?'':' style="background:none"'}>${dTotal}</div></div>
+    <div class="print"><div class="print-main">BLACKJACK PAYS 3 TO 2</div><div class="print-sub">${ruleSub}</div><div class="print-ins">INSURANCE PAYS 2 TO 1</div></div>
+    <div class="seats">${seatsHTML}</div>`;
+}
+
+let VOICE_EN=null,VOICE_JA=null;
+function pickVoices(){
+  if(!('speechSynthesis' in window))return;
+  const vs=speechSynthesis.getVoices();
+  VOICE_EN=vs.find(v=>/^en[-_]US/i.test(v.lang)&&/Google|Aria|Jenny|Samantha|Zira|Natural/i.test(v.name))||vs.find(v=>/^en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;
+  VOICE_JA=vs.find(v=>/^ja/i.test(v.lang))||null;
+}
+if('speechSynthesis' in window){pickVoices();speechSynthesis.onvoiceschanged=pickVoices;}
+function speak(list){
+  if(!G.opts.voice||!('speechSynthesis' in window)||!list.length)return;
+  try{
+    speechSynthesis.cancel();
+    list.forEach(c=>{
+      let u;
+      if(VOICE_EN||!VOICE_JA){u=new SpeechSynthesisUtterance(c.en);u.lang='en-US';if(VOICE_EN)u.voice=VOICE_EN;}
+      else{u=new SpeechSynthesisUtterance(c.ja);u.lang='ja-JP';u.voice=VOICE_JA;}
+      u.rate=0.95;speechSynthesis.speak(u);
+    });
+  }catch(e){}
+}
+let capShown=null;
+function renderCaption(){
+  const el=$('caption'),batch=G.capQueue.splice(0);
+  if(batch.length){capShown=batch.slice(-2);speak(batch);}
+  const list=capShown||[G.caption];
+  const en=list.map(c=>c.en).filter(Boolean).join(' '),ja=list.map(c=>c.ja).filter(Boolean).join('／');
+  const on=G.opts.voice,has='speechSynthesis' in window;
+  el.innerHTML=`<span class="who">ディーラー</span><div class="en" lang="en">${en?esc(en):'&nbsp;'}</div><div class="ja">${esc(ja)}</div>${has?`<button class="cap-voice${on?' on':''}" data-act="toggleVoice" aria-pressed="${on}">${on?'音声ON':'音声OFF'}</button>`:''}`;
+  if(batch.length){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+}
+
+function btn(key,label,cls){return `<button class="act${cls?' '+cls:''}" data-act="${key}">${String(label).replace(/（(.+?)）/,'<span class="sub">（$1）</span>')}</button>`;}
+
+function renderConsole(){
+  const P={idle:'待機中',bet:'ベット受付',deal:'カード配布',check:'アップカードの確認',play:'プレイヤーのアクション',dealer:'ディーラーのターン',settle:'精算',done:'ラウンド終了'};
+  let prompt='',actions='';
+  const fb=G.lastFb?`<div class="fb ${G.lastFb.t}">${esc(G.lastFb.text)}</div>`:'';
+  if(G.pending){
+    const p=G.pending,sum=p.chips.reduce((a,b)=>a+b,0),verb=p.ex.amountLabel==='回収する金額'?'回収':'支払い';
+    prompt=`チップトレイから${verb}のチップを出してください`;
+    const stack=p.chips.length?p.chips.map(d=>`<span class="mini-chip ch-${d}">${d}</span>`).join(''):'<span class="stack-empty">まだチップがありません</span>';
+    const total=G.opts.showTotals?`<div class="stack-total">合計 <b>${fmt$(sum)}</b>／${p.chips.length}枚</div>`:`<div class="stack-total">${p.chips.length}枚</div>`;
+    actions=`<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
+      <div class="stack"><div class="stack-row">${stack}</div>${total}</div>
+      <div class="actions chip-acts">${btn('chipUndo','1枚戻す')}${btn('chipClear','すべて戻す')}${btn('chipPay',`${verb}を確定する`,'primary')}</div>`;
+  }else switch(G.phase){
+    case 'idle':
+      prompt='ラウンドを開始して、プレイヤーにベットを促してください。';
+      actions=btn('start','ラウンドを開始（ベットを募る）','primary');break;
+    case 'bet':
+      prompt='プレイヤーのベットが揃いました。次の手順を選んでください。';
+      actions=btn('closeBets',LABEL.closeBets)+btn('burn',LABEL.burn)+btn('deal:dUp','ディーラーに表向きで配る');break;
+    case 'deal':
+      prompt='手順どおりにカードを配ってください。席をクリックするとその席に1枚配ります。';
+      actions=btn('burn',LABEL.burn)+btn('deal:dUp','ディーラーに表向きで配る')+btn('deal:dDown','ディーラーに裏向きで配る');break;
+    case 'check':
+      prompt='アップカードを確認し、次の手順を選んでください。';
+      actions=['offerIns','payEven','peek','reveal','collectIns','payIns','toPlayers'].map(k=>btn(k,LABEL[k])).join('');break;
+    case 'play':
+      {const ex=expected(G),h=curHand(G);
+       const sig=ex&&SIG[ex.key]&&h.decision===ex.key?`<span class="mob-signal">合図：${G.opts.showSignalNames?`<b>${SIG[ex.key].name}</b>／`:''}${SIG[ex.key].text}</span>`:'';
+       prompt=`${handName(G,G.turn.s,G.turn.h)}に対応してください。${sig}`;}
+      actions=['hit','stand','double','split','surrender','bust','payBJ'].map(k=>btn(k,LABEL[k])).join('');break;
+    case 'dealer':
+      prompt='ディーラーの手順を選んでください。';
+      actions=['reveal','dealerHit','dealerEnd'].map(k=>btn(k,LABEL[k])).join('');break;
+    case 'settle':
+      prompt=G.settle.selected?'選んだ手の精算方法を選んでください。':'精算する手をテーブル上でクリックしてください。';
+      actions=G.settle.selected?['pay','collect','push'].map(k=>btn(k,LABEL[k])).join(''):'';break;
+    case 'done':{
+      const r=G.round;
+      const errs=r.errors.length?`<ul>${r.errors.map(e=>`<li>【${CAT_NAME[e.cat]}】${esc(e.why)}</li>`).join('')}</ul>`:'<p>ミスなし。全手順を正しく進行できました。</p>';
+      const rows=Object.entries(STATS.cats).map(([k,c])=>{const t=c.ok+c.ng;return `<tr><td>${CAT_NAME[k]}</td><td>${c.ok}</td><td>${c.ng}</td><td>${t?Math.round(c.ok/t*100)+'%':'—'}</td></tr>`;}).join('');
+      const notes=r.notes.length?`<div class="phase">チップの出し方（減点なし）</div><ul>${r.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:'';
+      prompt=`<div class="summary"><div class="next-top">${btn('start','次のラウンドへ','primary')}</div><h3>ラウンド${r.no} 終了：正解${r.ok}／ミス${r.err}</h3>${errs}${notes}<div class="phase stats-label">通算成績（カテゴリ別）</div><table class="stat-table"><thead><tr><th>カテゴリ</th><th>正解</th><th>ミス</th><th>正答率</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      actions=btn('start','次のラウンドへ','primary');break;
+    }
+  }
+  const wrapActs=G.pending?actions:`<div class="actions">${actions}</div>`;
+  $('console').innerHTML=`<div class="phase">${P[G.phase]}</div>${G.phase==='done'&&!G.pending?prompt:`<div class="prompt">${prompt}</div>`}${fb}${wrapActs}`;
+}
+
+function renderLog(){
+  const items=G.log.map(e=>`<div class="entry ${e.t}"><span class="el">${esc(e.el)}</span>${e.call?`<span class="call" lang="en">${esc(e.call.en)}</span><span class="callja">${esc(e.call.ja)}</span>`:''}${e.why?`<span class="why">${esc(e.why)}</span>`:''}</div>`).join('');
+  $('log').innerHTML=`<h2>進行ログ</h2>${items||'<div class="log-empty">ラウンドを開始すると、操作の結果と発声がここに表示されます。</div>'}`;
+}
+
+function renderSettings(){
+  const o=G.opts,hasTTS='speechSynthesis' in window;
+  $('settings').innerHTML=`<h3>設定</h3>
+    <div class="row"><label for="optPlayers">プレイヤー人数</label><select id="optPlayers">${[1,2,3,4,5].map(n=>`<option value="${n}"${o.players===n?' selected':''}>${n}人</option>`).join('')}</select></div>
+    <div class="row"><label for="optRule">ディーラールール</label><select id="optRule"><option value="S17"${o.rule==='S17'?' selected':''}>S17（ソフト17でスタンド）</option><option value="H17"${o.rule==='H17'?' selected':''}>H17（ソフト17でヒット）</option></select></div>
+    <div class="row"><label for="optTotals">合計点を表示</label><input type="checkbox" id="optTotals"${o.showTotals?' checked':''}></div>
+    <div class="row"><label for="optSig">合図の名称を表示</label><input type="checkbox" id="optSig"${o.showSignalNames?' checked':''}></div>
+    <div class="row"><label for="optSpeech">発声を読み上げる${hasTTS?'':'（このブラウザは非対応）'}</label><input type="checkbox" id="optSpeech"${o.voice?' checked':''}${hasTTS?'':' disabled'}></div>
+    <p class="note">人数とルールは次のラウンドから反映されます。慣れてきたら「合計点」「合図の名称」をオフにしてください。</p>
+    <p class="note">テーブルルール：6デッキ、シュー開始時にバーン1枚、レイトサレンダー、ダブルダウンは最初の2枚（スプリット後も可）、リスプリットは最大${MAX_HANDS}手（Aは不可）、スプリットしたAは1枚のみ。</p>
+    <button class="danger" data-act="resetStats">通算成績をリセット</button>`;
+}
+
+function render(){renderMeta();renderTable();renderCaption();renderConsole();renderLog();G.lastCard=0;}
+
+function doAct(key,arg){
+  const prevPhase=G.phase,prevPending=!!G.pending;
+  const r=act(G,key,arg);
+  if(r){STATS.cats[r.cat][r.ok?'ok':'ng']++;}
+  if(G.phase==='done'&&!G._counted){STATS.rounds++;G._counted=true;}
+  if(G.phase!=='done')G._counted=false;
+  save(STORE_STATS,STATS);render();
+  if((G.phase==='done'&&prevPhase!=='done')||(G.pending&&!prevPending)){
+    const el=G.pending?document.querySelector('.tray'):$('console');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act;
+  if(a==='toggleSettings'){const p=$('settings');p.hidden=!p.hidden;$('btnSettings').setAttribute('aria-expanded',String(!p.hidden));if(!p.hidden)renderSettings();return;}
+  if(a==='toggleVoice'){
+    G.opts.voice=!G.opts.voice;save(STORE_OPTS,G.opts);
+    if('speechSynthesis' in window){if(G.opts.voice){capShown=null;speak([G.caption].filter(c=>c.en).length?[G.caption]:[C('Voice on.','音声をオンにしました')]);}else speechSynthesis.cancel();}
+    renderCaption();return;
+  }
+  if(a==='resetStats'){if(confirm('通算成績をリセットします。よろしいですか？')){STATS=emptyStats();save(STORE_STATS,STATS);render();}return;}
+  if(a.startsWith('deal:')){doAct('deal',a.slice(5));return;}
+  doAct(a,el.dataset.arg);
+});
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('.seat[data-act],.hand[data-act]')){e.preventDefault();e.target.click();}
+});
+document.addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='optPlayers')G.opts.players=+e.target.value;
+  else if(id==='optRule')G.opts.rule=e.target.value;
+  else if(id==='optTotals')G.opts.showTotals=e.target.checked;
+  else if(id==='optSig')G.opts.showSignalNames=e.target.checked;
+  else if(id==='optSpeech'){G.opts.voice=e.target.checked;if(!G.opts.voice&&'speechSynthesis' in window)speechSynthesis.cancel();}
+  else return;
+  save(STORE_OPTS,G.opts);render();
+});
+render();
+
+</script>
+</body>
+</html>
