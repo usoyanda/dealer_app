@@ -234,10 +234,6 @@ button{font:inherit}
   .felt.has-dealer{padding-top:88px}
   .dl-replay{font-size:11px;padding:3px 9px;left:8px;top:8px}
 }
-@media (prefers-reduced-motion:reduce){
-  .spinning #wheelGroup,.spinning #ballGroup,.chip.late,.result-plate,.cell.win-cell{animation:none}
-  .caption.flash .en,.caption.flash .ja{animation:none}
-}
 </style>
 </head>
 <body>
@@ -631,7 +627,9 @@ function buildWheel(){
 /* ===== ディーラー：骨格アニメーション =====
    手先をテーブル上の実座標（ホイール／当選セル／ゾーン／チップ）へ運び、
    肩から肘・手首を逆運動学で描く。所作ごとの「どこへ・どの向きに」を可視化する。 */
-const REDUCED=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches);
+/* このアプリの目的は所作を映像として見て覚えること。OS側の「アニメーション削減」設定に
+   関わらず、ディーラーの動きは常に再生する。 */
+const REDUCED=false;
 const HAND_MARKUP=`
   <g class="dl-hand">
     <g class="hand-shape">
