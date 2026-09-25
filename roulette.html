@@ -726,10 +726,14 @@ const Dealer={
     this.band=parseFloat(getComputedStyle(host).paddingTop)||110;
     this.svg.setAttribute('viewBox',`0 0 ${this.W} ${this.H}`);
     this.s=Math.max(0.5,Math.min(1,(this.band-16)/112));
-    this.cx=this.W*0.5;
+    /* 実物と同じく、ホイールとレイアウトの境目に立たせる（中央に置くと両端まで
+       腕が伸びきってしまうため）。ただし縦積みレイアウト（狭幅）では中央に戻す */
+    const stacked=window.matchMedia('(max-width:760px)').matches;
+    const wc=!stacked&&elRect('.wheel-col');
+    this.cx=wc?(wc.x+wc.w):this.W*0.5;
     const s=this.s;
-    this.armA=Math.max(48,this.H*0.26);
-    this.armB=Math.max(50,this.H*0.28);
+    this.armA=Math.max(52,this.H*0.3);
+    this.armB=Math.max(56,this.H*0.32);
     this.shL={x:this.cx-46*s,y:78*s+4};
     this.shR={x:this.cx+46*s,y:78*s+4};
     const rw=126*s,rh=18*s;
@@ -766,8 +770,8 @@ const Dealer={
     const reach=(this.armA+this.armB)*0.98;
     const dL=Math.hypot(p.lx-this.shL.x,p.ly-this.shL.y),dR=Math.hypot(p.rx-this.shR.x,p.ry-this.shR.y);
     const need=Math.max(dL-reach,dR-reach,0);
-    const leanY=Math.min(20,need*0.5);
-    const midX=(p.lx+p.rx)/2,leanX=Math.max(-26,Math.min(26,(midX-this.cx)*0.22));
+    const leanY=Math.min(34,need*0.5);
+    const midX=(p.lx+p.rx)/2,leanX=Math.max(-88,Math.min(88,(midX-this.cx)*0.4));
     const s=this.s;
     this.q.bust.setAttribute('transform',`translate(${this.cx+leanX} ${leanY}) scale(${s})`);
     this.q.head.setAttribute('transform',`rotate(${p.nod*7} 0 54) translate(0 ${p.nod*3})`);
@@ -779,6 +783,11 @@ const Dealer={
 
   drawArm(side,S,Hd,sign,p){
     const A=this.q.arm[side];
+    /* 手先は肩からの実際の可動範囲より外へは出さない（届かない距離に置くと
+       腕だけが伸びきる「ゴムゴムの実」状態になるため、届く位置で止める） */
+    const reach=(this.armA+this.armB)*0.97;
+    const hdx=Hd.x-S.x,hdy=Hd.y-S.y,hdd=Math.hypot(hdx,hdy);
+    if(hdd>reach){const k=reach/hdd;Hd={x:S.x+hdx*k,y:S.y+hdy*k};}
     const E=this.ik(S,Hd,this.armA,this.armB,sign);
     const d=`M ${S.x} ${S.y} L ${E.x} ${E.y} L ${Hd.x} ${Hd.y}`;
     A.out.setAttribute('d',d);A.sleeve.setAttribute('d',d);A.hi.setAttribute('d',d);
