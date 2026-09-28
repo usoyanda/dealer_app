@@ -118,13 +118,14 @@ button{font:inherit}
 .cell-num.is-red{background:var(--rred)}
 .cell-num.is-black{background:var(--rblk)}
 .cell-201{grid-column:14/15;background:transparent;font-family:inherit;font-size:11px;gap:2px}
-.cell-201 .label{position:absolute;top:1px;left:4px;font-size:9px;opacity:.6}
+.cell-201 .label{position:absolute;top:1px;left:4px;font-size:9px;opacity:.6;pointer-events:none}
 .row-dozens,.row-outside{display:grid;gap:2px;margin-top:2px}
 .row-dozens,.row-outside{margin-left:calc((100% - 26px)/14 + 2px);width:calc((100% - 26px)/14*12 + 22px)}
 .row-dozens{grid-template-columns:1fr 1fr 1fr}
 .row-outside{grid-template-columns:repeat(6,1fr)}
 .box{background:transparent;border:1px solid rgba(250,247,239,.35);border-radius:3px;color:#F4EFE2;min-height:36px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:bold;padding:2px;position:relative}
-.box .bl{position:absolute;top:2px;left:5px;font-size:10px;opacity:.7;font-weight:normal}
+/* ラベルはチップのタップを邪魔しないようクリック透過にする */
+.box .bl{position:absolute;top:2px;left:5px;font-size:10px;opacity:.7;font-weight:normal;pointer-events:none}
 .box.b-red{background:rgba(179,38,30,.75)}
 .box.b-black{background:rgba(27,27,27,.75)}
 .zone-hl{outline:2px dashed var(--brass);outline-offset:3px;border-radius:5px;background:rgba(201,162,75,.10)}
@@ -244,9 +245,52 @@ button{font:inherit}
   .next-top{display:none}
   .log{max-height:none}
 }
+/* ===== スマホ：選択肢まで1画面に収める圧縮レイアウト =====
+   縦積みだとホイールとレイアウトで画面の大半を使ってしまうため、
+   横並びに変えて高さを半分以下にする。 */
 @media (max-width:600px){
-  .felt.has-dealer{padding-top:88px}
-  .dl-replay{font-size:11px;padding:3px 9px;left:8px;top:8px}
+  .felt{grid-template-columns:96px minmax(0,1fr);gap:6px;padding:6px 6px 8px;border-width:7px;border-radius:10px}
+  .felt.has-dealer{padding-top:66px}
+  .dl-replay{font-size:10px;padding:2px 8px;left:7px;top:6px}
+  .wheel-col{gap:3px}
+  .wheel-wrap{max-width:92px}
+  .wheel-note{font-size:9px;line-height:1.2}
+  .result-plate{padding:3px 5px 4px;border-width:1px;border-radius:7px;margin-top:1px}
+  .rp-cap{font-size:8px}
+  .rp-num{font-size:26px;line-height:1}
+  .rp-meta,.rp-wait{font-size:8.5px;line-height:1.2}
+  .dolly-badge{font-size:9px;padding:1px 5px}
+  .zone-tag{display:none}
+  .lay-scroll{overflow:visible;padding:0}
+  .lay{min-width:0;width:100%}
+  .grid-main{grid-template-rows:repeat(3,26px);gap:1px}
+  .cell{font-size:10px;border-radius:2px}
+  .cell-201{font-size:8px}
+  .cell-201 .label{display:none}
+  .row-dozens,.row-outside{gap:1px;margin-top:1px;margin-left:calc((100% - 13px)/14 + 1px);width:calc((100% - 13px)/14*12 + 11px)}
+  .box{min-height:22px;font-size:9px;padding:1px;border-radius:2px}
+  .box .bl{font-size:8px;top:0;left:3px}
+  .chip{width:20px;height:20px;font-size:7px;border-width:2px}
+  .dolly,.dolly i{width:13px;height:13px}
+  .seatkey{display:none}
+  .table-next{right:8px;top:8px;font-size:12px;padding:5px 9px}
+  .caption{min-height:0;padding:4px 60px 4px 9px !important}
+  .caption .en{font-size:14px}
+  .caption .ja{font-size:10px}
+  .console{padding:6px 8px 7px}
+  .prompt{font-size:12.5px;margin:0 0 4px}
+  .tray{padding:5px;gap:4px;margin-bottom:5px}
+  .tray-chip{width:42px;height:42px;font-size:10px;border-width:3px}
+  .stack{padding:2px 7px;min-height:30px;margin-bottom:5px}
+  .mini-chip{width:20px;height:20px;font-size:7px}
+  .act{min-height:34px;font-size:11.5px}
+}
+@media (max-width:390px){
+  .felt{grid-template-columns:86px minmax(0,1fr)}
+  .wheel-wrap{max-width:82px}
+  .grid-main{grid-template-rows:repeat(3,23px)}
+  .cell{font-size:9px}
+  .act{min-height:32px;font-size:11px}
 }
 </style>
 </head>
