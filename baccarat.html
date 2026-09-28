@@ -52,7 +52,8 @@ button{font:inherit}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;padding:16px 20px;max-width:1360px;margin:0 auto}
 .main-col{display:flex;flex-direction:column;gap:12px;min-width:0}
 
-.felt{position:relative;background:radial-gradient(ellipse at 50% 20%,var(--felt2),var(--felt) 72%);border:12px solid var(--rail);border-radius:14px;padding:14px 16px 18px;box-shadow:inset 0 0 50px rgba(0,0,0,.35);display:grid;grid-template-columns:124px minmax(0,1fr);gap:14px;align-items:start}
+/* テーブルそのものは SVG が描くので、外枠は台を置く床として控えめにする */
+.felt{position:relative;background:linear-gradient(180deg,#223A33,#16281F);border:10px solid #2A1C12;border-radius:14px;padding:12px 14px 14px;box-shadow:inset 0 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px}
 
 /* ---- dealer figure（骨格アニメーション） ---- */
 .felt.has-dealer{padding-top:134px}
@@ -93,23 +94,40 @@ button{font:inherit}
 .rs-desc{font-size:12px;color:#B8C2CB;margin-top:6px;line-height:1.5}
 .rs-close{margin-top:9px;background:transparent;border:1px solid var(--brass);color:var(--brass);border-radius:16px;padding:4px 16px;font-size:12px;cursor:pointer;pointer-events:auto}
 
-/* ---- シュー ---- */
-.shoe-col{display:flex;flex-direction:column;align-items:center;gap:6px}
-.shoe{width:100%;max-width:112px;background:linear-gradient(160deg,#46301F,#2E1E12);border:2px solid var(--brass);border-radius:8px 8px 4px 4px;padding:8px 6px 6px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.45)}
-.shoe-cap{font-size:9.5px;letter-spacing:.1em;color:var(--brass)}
-.shoe-stack{height:38px;margin:4px 0;border-radius:3px;background:repeating-linear-gradient(90deg,#F4EFE2,#F4EFE2 2px,#C9C2B0 2px,#C9C2B0 3px);border:1px solid #1B1B1B;position:relative;overflow:hidden}
-.shoe-stack i{position:absolute;right:0;top:0;bottom:0;background:#2E1E12;transition:width .4s}
-.shoe-num{font-family:Georgia,serif;font-size:13px;color:#F4EFE2}
-.shoe-num b{color:var(--brass)}
-.shoe-note{color:rgba(250,247,239,.6);font-size:10px;text-align:center;line-height:1.35}
-.discard{width:100%;max-width:112px;border:1px dashed rgba(250,247,239,.4);border-radius:6px;padding:4px;text-align:center;font-size:10px;color:rgba(250,247,239,.7)}
-.discard b{color:#F4EFE2;font-family:Georgia,serif;font-size:13px;display:block}
-.comm-box{width:100%;max-width:112px;border:1.5px solid var(--brass);border-radius:6px;padding:4px;text-align:center;font-size:10px;color:var(--brass);background:rgba(201,162,75,.08)}
-.comm-box b{display:block;font-family:Georgia,serif;font-size:14px;color:#F4EFE2}
+/* ---- ハーフムーン型のテーブル（SVG） ---- */
+.table-wrap{position:relative;width:100%;max-width:680px;margin:0 auto;aspect-ratio:1060/620}
+.table-svg{display:block;width:100%;height:100%}
+.felt-shape{fill:#0F5B44;stroke:var(--rail);stroke-width:14;stroke-linejoin:round}
+.felt-line{stroke:rgba(201,162,75,.35);stroke-width:2}
+.tbox{fill:rgba(0,0,0,.34);stroke:rgba(201,162,75,.6);stroke-width:2}
+.shoe-cards{fill:#F4EFE2;stroke:#1B1B1B;stroke-width:1.5}
+.discard-cards{fill:#8A2530;stroke:#3A0E14;stroke-width:1.5}
+.tbox-cap{fill:var(--brass);font-size:17px;letter-spacing:.12em;text-anchor:middle;font-family:Georgia,serif}
+.tbox-val{fill:#F4EFE2;font-size:21px;text-anchor:middle;font-family:Georgia,serif}
+.comm-cell{fill:rgba(0,0,0,.26);stroke:rgba(250,247,239,.4);stroke-width:1.6}
+.comm-cell.live{stroke:var(--brass);fill:rgba(201,162,75,.14)}
+.comm-n{fill:rgba(250,247,239,.85);font-size:19px;text-anchor:middle;font-family:Georgia,serif}
+.felt-logo{fill:rgba(250,247,239,.22);font-size:34px;letter-spacing:.3em;text-anchor:middle;font-family:Georgia,serif;font-style:italic}
+.sp{stroke:rgba(250,247,239,.55);stroke-width:2.2;fill:rgba(0,0,0,.14)}
+.sp-player{fill:rgba(47,95,179,.4)}
+.sp-banker{fill:rgba(184,58,58,.4)}
+.sp-tie{fill:rgba(46,125,79,.42)}
+.sp-ppair{fill:rgba(47,95,179,.28)}
+.sp-bpair{fill:rgba(184,58,58,.28)}
+.sp-dragon{fill:rgba(201,162,75,.2)}
+.sp.idle{opacity:.42}
+.sp.hl{stroke:var(--brass);stroke-width:5;stroke-dasharray:10 7;filter:drop-shadow(0 0 7px rgba(201,162,75,.9))}
+.sp-lb{fill:rgba(250,247,239,.9);font-size:17px;letter-spacing:.14em;text-anchor:middle;font-family:Georgia,serif;pointer-events:none}
+.sp-lb-dot{font-size:14px;letter-spacing:.06em}
+.seat-num{fill:rgba(250,247,239,.45);font-size:24px;text-anchor:middle;font-family:Georgia,serif}
+.seat-num.live{fill:var(--brass);font-weight:bold}
+.chip-layer{position:absolute;inset:0;pointer-events:none}
+.chip-abs{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
+.chip-abs.pick:hover{transform:translate(-50%,-50%) scale(1.18)}
+.table-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
 .table-next{position:absolute;right:14px;top:12px;z-index:6;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 
 /* ---- ハンド ---- */
-.table-col{min-width:0;display:flex;flex-direction:column;gap:8px}
 .hands{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hand{border:1.5px solid rgba(250,247,239,.32);border-radius:8px;padding:5px 6px 7px;background:rgba(0,0,0,.14);min-height:96px}
 .hand.h-p{border-color:rgba(110,158,235,.6)}
@@ -137,31 +155,22 @@ button{font:inherit}
 @keyframes csq{0%{transform:none}22%{transform:rotate(-16deg) translateY(-5px)}44%{transform:rotate(14deg) translateY(-5px)}62%{transform:rotate(0) scaleX(.16)}63%{transform:rotate(0) scaleX(.16)}100%{transform:none}}
 .card-slot{width:44px;height:62px;border:1px dashed rgba(250,247,239,.24);border-radius:5px;flex:none}
 
-/* ---- 席とベット枠 ---- */
-.seats{display:flex;flex-direction:column;gap:5px}
-.seat{display:grid;grid-template-columns:52px minmax(0,1fr);gap:6px;align-items:center}
-.seat-no{font-size:10px;color:rgba(250,247,239,.8);display:flex;align-items:center;gap:4px;line-height:1.2}
-.boxes{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
-.bx{position:relative;min-height:34px;border:1px solid rgba(250,247,239,.38);border-radius:4px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px;padding:9px 2px 2px;color:#F4EFE2}
-.bx .bl{position:absolute;top:1px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.04em;opacity:.78;pointer-events:none;white-space:nowrap}
-.bx.b-player{background:rgba(47,95,179,.34)}
-.bx.b-banker{background:rgba(184,58,58,.34)}
-.bx.b-tie{background:rgba(46,125,79,.34)}
-.bx.b-side{background:rgba(0,0,0,.2)}
-.bx.zone-hl{outline:2px dashed var(--brass);outline-offset:2px;background:rgba(201,162,75,.16)}
-.chip{width:26px;height:26px;border-radius:50%;border:3px dashed rgba(255,255,255,.9);color:#fff;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;box-shadow:0 1px 3px rgba(0,0,0,.5);padding:0;cursor:default;flex:none}
+/* ---- チップ ---- */
+.chip{width:26px;height:26px;border-radius:50%;border:3px dashed rgba(255,255,255,.9);color:#fff;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;box-shadow:0 1px 3px rgba(0,0,0,.6);padding:0;cursor:default;flex:none;z-index:4}
 .c-s1{background:#B83A3A}.c-s2{background:#2F5FB3}.c-s3{background:#2E7D4F}
+.c-s4{background:#C7711E}.c-s5{background:#6B3FA0}.c-s6{background:#1C7C86}.c-s7{background:#9A2E62}
 .chip.lost{opacity:.3;filter:grayscale(80%)}
-.chip.won{box-shadow:0 0 0 3px var(--brass),0 1px 4px rgba(0,0,0,.5)}
+.chip.won{box-shadow:0 0 0 3px var(--brass),0 1px 4px rgba(0,0,0,.5);z-index:6}
 .chip.push{box-shadow:0 0 0 3px #7C8B99,0 1px 4px rgba(0,0,0,.5)}
-.chip.paid{opacity:.45;border-style:solid}
+.chip.paid{opacity:.5;border-style:solid}
 .chip.gone{display:none}
-.chip.pick{cursor:pointer}
-.chip.pick:hover{transform:scale(1.16)}
-.seatkey{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;font-size:11px;color:rgba(250,247,239,.85)}
+.chip.pick{cursor:pointer;z-index:7;animation:chippick 1.2s ease-in-out infinite}
+@keyframes chippick{0%,100%{box-shadow:0 0 0 3px rgba(201,162,75,.5),0 1px 4px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 7px rgba(201,162,75,.85),0 1px 4px rgba(0,0,0,.5)}}
+.seatkey{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:rgba(250,247,239,.85)}
 .seatkey span{display:flex;align-items:center;gap:4px}
 .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
-.zone-tag{font-size:11px;color:rgba(250,247,239,.7);margin:0 0 1px 2px}
+.zone-tag{font-size:11px;color:rgba(250,247,239,.7)}
+
 
 .caption{position:relative;background:#11171C;color:#fff;border-radius:8px;padding:10px 96px 10px 96px;min-height:64px;display:flex;flex-direction:column;justify-content:center;border-left:4px solid var(--brass)}
 .caption .who{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--brass)}
@@ -238,7 +247,7 @@ button{font:inherit}
 }
 @media (max-width:1040px){.wrap{grid-template-columns:1fr}.log{position:static;max-height:320px}}
 @media (max-width:760px){
-  .felt{grid-template-columns:104px minmax(0,1fr);padding:10px 8px 12px;border-width:8px}
+  .felt{padding:10px 8px 12px;border-width:8px;gap:8px}
   .felt.has-dealer{padding-top:104px}
   .table-next{position:absolute;right:10px;top:10px;width:auto;font-size:13px;padding:6px 10px}
 }
@@ -277,18 +286,9 @@ button{font:inherit}
    ハンド（カード）と3席ぶんのベット枠で縦を食うため、カードと枠を縮めて
    コンソールの選択肢までスクロールなしで届くようにする。 */
 @media (max-width:600px){
-  .felt{grid-template-columns:78px minmax(0,1fr);gap:6px;padding:6px 6px 8px;border-width:7px;border-radius:10px}
+  .felt{gap:6px;padding:6px 6px 8px;border-width:7px;border-radius:10px}
   .felt.has-dealer{padding-top:66px}
   .dl-replay{font-size:10px;padding:2px 8px;left:7px;top:6px}
-  .shoe-col{gap:3px}
-  .shoe{max-width:78px;padding:5px 4px 4px;border-radius:6px}
-  .shoe-cap{font-size:8px}
-  .shoe-stack{height:22px;margin:2px 0}
-  .shoe-num{font-size:11px}
-  .shoe-note{display:none}
-  .discard,.comm-box{max-width:78px;font-size:8.5px;padding:2px}
-  .discard b{font-size:11px}.comm-box b{font-size:12px}
-  .table-col{gap:5px}
   .hands{gap:5px}
   .hand{min-height:70px;padding:3px 4px 4px;border-radius:6px}
   .hand-cap{font-size:8.5px;margin-bottom:2px}
@@ -299,15 +299,9 @@ button{font:inherit}
   .card .r{font-size:13px}
   .card .s{font-size:10px}
   .card-slot{width:31px;height:44px}
-  .seats{gap:3px}
-  .seat{grid-template-columns:34px minmax(0,1fr);gap:4px}
-  .seat-no{font-size:8.5px;line-height:1.1}
-  .boxes{gap:2px}
-  .bx{min-height:25px;padding:8px 1px 1px;border-radius:3px}
-  .bx .bl{font-size:6.5px;top:0}
-  .chip{width:18px;height:18px;font-size:7px;border-width:2px}
+  .chip{width:19px;height:19px;font-size:7px;border-width:2px}
   .seatkey{display:none}
-  .zone-tag{display:none}
+  .zone-tag{font-size:9.5px}
   .table-next{right:8px;top:8px;font-size:12px;padding:5px 9px}
   .rule-sign-box{padding:9px 14px;border-width:2px}
   .rs-cap{font-size:8.5px}
@@ -340,12 +334,10 @@ button{font:inherit}
   .btn-ghost{padding:4px 6px;font-size:11px}
 }
 @media (max-width:390px){
-  .felt{grid-template-columns:70px minmax(0,1fr)}
-  .shoe,.discard,.comm-box{max-width:70px}
   .card{width:28px;height:40px}
   .card .r{font-size:12px}
   .card-slot{width:28px;height:40px}
-  .bx .bl{font-size:6px}
+  .chip{width:17px;height:17px;font-size:6.5px}
   .act{min-height:32px;font-size:11px}
 }
 </style>
@@ -372,6 +364,9 @@ button{font:inherit}
 const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SUITS=[{m:'♠',c:'black'},{m:'♥',c:'red'},{m:'♦',c:'red'},{m:'♣',c:'black'}];
 const DECKS=8;
+/* 実際のミニ／ミディ・バカラ台と同じ7ポジション。設定の「人数」は着席数で、
+   空席のポジションもレイアウト上は常に描く。 */
+const TABLE_SEATS=7;
 /* バカラはルーレットより高額ベットが動くため、$1000チップまで用意する
    （タイ9:1などで配当が数千ドルになる場面の枚数を現実的な範囲に収める） */
 const CHIPS=[1000,500,100,25,5,1];
@@ -436,15 +431,18 @@ function ruleSummary(T){
 }
 
 /* ===== ベット種別 ===== */
+/* ring は実際のバカラ台での枠の位置。半円テーブルでは PLAYER が最も外周（客側＝
+   ディーラーから遠い）、BANKER がその内側、TIE・ペア・ドラゴンはさらに内側の
+   小さい丸枠になる。回収も配当もこの遠近が手順の根拠になるため属性として持つ。 */
 const BET_META={
-  player:{label:'プレイヤー',box:'PLAYER',cls:'b-player',main:true,pay:1},
-  banker:{label:'バンカー',box:'BANKER',cls:'b-banker',main:true,pay:1},
-  tie:{label:'タイ',box:'TIE',cls:'b-tie',main:true,pay:8},
-  ppair:{label:'プレイヤーペア',box:'P PAIR',cls:'b-side',main:false,pay:11},
-  bpair:{label:'バンカーペア',box:'B PAIR',cls:'b-side',main:false,pay:11},
-  dragon:{label:'ドラゴンボーナス',box:'DRAGON',cls:'b-side',main:false,pay:null}
+  player:{label:'プレイヤー',box:'PLAYER',main:true,ring:'outer',pay:1},
+  banker:{label:'バンカー',box:'BANKER',main:true,ring:'outer',pay:1},
+  tie:{label:'タイ',box:'TIE',main:true,ring:'inner',pay:8},
+  ppair:{label:'プレイヤーペア',box:'P',main:false,ring:'inner',pay:11},
+  bpair:{label:'バンカーペア',box:'B',main:false,ring:'inner',pay:11},
+  dragon:{label:'ドラゴンボーナス',box:'DRG',main:false,ring:'inner',pay:null}
 };
-const BOX_ORDER=['player','banker','tie','ppair','bpair','dragon'];
+const RING_NAME={outer:'外周の大枠（プレイヤー／バンカー）',inner:'内側の丸枠（タイ・ペア・ドラゴン）'};
 /* ドラゴンボーナス：勝った側の点差で配当が決まる。ナチュラル勝ちは1:1、ナチュラルタイはプッシュ。 */
 const DRAGON_TABLE=[[9,30],[8,10],[7,6],[6,4],[5,2],[4,1]];
 function dragonPay(margin){for(const[m,p]of DRAGON_TABLE)if(margin===m)return p;return 0;}
@@ -465,8 +463,8 @@ const LABEL={
   bankerStand:'バンカーはスタンド',
   bankerReason:'バンカー判定の根拠',
   callResult:'勝敗をコール',
-  takeSide:'サイドベットのハズレを回収',
-  takeMain:'メインベットのハズレを回収',
+  takeOuter:'外周（P/B枠）のハズレを回収',
+  takeInner:'内側（タイ・ペア）のハズレを回収',
   select:'支払う対象を選ぶ',
   pay:'配当を支払う',
   takeCommission:'コミッションを徴収',
@@ -563,7 +561,7 @@ function bankerReasonSet(bTotal,p3){
 function createGame(opts){
   return{opts:Object.assign({seats:3,randomRule:true,showDrawHints:true,showZoneHints:true,
       showDealer:true,voice:true,dealerSpeed:1,adaptiveDifficulty:true,drawFocus:true},opts||{}),
-    roundNo:0,phase:'idle',shoe:newShoe(),discard:0,bets:[],
+    roundNo:0,phase:'idle',shoe:newShoe(),discard:0,bets:[],seatNos:[],
     pCards:[],bCards:[],p3:null,winner:null,
     table:makeTableRule(null),ruleChanged:false,prevRule:null,signOpen:false,
     commissionDue:0,commissionTaken:0,commissionBox:0,
@@ -580,9 +578,15 @@ function makeBet(kind,seat,id,df,side){
     win:null,push:false,mult:0,payAmt:0,settled:false,collected:false};
 }
 
+/* 7つの座席のうち、設定した人数ぶんをテーブル中央寄りから埋める
+   （実際の台も端の席から埋まることは少ない） */
+function occupiedSeats(n){
+  const start=Math.floor((TABLE_SEATS-n)/2)+1;
+  return Array.from({length:n},(_,i)=>start+i);
+}
 function buildBets(G,df){
   const bets=[];let id=0;
-  for(let s=G.opts.seats;s>=1;s--){
+  for(const s of G.seatNos){
     /* メインは必ず1口。タイは単独では置かず、メインに添える形で入る。 */
     bets.push(makeBet(Math.random()<0.52?'banker':'player',s,'b'+(id++),df));
     if(Math.random()<df.tieChance)bets.push(makeBet('tie',s,'b'+(id++),df));
@@ -621,6 +625,7 @@ function startRound(G){
   else if(G.opts.randomRule&&Math.random()<df.ruleChance){G.table=makeTableRule(G.table);G.ruleChanged=true;}
   G.signOpen=G.ruleChanged;
 
+  G.seatNos=occupiedSeats(Math.max(1,Math.min(TABLE_SEATS,G.opts.seats)));
   G.bets=buildBets(G,df);
   const h=drawInitial(G);
   G.pCards=h.p;G.bCards=h.b;G.p3=null;G.winner=null;
@@ -629,7 +634,7 @@ function startRound(G){
   G.flags={closed:false,dealt:0,openedP:false,openedB:false,calledTotal:false,
     natural:false,naturalDone:false,pDecided:false,pDrew:false,pCard3:false,
     bDecided:false,bDrew:false,bCard3:false,bReasonDone:false,
-    calledResult:false,tookSide:false,tookMain:false,commDone:false,cleaned:false};
+    calledResult:false,tookOuter:false,tookInner:false,commDone:false,cleaned:false};
   G.phase='bet';
   G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[]};
   if(G.ruleChanged){
@@ -637,7 +642,7 @@ function startRound(G){
       why:G.table.rule.desc});
   }
   const cap=C('Place your bets, please.','お賭けください');setCaption(G,cap);
-  addLog(G,{t:'info',el:`ラウンド${G.roundNo}開始（${G.opts.seats}席・ベット${G.bets.length}件）`,call:cap});
+  addLog(G,{t:'info',el:`ラウンド${G.roundNo}開始（${G.seatNos.join('・')}番席／ベット${G.bets.length}件）`,call:cap});
 }
 
 /* ===== 精算 ===== */
@@ -766,18 +771,20 @@ function resultOptions(G){
 
 function E(key,cat,why,call,extra){return Object.assign({key,cat,why,call:call||C('','')},extra||{});}
 
-/* 支払い順：サイドベット → タイ → メイン。各グループ内は奥席（番号が大きい）から手前席へ。 */
-function payGroup(b){return BET_META[b.kind].main?(b.kind==='tie'?1:2):0;}
-const PAY_GROUP_NAME=['サイドベット（ペア・ドラゴン）','タイ','メインベット（プレイヤー／バンカー）'];
+/* 回収も配当も「外周（ディーラーから遠い）→内側（手前）」。手前を先に片付けると、
+   外周へ手を伸ばすたびに処理済みのチップの上を越えることになり事故が増える。
+   各リング内は1番席から7番席へ、必ず同じ向きに回して払い忘れと二重払いを防ぐ。 */
+function payGroup(b){return BET_META[b.kind].ring==='outer'?0:1;}
+const PAY_GROUP_NAME=[RING_NAME.outer,RING_NAME.inner];
 function payCandidates(G){
   const rest=G.bets.filter(b=>b.win&&!b.settled);
   if(!rest.length)return[];
   const minG=Math.min(...rest.map(payGroup));
   const inG=rest.filter(b=>payGroup(b)===minG);
-  const maxSeat=Math.max(...inG.map(b=>b.seat));
-  return inG.filter(b=>b.seat===maxSeat);
+  const minSeat=Math.min(...inG.map(b=>b.seat));
+  return inG.filter(b=>b.seat===minSeat);
 }
-function losersIn(G,main){return G.bets.filter(b=>b.win===false&&!b.push&&!b.collected&&BET_META[b.kind].main===main);}
+function losersIn(G,ring){return G.bets.filter(b=>b.win===false&&!b.push&&!b.collected&&BET_META[b.kind].ring===ring);}
 
 function expected(G){
   const F=G.flags,T=G.table,df=currentDifficulty(G);
@@ -873,19 +880,19 @@ function expected(G){
     }
 
     case 'take':{
-      if(!F.tookSide){
-        const n=losersIn(G,false).length;
-        if(n)return E('takeSide','take',
-          `回収は外側（サイドベット）から内側（メインベット）へ。ペアやドラゴンのハズレ${n}件を先に引き上げます。外側から片付けるのは、手前のメインベットを跨いでレーキを動かさずに済むからです。`,
-          null,{group:'side'});
-        F.tookSide=true;
+      if(!F.tookOuter){
+        const n=losersIn(G,'outer').length;
+        if(n)return E('takeOuter','take',
+          `回収は外周（客側のプレイヤー／バンカー枠）から内側へ。まず外周のハズレ${n}件を、円弧に沿って端から端までレーキで一掃します。内側を先に片付けると、外周へ手を伸ばすたびに処理済みのチップの上を越えることになり、崩した・すり替えたと言われる原因になります。`,
+          null,{ring:'outer'});
+        F.tookOuter=true;
       }
-      if(!F.tookMain){
-        const n=losersIn(G,true).length;
-        if(n)return E('takeMain','take',
-          `続いてメインベットのハズレ${n}件を回収します。タイでプッシュになったチップは客のものなので絶対に触りません。回収し終えるまで配当は始めない、これが順序の鉄則です。`,
-          null,{group:'main'});
-        F.tookMain=true;
+      if(!F.tookInner){
+        const n=losersIn(G,'inner').length;
+        if(n)return E('takeInner','take',
+          `続いて内側の丸枠（タイ・ペア・ドラゴン）のハズレ${n}件を回収します。タイでプッシュになったプレイヤー／バンカーのチップは客のものなので絶対に触りません。回収を終えるまで配当は始めない、これが順序の鉄則です。`,
+          null,{ring:'inner'});
+        F.tookInner=true;
       }
       G.phase='pay';return expected(G);
     }
@@ -895,7 +902,7 @@ function expected(G){
       if(cands.length){
         if(G.payIdx===null){
           const g=payGroup(cands[0]);
-          const why=`配当は「${PAY_GROUP_NAME[0]}→${PAY_GROUP_NAME[1]}→${PAY_GROUP_NAME[2]}」の順、各グループ内は奥席から手前席へ支払います。次は${PAY_GROUP_NAME[g]}の${cands[0].seat}番席です。テーブル上の該当チップを選んでください。`;
+          const why=`配当も回収と同じ「${PAY_GROUP_NAME[0]}→${PAY_GROUP_NAME[1]}」の順、各リング内は1番席から7番席へ一方向に回します。次は${PAY_GROUP_NAME[g]}、${cands[0].seat}番席です。テーブル上の該当チップを選んでください。`;
           return E('select','pay',why,null,{picks:cands.map(b=>b.id)});
         }
         const b=G.bets.find(x=>x.id===G.payIdx);
@@ -974,11 +981,11 @@ function apply(G,ex,amount){
       if(G.ezPush)addLog(G,{t:'rule',el:'EZバカラ：バンカーが3枚で7の勝ち（ドラゴン7）',
         why:'バンカーベットはプッシュとして客に返します。プレイヤーベットとタイはハズレです。'});
       break;
-    case 'takeSide':case 'takeMain':{
-      const main=ex.group==='main';
-      const hit=losersIn(G,main);
+    case 'takeOuter':case 'takeInner':{
+      const ring=ex.ring;
+      const hit=losersIn(G,ring);
       hit.forEach(b=>{b.collected=true;});
-      if(main)F.tookMain=true;else F.tookSide=true;
+      if(ring==='outer')F.tookOuter=true;else F.tookInner=true;
       extra=`（${hit.length}件）`;break;
     }
     case 'select':G.payIdx=ex.chosen;return;
@@ -1086,8 +1093,8 @@ const G=createGame(load(STORE_OPTS,{}));
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const SEATC=['','c-s1','c-s2','c-s3'];
-function seatClass(s){return SEATC[((s-1)%3)+1];}
+const SEATC=['','c-s1','c-s2','c-s3','c-s4','c-s5','c-s6','c-s7'];
+function seatClass(s){return SEATC[((s-1)%7)+1];}
 
 /* ===== ディーラー：骨格アニメーション =====
    手先をテーブル上の実座標（シュー・両ハンド・各ベット枠・コミッションボックス・
@@ -1217,8 +1224,11 @@ const Dealer={
        目標に応じて体ごと台に沿って踏み込ませる（setPose の leanX）。 */
     this.cx=this.W*0.5;
     const s=this.s;
-    this.armA=Math.max(52,this.H*0.3);
-    this.armB=Math.max(56,this.H*0.32);
+    /* 円弧の一番外側（客側のPLAYER枠）まで手が届く必要があるため、
+       腕の長さと踏み込み量はテーブルの縦の大きさに比例させる */
+    this.armA=Math.max(52,this.H*0.32);
+    this.armB=Math.max(56,this.H*0.34);
+    this.leanCap=Math.max(34,this.H*0.21);
     this.shL={x:this.cx-46*s,y:78*s+4};
     this.shR={x:this.cx+46*s,y:78*s+4};
     const rw=126*s,rh=18*s;
@@ -1255,7 +1265,7 @@ const Dealer={
     const reach=(this.armA+this.armB)*0.98;
     const dL=Math.hypot(p.lx-this.shL.x,p.ly-this.shL.y),dR=Math.hypot(p.rx-this.shR.x,p.ry-this.shR.y);
     const need=Math.max(dL-reach,dR-reach,0);
-    const leanY=Math.min(34,need*0.5);
+    const leanY=Math.min(this.leanCap||34,need*0.62);
     /* 手先が肩の可動域を超える位置にあるときは、腕を伸ばしきるのではなく
        体を目標側へ踏み込ませる。台が横に広いバカラでは移動量も大きくなる。 */
     const lim=this.W*0.42;
@@ -1332,6 +1342,11 @@ const Dealer={
   replay(){if(this.last)this.play(this.last.frames,this.last.label);}
 };
 
+/* SVGのテーブル座標を、felt 内のピクセル座標（ディーラーの手先の座標系）に変換する */
+function svgPt(q){
+  const r=elRect('.table-wrap');if(!r)return null;
+  return{x:r.x+q.x/TBL.W*r.w,y:r.y+q.y/TBL.H*r.h};
+}
 /* 手先を肩側へ d だけ戻した点（レーキの先端を目標に当てるため） */
 function pullBack(p,d){
   const S={x:Dealer.cx,y:Dealer.band*0.6};
@@ -1348,7 +1363,7 @@ function buildMotion(key,arg,pre){
   const handPt=side=>ptOf(side==='p'?'.hand.h-p .cards':'.hand.h-b .cards',0.5,0.5);
   switch(key){
     case 'noMoreBets':{
-      const g=elRect('.seats');if(!g)return null;
+      const g=elRect('.table-wrap');if(!g)return null;
       const y=g.y+g.h*0.35;
       return[{t:0,open:0},
         {t:260,r:P(g.x+g.w*0.78,y),l:P(g.x+g.w*0.22,y),open:1},
@@ -1397,17 +1412,17 @@ function buildMotion(key,arg,pre){
         {t:820,r:P(c.x+30,c.y+10),open:1},
         {t:1120,r:P(R.rx,R.ry),open:0}];
     }
-    case 'takeSide':case 'takeMain':{
-      const z=unionRect(key==='takeMain'?'.bx.g-main':'.bx.g-side');if(!z)return null;
-      const sweep=fx=>{
-        const far=pullBack(P(z.x+z.w*fx,z.y+z.h+6),34);
-        const near=pullBack(P(z.x+z.w*fx*0.92,z.y-8),34);
-        return[far,near];
-      };
-      const a=sweep(0.78),b=sweep(0.32);
-      return[{t:0,prop:'rake'},{t:260,r:a[0],prop:'rake'},{t:560,r:a[1],prop:'rake'},
-        {t:740,r:b[0],prop:'rake'},{t:1040,r:b[1],prop:'rake'},
-        {t:1240,r:P(rk.x,rk.y),prop:'rake'},{t:1520,r:P(R.rx,R.ry),prop:''}];
+    case 'takeOuter':case 'takeInner':{
+      /* 実際の所作どおり、円弧に沿って端から端まで一気に掃き寄せる */
+      const fr=key==='takeOuter'?(SPOT.player.fr+SPOT.banker.fr)/2:(SPOT.tie.fr+SPOT.dragon.fr)/2;
+      const pts=[1,.84,.67,.5,.33,.16,0].map(u=>svgPt(atU(fr,u))).filter(Boolean);
+      if(pts.length<3)return null;
+      const seq=[{t:0,prop:'rake'}];
+      pts.forEach((q,i)=>seq.push({t:240+i*150,r:pullBack(q,30),prop:'rake'}));
+      const last=240+pts.length*150;
+      seq.push({t:last+160,r:P(rk.x,rk.y),prop:'rake'});
+      seq.push({t:last+430,r:P(R.rx,R.ry),prop:''});
+      return seq;
     }
     case 'select':{
       const c=ptOf(`[data-bet="${arg}"]`);if(!c)return null;
@@ -1418,8 +1433,7 @@ function buildMotion(key,arg,pre){
       if(!c){
         /* コミッション徴収：テーブル上からコミッションボックスへ運ぶ */
         const cb=ptOf('#commBox');if(!cb)return null;
-        const from=unionRect('.bx.b-banker');
-        const f=from?P(from.x+from.w*0.5,from.y+from.h*0.5):P(rk.x,rk.y);
+        const f=svgPt(TP(SPOT.banker.fr,90))||P(rk.x,rk.y);
         return[{t:0,prop:''},{t:280,r:P(f.x,f.y),prop:''},{t:420,r:P(f.x,f.y),prop:'chips'},
           {t:760,r:P((f.x+cb.x)/2,Math.min(f.y,cb.y)-20),prop:'chips'},
           {t:1000,r:P(cb.x,cb.y),prop:'chips'},{t:1140,r:P(cb.x,cb.y),prop:''},
@@ -1479,33 +1493,144 @@ function handHTML(G,side){
   </div>`;
 }
 
-function seatsHTML(G){
+/* ===== テーブル・レイアウト（実物と同じハーフムーン型）=====
+   ディーラーは半円の直線側（上辺）に立ち、客は円弧側に7ポジション並ぶ。
+   1ポジションあたり、外周から PLAYER → BANKER、その内側に TIE と
+   P/B ペア、さらに内側にドラゴンボーナスの丸枠。直線側にはシュー・
+   ディスカードホルダー・1〜7番のコミッションボックスが並ぶ。
+   回収と配当の「外周→内側」「1番席→7番席」はこの配置がそのまま根拠になる。 */
+const TBL={W:1060,H:620,cx:530,cy:146,rx:514,ry:458,tA:168,tB:12};
+function TP(fr,deg){const t=deg*Math.PI/180;return{x:TBL.cx+TBL.rx*fr*Math.cos(t),y:TBL.cy+TBL.ry*fr*Math.sin(t)};}
+function arcPts(fr,d0,d1,n){
+  const out=[];
+  for(let i=0;i<=n;i++)out.push(TP(fr,d0+(d1-d0)*i/n));
+  return out;
+}
+function poly(pts){return pts.map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ');}
+
+/* 楕円の円弧は角度を等分しても弧の長さが等分にならず、端のポジションだけ枠が
+   潰れて重なる。実物の台は7ポジションが等間隔に並ぶので、弧長で等分した位置
+   （u：左端0〜右端1）を座標の基準にする。 */
+const ARCT={};
+function arcTable(fr){
+  const key=fr.toFixed(3);
+  if(ARCT[key])return ARCT[key];
+  const N=360,pts=[],cum=[0];
+  for(let i=0;i<=N;i++)pts.push(TP(fr,TBL.tA+(TBL.tB-TBL.tA)*i/N));
+  for(let i=1;i<=N;i++)cum.push(cum[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+  return ARCT[key]={pts,cum,N,total:cum[N]};
+}
+/* u（0〜1）の位置の座標と、その点での角度 */
+function atU(fr,u){
+  const T=arcTable(fr),target=Math.max(0,Math.min(1,u))*T.total;
+  let i=1;while(i<T.N&&T.cum[i]<target)i++;
+  const a=T.cum[i-1],b=T.cum[i],k=(target-a)/Math.max(1e-6,b-a);
+  const p=T.pts[i-1],q=T.pts[i];
+  return{x:p.x+(q.x-p.x)*k,y:p.y+(q.y-p.y)*k,
+    deg:TBL.tA+(TBL.tB-TBL.tA)*((i-1+k)/T.N)};
+}
+const SEAT_W=1/TABLE_SEATS,CELL_GAP=0.085;
+function seatU(seat){return (seat-0.5)*SEAT_W;}
+/* fr＝外周からの半径比、du＝1ポジション幅に対する左右のずれ。
+   ペアの2枠は左右だけでなく半径もずらす。真横に並べると隣のポジションの枠と
+   くっついてしまい、実物の台でも斜めにずらして配置されている。 */
+const SPOT={
+  player:{fr:.860,du:0,band:true,hw:.070,label:'PLAYER'},
+  banker:{fr:.715,du:0,band:true,hw:.063,label:'BANKER'},
+  tie:{fr:.600,du:0,r:24,label:'TIE'},
+  ppair:{fr:.495,du:-0.24,r:19,label:'P'},
+  bpair:{fr:.440,du:0.24,r:19,label:'B'},
+  dragon:{fr:.330,du:0,r:20,label:'DRG'}
+};
+const SPOT_ORDER=['player','banker','tie','ppair','bpair','dragon'];
+function spotPt(kind,seat){
+  const sp=SPOT[kind];
+  return atU(sp.fr,seatU(seat)+sp.du*SEAT_W);
+}
+/* 1ポジションぶんの帯。両端は中心へ向かう放射方向に切る（実物の罫線と同じ） */
+function cellPath(sp,seat){
+  const u0=(seat-1)*SEAT_W+SEAT_W*CELL_GAP,u1=seat*SEAT_W-SEAT_W*CELL_GAP;
+  const d0=atU(sp.fr,u0).deg,d1=atU(sp.fr,u1).deg;
+  const inner=arcPts(sp.fr-sp.hw,d0,d1,10),outer=arcPts(sp.fr+sp.hw,d1,d0,10);
+  return `M ${poly(inner)} L ${poly(outer)} Z`;
+}
+function feltPath(){
+  return `M 16 20 Q 16 8 28 8 L 1032 8 Q 1044 8 1044 20 L 1044 ${TBL.cy} L ${poly(arcPts(1,0,180,60))} Z`;
+}
+
+function tableSvgHTML(G){
+  const F=G.flags,ex=G.pending?null:expected(G);
+  const hlRing=G.opts.showZoneHints&&ex&&ex.ring?ex.ring:null;
+  const occupied=new Set(G.seatNos);
+  let cells='',labels='';
+  const rot=(q,dy)=>`x="${q.x.toFixed(1)}" y="${(q.y+(dy||0)).toFixed(1)}" transform="rotate(${(q.deg-90).toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)})"`;
+  for(let seat=1;seat<=TABLE_SEATS;seat++){
+    const live=occupied.has(seat);
+    for(const kind of SPOT_ORDER){
+      const sp=SPOT[kind],m=BET_META[kind];
+      const lose=live&&G.bets.some(b=>b.seat===seat&&b.kind===kind&&b.win===false&&!b.push&&!b.collected);
+      const hl=hlRing&&m.ring===hlRing&&lose?' hl':'';
+      const dim=live?'':' idle';
+      const q=spotPt(kind,seat);
+      if(sp.band){
+        cells+=`<path class="sp sp-${kind}${hl}${dim}" d="${cellPath(sp,seat)}"/>`;
+        labels+=`<text class="sp-lb sp-lb-${kind}" ${rot(q,5)}>${sp.label}</text>`;
+      }else{
+        cells+=`<circle class="sp sp-dot sp-${kind}${hl}${dim}" cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="${sp.r}"/>`;
+        labels+=`<text class="sp-lb sp-lb-dot" ${rot(q,4)}>${sp.label}</text>`;
+      }
+    }
+    const n=atU(.962,seatU(seat));
+    labels+=`<text class="seat-num${live?' live':''}" ${rot(n,7)}>${seat}</text>`;
+  }
+  /* コミッションボックス（1〜7）。バンカー勝ちのコミッションを席ごとに管理する枠 */
+  let comm='';
+  const cw=52,cg=5,cAll=TABLE_SEATS*cw+(TABLE_SEATS-1)*cg,cx0=TBL.cx-cAll/2;
+  for(let i=0;i<TABLE_SEATS;i++){
+    const x=cx0+i*(cw+cg);
+    comm+=`<rect class="comm-cell${occupied.has(i+1)?' live':''}" x="${x}" y="30" width="${cw}" height="34" rx="3"/>`
+      +`<text class="comm-n" x="${x+cw/2}" y="53">${i+1}</text>`;
+  }
+  const total=DECKS*52,left=G.shoe.length,used=total-left-(G.pCards.length+G.bCards.length);
+  const fill=Math.max(0,Math.min(1,left/total));
+  return `<svg class="table-svg" viewBox="0 0 ${TBL.W} ${TBL.H}" role="img" aria-label="バカラテーブル">
+    <path class="felt-shape" d="${feltPath()}"/>
+    <path class="felt-line" d="M 16 ${TBL.cy} L 1044 ${TBL.cy}"/>
+    <g id="shoeBox">
+      <rect class="tbox" x="34" y="24" width="152" height="94" rx="6"/>
+      <rect class="shoe-cards" x="44" y="46" width="${(132*fill).toFixed(0)}" height="40" rx="2"/>
+      <text class="tbox-cap" x="110" y="40">SHOE / ${DECKS} DECKS</text>
+      <text class="tbox-val" x="110" y="108">残 ${left}</text>
+    </g>
+    <g id="discardBox">
+      <rect class="tbox" x="874" y="24" width="152" height="94" rx="6"/>
+      <rect class="discard-cards" x="884" y="46" width="${(132*(1-fill)).toFixed(0)}" height="40" rx="2"/>
+      <text class="tbox-cap" x="950" y="40">DISCARD</text>
+      <text class="tbox-val" x="950" y="108">${used}</text>
+    </g>
+    <g id="commBox">
+      <text class="tbox-cap" x="${TBL.cx}" y="22">COMMISSION  ${fmt$(G.commissionBox)}</text>
+      ${comm}
+    </g>
+    <text class="felt-logo" x="${TBL.cx}" y="122">BACCARAT</text>
+    ${cells}
+    ${labels}
+  </svg>`;
+}
+
+function chipLayerHTML(G){
   const F=G.flags,ex=G.pending?null:expected(G);
   const picks=ex&&ex.key==='select'?ex.picks:[];
-  const hlGroup=G.opts.showZoneHints&&ex&&ex.group?ex.group:null;
   const reveal=F.calledResult;
-  const chipEl=b=>{
+  return G.bets.map(b=>{
+    const q=spotPt(b.kind,b.seat);
     const st=b.collected?'gone':b.settled?'paid':!reveal?'':b.push?'push':b.win?'won':'lost';
     const pick=picks.includes(b.id)?' pick':'';
     const attrs=pick?` data-act="select" data-arg="${b.id}" tabindex="0" role="button"`:'';
-    return `<button type="button" class="chip ${seatClass(b.seat)} ${st}${pick}" data-bet="${b.id}" title="${esc(betTitle(b))}"${attrs}>${b.amount}</button>`;
-  };
-  let rows='';
-  for(let s=G.opts.seats;s>=1;s--){
-    const tag=s===G.opts.seats?'奥':s===1?'手前':'';
-    const boxes=BOX_ORDER.map(kind=>{
-      const m=BET_META[kind];
-      const bs=G.bets.filter(b=>b.kind===kind&&b.seat===s);
-      const grp=m.main?'g-main':'g-side';
-      const lose=bs.some(b=>b.win===false&&!b.push&&!b.collected);
-      const hl=hlGroup&&((hlGroup==='main'&&m.main)||(hlGroup==='side'&&!m.main))&&lose?' zone-hl':'';
-      let lbl=m.box;
-      if(kind==='dragon'&&bs.length)lbl=bs[0].side==='player'?'DRG P':'DRG B';
-      return `<div class="bx ${m.cls} ${grp}${hl}" data-box="${s}-${kind}"><span class="bl">${lbl}</span>${bs.map(chipEl).join('')}</div>`;
-    }).join('');
-    rows+=`<div class="seat"><div class="seat-no">${s}番席${tag?`<br>（${tag}）`:''}</div><div class="boxes">${boxes}</div></div>`;
-  }
-  return rows;
+    return `<button type="button" class="chip chip-abs ${seatClass(b.seat)} ${st}${pick}"`
+      +` style="left:${(q.x/TBL.W*100).toFixed(2)}%;top:${(q.y/TBL.H*100).toFixed(2)}%"`
+      +` data-bet="${b.id}" title="${esc(betTitle(b))}"${attrs}>${b.amount}</button>`;
+  }).join('');
 }
 
 function ruleSignHTML(G){
@@ -1533,27 +1658,17 @@ function renderMeta(){
 }
 
 function renderTable(){
-  const total=DECKS*52,left=G.shoe.length,used=total-left-(G.pCards.length+G.bCards.length);
-  const pct=Math.max(0,Math.min(100,100-left/total*100));
+  const seatKey=G.seatNos.map(n=>`<span><i class="dot ${seatClass(n)}"></i>${n}番席</span>`).join('');
   $('table').innerHTML=`
     ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
-    <div class="shoe-col">
-      <div class="shoe" id="shoeBox">
-        <div class="shoe-cap">SHOE / ${DECKS} DECKS</div>
-        <div class="shoe-stack"><i style="width:${pct}%"></i></div>
-        <div class="shoe-num">残 <b>${left}</b></div>
-      </div>
-      <div class="discard" id="discardBox">DISCARD<b>${used}</b></div>
-      <div class="comm-box" id="commBox">COMMISSION<b>${fmt$(G.commissionBox)}</b></div>
-      <div class="shoe-note">シューが残り20枚を切ったら新しいシューに交換</div>
+    <div class="hands">${handHTML(G,'p')}${handHTML(G,'b')}</div>
+    <div class="table-wrap">
+      ${tableSvgHTML(G)}
+      <div class="chip-layer">${chipLayerHTML(G)}</div>
     </div>
-    <div class="table-col">
-      <div class="hands">${handHTML(G,'p')}${handHTML(G,'b')}</div>
-      <div class="zone-tag">${esc(ruleSummary(G.table))}</div>
-      <div class="seats">${seatsHTML(G)}</div>
-      <div class="seatkey">${Array.from({length:G.opts.seats},(_,i)=>{
-        const s=G.opts.seats-i,tag=s===G.opts.seats?'（奥）':s===1?'（手前）':'';
-        return `<span><i class="dot ${seatClass(s)}"></i>${s}番席${tag}</span>`;}).join('')}</div>
+    <div class="table-foot">
+      <span class="zone-tag">${esc(ruleSummary(G.table))}</span>
+      <span class="seatkey">${seatKey}</span>
     </div>
     ${G.signOpen?ruleSignHTML(G):''}`;
   const show=G.opts.showDealer!==false;
@@ -1618,7 +1733,7 @@ function actionKeys(G,ex){
       if(ex.key==='dealPlayer'||ex.key==='dealBanker')return['dealPlayer','dealBanker'];
       if(ex.key==='bankerDraw'||ex.key==='bankerStand')return['bankerDraw','bankerStand'];
       return['declareNatural','playerDraw','playerStand'];
-    case 'take':return['takeSide','takeMain'];
+    case 'take':return['takeOuter','takeInner'];
     case 'comm':return['takeCommission'];
     case 'close':return['cleanHands','clearCards'];
   }
@@ -1652,7 +1767,7 @@ const PHASE_PROMPT={
   bet:['ベットが出そろいました。締切を宣言してください。','宣言してからでないとカードは出せない。'],
   deal:['配り順どおりにカードを出してください。','プレイヤー→バンカー→プレイヤー→バンカーの4枚。'],
   open:['手札を開いてください。','プレイヤー側が先。絞ってから全員に見える形で開く。'],
-  take:['ハズレチップを回収してください。','サイドベット→メインベットの順。プッシュには触らない。'],
+  take:['ハズレチップを回収してください。','外周（P/B枠）→内側（タイ・ペア）の順。プッシュには触らない。'],
   comm:['コミッションを徴収してください。','配当を払い終えてから。端数は$1単位に切り上げ。'],
   close:['締めの所作を選んでください。','クリーンハンド → カードを片付ける。']
 };
@@ -1695,7 +1810,7 @@ function renderConsole(){
     if(hintsOn)extra=drawTableHTML(G,ex);
     actions=ex.reasonSet.opts.map((o,i)=>btn('bankerReason',o,'wide',o)).join('');
   }else if(ex&&ex.key==='select'){
-    prompt='支払う対象をテーブル上のチップから選んでください。<span class="hint">サイド→タイ→メイン、各グループ内は奥席→手前席。</span>';
+    prompt='支払う対象をテーブル上のチップから選んでください。<span class="hint">外周（P/B枠）→内側（タイ・ペア・ドラゴン）の順。各リング内は1番席から順に。</span>';
     actions='';
   }else if(ex){
     const keys=actionKeys(G,ex);
@@ -1728,7 +1843,7 @@ function renderSettings(){
   const o=G.opts,hasTTS='speechSynthesis' in window,df=currentDifficulty(G),T=G.table;
   const bankerRow=[['0〜2','すべて'],['3','8以外'],['4','2〜7'],['5','4〜7'],['6','6〜7'],['7','なし']];
   $('settings').innerHTML=`<h3>設定</h3>
-    <div class="row"><label for="optSeats">席数</label><select id="optSeats">${[2,3].map(n=>`<option value="${n}"${o.seats===n?' selected':''}>${n}席</option>`).join('')}</select></div>
+    <div class="row"><label for="optSeats">着席人数（台は7ポジション）</label><select id="optSeats">${[1,2,3,4,5,6,7].map(n=>`<option value="${n}"${o.seats===n?' selected':''}>${n}人</option>`).join('')}</select></div>
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
     <div class="row"><label for="optRule">ハウスルールをランダムに切り替える</label><input type="checkbox" id="optRule"${o.randomRule!==false?' checked':''}></div>
     <div class="row"><label for="optDrawFocus">ドロー判定が起きる手札を多めに配る</label><input type="checkbox" id="optDrawFocus"${o.drawFocus!==false?' checked':''}></div>
