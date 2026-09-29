@@ -357,7 +357,7 @@ button{font:inherit}
 @media (max-width:600px){
   .seat-badge{r:24px}
   .seat-no{font-size:31px}
-  .seat-stack{font-size:33px}
+  .seat-stack{font-size:38px}
   .seat-state{font-size:25px}
   .seat-tag{font-size:30px}
   .pot-cap{font-size:25px}
@@ -369,12 +369,19 @@ button{font:inherit}
   .pc .r{font-size:3.5cqw}.pc .s{font-size:3cqw}
   .pc.bc .r{font-size:3.9cqw}.pc.bc .s{font-size:3.3cqw}
   .pcards.n2 .pc+.pc{margin-left:.6cqw}
-  .pcards.n4 .pc+.pc{margin-left:-2cqw}
-  .bet-chip{width:8cqw;height:8cqw;font-size:2.8cqw}
-  .pot-chip{width:11cqw;height:11cqw;font-size:3.4cqw}
-  .pot-chip small{font-size:1.8cqw}
+  .pcards.n4 .pc+.pc{margin-left:-2.6cqw}
+  .bet-chip{width:10.5cqw;height:10.5cqw;font-size:3.9cqw;border-width:3px}
+  .pot-chip{width:16cqw;height:16cqw;font-size:5.2cqw}
+  .pot-chip small{font-size:2.4cqw}
   .puck{width:6.4cqw;height:6.4cqw;font-size:3.6cqw}
   .seat-pick{width:10cqw;height:10cqw;font-size:4.4cqw}
+}
+
+/* スマホ：外側の余白を詰めてテーブルの横幅を稼ぐ */
+@media (max-width:600px){
+  .wrap{padding:4px}
+  .felt{padding:4px 4px 6px;border-width:5px}
+  .felt.has-dealer{padding-top:66px}
 }
 
 </style>
@@ -1880,7 +1887,7 @@ const POT_PT={x:530,y:196};
    文字・カード・チップは幅基準なので、伸ばした分は座席の間隔と各要素の拡大に回る。 */
 function fitTable(){
   const mob=window.matchMedia('(max-width:600px)').matches;
-  const w=Math.max(280,innerWidth-38);
+  const w=Math.max(280,innerWidth-26);
   let H=620;
   if(mob)H=Math.max(620,Math.min(1240,Math.round((innerHeight-MOB_OVERHEAD)*TBL.W/w)));
   if(Math.abs(H-TBL.H)<=24&&mob===TBL.mob)return false;
@@ -1890,7 +1897,7 @@ function fitTable(){
   else{BOARD.w=52;BOARD.h=72;BOARD.dx=62;BOARD.x0=406;}
   BOARD.y=TBL.cy+TBL.ry*(mob?.29:.253);
   POT_PT.y=TBL.cy+TBL.ry*(mob?.10:.11);
-  FR.cards=mob?.655:.705;FR.bet=mob?.46:.50;
+  FR.cards=mob?.655:.705;FR.bet=mob?.42:.50;
   return true;
 }
 fitTable();
@@ -1909,7 +1916,7 @@ function tableSvgHTML(G,ex){
   let seats='';
   for(let s=1;s<=SEATS;s++){
     const p=has?pl(G,s):null,out=p&&p.folded;
-    const b=seatPt(s,FR.rim),st=seatPt(s,FR.stack),sm=seatPt(s,FR.state);
+    const b=seatPt(s,FR.rim),st=seatPt(s,FR.stack),sm=TBL.mob?{x:seatPt(s,FR.stack).x,y:seatPt(s,FR.stack).y-34}:seatPt(s,FR.state);
     seats+=`<circle class="seat-badge${declSeat===s?' act':''}${out?' out':''}" cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="17"/>`
       +`<text class="seat-no${out?' out':''}" x="${b.x.toFixed(1)}" y="${(b.y+1).toFixed(1)}">${s}</text>`;
     if(p){
@@ -1964,6 +1971,12 @@ function overlayHTML(G,ex){
   const anim=G.anim||{};G.anim=null;
   let h='';
   const F=G.flags;
+  /* ベット */
+  G.players.forEach(p=>{
+    if(p.bet<=0)return;
+    const q=seatPt(p.seat,FR.bet);
+    h+=`<div class="chip chip-abs bet-chip ${seatClass(p.seat)}" style="${pct(q)}" data-bet="${p.seat}">${p.bet}</div>`;
+  });
   /* ホールカード */
   G.players.forEach(p=>{
     if(p.folded||!p.cards.length)return;
@@ -1976,12 +1989,6 @@ function overlayHTML(G,ex){
     const q=slotPt(i);
     h+=`<div class="bcard" style="${pct(q)}">${cardHTML(c,true,anim.boardFrom!==undefined&&i>=anim.boardFrom?'dealt':'','bc')}</div>`;
   });
-  /* ベット */
-  G.players.forEach(p=>{
-    if(p.bet<=0)return;
-    const q=seatPt(p.seat,FR.bet);
-    h+=`<div class="chip chip-abs bet-chip ${seatClass(p.seat)}" style="${pct(q)}" data-bet="${p.seat}">${p.bet}</div>`;
-  });
   /* ポット */
   h+=`<span id="potSpot" class="pot-spot" style="${pct(POT_PT)}"></span>`;
   const showPots=G.pots&&['showdown','award','close','done'].includes(G.phase)&&G.pots.length>0;
@@ -1989,7 +1996,7 @@ function overlayHTML(G,ex){
     const n=G.pots.length;
     G.pots.forEach((P,i)=>{
       if(P.amount<=0)return;
-      const q={x:POT_PT.x+(i-(n-1)/2)*(TBL.mob?126:88),y:POT_PT.y};
+      const q={x:POT_PT.x+(i-(n-1)/2)*(TBL.mob?178:88),y:POT_PT.y};
       h+=`<div class="chip chip-abs pot-chip" style="${pct(q)}" title="${esc(P.name)}">${P.amount}<small>${n>1?(i===0?'MAIN':'SIDE'+i):'POT'}</small></div>`;
     });
   }else if(G.pot>0){
