@@ -353,6 +353,30 @@ button{font:inherit}
   .act{min-height:34px;font-size:11.5px}
 }
 
+/* ===== スマホ：文字・カード・チップを拡大（SVG内の文字は幅基準で縮むため大きめに指定） ===== */
+@media (max-width:600px){
+  .seat-badge{r:24px}
+  .seat-no{font-size:31px}
+  .seat-stack{font-size:33px}
+  .seat-state{font-size:25px}
+  .seat-tag{font-size:30px}
+  .pot-cap{font-size:25px}
+  .tbox-cap{font-size:19px}
+  .tbox-val{font-size:25px}
+  .felt-logo{font-size:30px;letter-spacing:.1em}
+  .pc{width:6.1cqw;height:8.5cqw;border-radius:.9cqw}
+  .pc.bc{width:6.4cqw;height:8.9cqw}
+  .pc .r{font-size:3.5cqw}.pc .s{font-size:3cqw}
+  .pc.bc .r{font-size:3.9cqw}.pc.bc .s{font-size:3.3cqw}
+  .pcards.n2 .pc+.pc{margin-left:.6cqw}
+  .pcards.n4 .pc+.pc{margin-left:-2cqw}
+  .bet-chip{width:8cqw;height:8cqw;font-size:2.8cqw}
+  .pot-chip{width:11cqw;height:11cqw;font-size:3.4cqw}
+  .pot-chip small{font-size:1.8cqw}
+  .puck{width:6.4cqw;height:6.4cqw;font-size:3.6cqw}
+  .seat-pick{width:10cqw;height:10cqw;font-size:4.4cqw}
+}
+
 </style>
 </head>
 <body>
@@ -1805,7 +1829,7 @@ function pullBack(p,d){
   const dx=p.x-S.x,dy=p.y-S.y,L=Math.hypot(dx,dy)||1;
   return{x:p.x-dx/L*d,y:p.y-dy/L*d};
 }
-const TBL={W:1060,H:620,cx:530,cy:146,rx:514,ry:458,tA:168,tB:12};
+const TBL={W:1060,H:620,cx:530,cy:146,rx:514,ry:458,tA:168,tB:12,mob:false};
 function TP(fr,deg){const t=deg*Math.PI/180;return{x:TBL.cx+TBL.rx*fr*Math.cos(t),y:TBL.cy+TBL.ry*fr*Math.sin(t)};}
 function arcPts(fr,d0,d1,n){
   const out=[];
@@ -1849,8 +1873,27 @@ const FR={rim:.972,stack:.918,state:.845,cards:.705,bet:.50,tag:.972};
 function seatU(s){return 1-(s-0.5)/SEATS;}
 function seatPt(s,fr,du){return atU(fr,seatU(s)+(du||0)/SEATS);}
 const BOARD={x0:406,dx:62,y:262,w:52,h:72};
+const MOB_OVERHEAD=470;   /* スマホで、テーブル以外（ヘッダー・字幕・コンソール最大時）が占める縦の高さ */
 function slotPt(i){return{x:BOARD.x0+i*BOARD.dx,y:BOARD.y};}
 const POT_PT={x:530,y:196};
+/* スマホ幅では、画面に余った縦の空きぶんだけテーブルを縦に伸ばす（選択肢は1画面に収めたまま）。
+   文字・カード・チップは幅基準なので、伸ばした分は座席の間隔と各要素の拡大に回る。 */
+function fitTable(){
+  const mob=window.matchMedia('(max-width:600px)').matches;
+  const w=Math.max(280,innerWidth-38);
+  let H=620;
+  if(mob)H=Math.max(620,Math.min(1240,Math.round((innerHeight-MOB_OVERHEAD)*TBL.W/w)));
+  if(Math.abs(H-TBL.H)<=24&&mob===TBL.mob)return false;
+  TBL.H=H;TBL.mob=mob;TBL.ry=H-TBL.cy-16;
+  for(const k in ARCT)delete ARCT[k];
+  if(mob){BOARD.w=66;BOARD.h=92;BOARD.dx=78;BOARD.x0=TBL.cx-2*78;}
+  else{BOARD.w=52;BOARD.h=72;BOARD.dx=62;BOARD.x0=406;}
+  BOARD.y=TBL.cy+TBL.ry*(mob?.29:.253);
+  POT_PT.y=TBL.cy+TBL.ry*(mob?.10:.11);
+  FR.cards=mob?.655:.705;FR.bet=mob?.46:.50;
+  return true;
+}
+fitTable();
 const PUCK_REST={x:302,y:98};
 function pct(q){return `left:${(q.x/TBL.W*100).toFixed(2)}%;top:${(q.y/TBL.H*100).toFixed(2)}%`;}
 
@@ -1946,7 +1989,7 @@ function overlayHTML(G,ex){
     const n=G.pots.length;
     G.pots.forEach((P,i)=>{
       if(P.amount<=0)return;
-      const q={x:POT_PT.x+(i-(n-1)/2)*88,y:POT_PT.y};
+      const q={x:POT_PT.x+(i-(n-1)/2)*(TBL.mob?126:88),y:POT_PT.y};
       h+=`<div class="chip chip-abs pot-chip" style="${pct(q)}" title="${esc(P.name)}">${P.amount}<small>${n>1?(i===0?'MAIN':'SIDE'+i):'POT'}</small></div>`;
     });
   }else if(G.pot>0){
@@ -2006,7 +2049,7 @@ function renderTable(){
   const ex=EXNOW;
   $('table').innerHTML=`
     ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
-    <div class="table-wrap">
+    <div class="table-wrap" style="aspect-ratio:${TBL.W}/${TBL.H}">
       ${tableSvgHTML(G,ex)}
       <div class="chip-layer">${overlayHTML(G,ex)}</div>
     </div>
@@ -2027,7 +2070,7 @@ function renderTable(){
   }
 }
 let rzTimer=0;
-addEventListener('resize',()=>{clearTimeout(rzTimer);rzTimer=setTimeout(()=>{if(Dealer.svg&&Dealer.root.parentNode&&!Dealer.busy)Dealer.reset();},150);});
+addEventListener('resize',()=>{clearTimeout(rzTimer);rzTimer=setTimeout(()=>{if(Dealer.busy)return;if(fitTable())render();else if(Dealer.svg&&Dealer.root.parentNode)Dealer.reset();},150);});
 
 /* ---- 字幕 ---- */
 let VOICE_EN=null,VOICE_JA=null;
