@@ -17,6 +17,7 @@ button{font:inherit}
 .topbar{display:flex;align-items:center;gap:16px;padding:10px 20px;background:var(--room2);color:#E9EDF1;border-bottom:1px solid #3A4652;position:relative}
 .brand-main{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;color:var(--brass)}
 .brand-sub{margin-left:10px;font-size:13px;color:#AEB8C2}
+.bm-sm{display:none}
 .meta{margin-left:auto;display:flex;gap:18px;font-size:13px;color:#C2CBD3;flex-wrap:wrap;justify-content:flex-end}
 .meta b{color:#fff;font-size:15px;margin-left:4px;font-weight:bold}
 .meta i{font-style:normal}.meta .sm{display:none}.meta span{white-space:nowrap}
@@ -48,6 +49,26 @@ button{font:inherit}
 .rule-table td.hit{background:#DDF0E4;color:#1E5E3B;font-weight:bold}
 .rule-table td.stand{background:#F8DEDB;color:#8A231B;font-weight:bold}
 .rule-table td.lead{background:#EDF0F3;font-weight:bold;text-align:left;white-space:normal}
+
+/* ---- 質問チャット ---- */
+.chat{position:fixed;right:20px;bottom:20px;z-index:40;width:400px;max-width:calc(100vw - 24px);height:560px;max-height:calc(100vh - 40px);background:#fff;color:var(--ink);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden;border-top:4px solid var(--brass)}
+.chat[hidden]{display:none}
+.chat-head{display:flex;align-items:baseline;gap:8px;padding:8px 12px;background:#F3F5F7;border-bottom:1px solid #E1E5E9}
+.chat-head b{font-size:15px}
+.chat-sub{font-size:11px;color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-x{background:transparent;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+.chat-x:hover{color:var(--ink)}
+.chat-body{flex:1;overflow-y:auto;padding:10px 12px;background:#EEF1F4}
+.cm{max-width:90%;padding:8px 11px;border-radius:12px;margin:0 0 8px;font-size:13.5px;line-height:1.65;word-break:break-word}
+.cm.bot{background:#fff;border:1px solid #D5DBE1;border-top-left-radius:3px}
+.cm.me{background:var(--felt);color:#fff;margin-left:auto;border-top-right-radius:3px}
+.cm.hint::before{content:"ヒント使用";display:block;font-size:10.5px;color:#8A5A00;margin-bottom:2px}
+.chat-sug{display:flex;gap:6px;overflow-x:auto;padding:6px 10px;border-top:1px solid #E1E5E9;background:#fff;flex:none}
+.chat-sug button{flex:none;font-size:12px;border:1px solid #9AA5B0;background:#fff;border-radius:14px;padding:3px 10px;cursor:pointer;color:var(--ink)}
+.chat-sug button:hover{border-color:var(--ink)}
+.chat-form{display:flex;gap:6px;padding:8px 10px;border-top:1px solid #E1E5E9;background:#fff;flex:none}
+.chat-form input{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px;border:1.5px solid #9AA5B0;border-radius:8px}
+.chat-form .act{min-height:40px;padding:6px 16px}
 
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;padding:16px 20px;max-width:1360px;margin:0 auto}
 .main-col{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -137,6 +158,7 @@ button{font:inherit}
 .hand.h-b .hand-cap{color:#F0A9A2}
 .hand-cap b{font-family:Georgia,serif;font-size:21px;color:#F4EFE2;line-height:1}
 .hand-cap .pend{font-family:inherit;font-size:11px;color:rgba(250,247,239,.5);font-weight:normal}
+.hand-cap small{margin-left:8px;font-size:10.5px;letter-spacing:0;color:var(--brass)}
 .hand.win{box-shadow:0 0 14px rgba(201,162,75,.85);border-color:var(--brass);animation:hwin .5s ease-out}
 @keyframes hwin{0%{box-shadow:0 0 0 rgba(201,162,75,0)}55%{box-shadow:0 0 26px rgba(201,162,75,1)}100%{box-shadow:0 0 14px rgba(201,162,75,.85)}}
 .cards{display:flex;gap:4px;align-items:flex-start;min-height:64px}
@@ -156,7 +178,7 @@ button{font:inherit}
 .card-slot{width:44px;height:62px;border:1px dashed rgba(250,247,239,.24);border-radius:5px;flex:none}
 
 /* ---- チップ ---- */
-.chip{width:26px;height:26px;border-radius:50%;border:3px dashed rgba(255,255,255,.9);color:#fff;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;box-shadow:0 1px 3px rgba(0,0,0,.6);padding:0;cursor:default;flex:none;z-index:4}
+.chip{width:36px;height:36px;border-radius:50%;border:3px dashed rgba(255,255,255,.9);color:#fff;font-size:11.5px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;box-shadow:0 1px 3px rgba(0,0,0,.6);padding:0;cursor:default;flex:none;z-index:4}
 .c-s1{background:#B83A3A}.c-s2{background:#2F5FB3}.c-s3{background:#2E7D4F}
 .c-s4{background:#C7711E}.c-s5{background:#6B3FA0}.c-s6{background:#1C7C86}.c-s7{background:#9A2E62}
 .chip.lost{opacity:.3;filter:grayscale(80%)}
@@ -299,7 +321,7 @@ button{font:inherit}
   .card .r{font-size:13px}
   .card .s{font-size:10px}
   .card-slot{width:31px;height:44px}
-  .chip{width:19px;height:19px;font-size:7px;border-width:2px}
+  .chip{width:26px;height:26px;font-size:9px;border-width:2px}
   .seatkey{display:none}
   .zone-tag{font-size:9.5px}
   .table-next{right:8px;top:8px;font-size:12px;padding:5px 9px}
@@ -323,10 +345,16 @@ button{font:inherit}
   .stack-total{font-size:12px}.stack-total b{font-size:15px}
   .act{min-height:34px;font-size:11.5px}
 }
-/* 360px 幅では設定ボタンまでが1行に収まらないため、ヘッダーをさらに詰める */
-@media (max-width:400px){
+@media (max-width:600px){
+  .chat{left:8px;right:8px;bottom:8px;width:auto;max-width:none;height:min(74vh,540px)}
+  .cm{font-size:13px}
+}
+/* 「質問」ボタンが増えたぶん、スマホ幅ではヘッダーを1行に収めるためにさらに詰める
+   （412px前後のAndroidでも、方式ラベル・ミス数が長い局面で溢れないように） */
+@media (max-width:520px){
   .topbar{gap:6px;padding:6px 8px}
   .brand-main{font-size:13px}
+  .bm-lg{display:none}.bm-sm{display:inline}
   .meta{gap:6px;font-size:10px}
   .meta b{font-size:11.5px}
   .rule-pill,.difficulty-pill{padding:1px 5px}
@@ -337,15 +365,16 @@ button{font:inherit}
   .card{width:28px;height:40px}
   .card .r{font-size:12px}
   .card-slot{width:28px;height:40px}
-  .chip{width:17px;height:17px;font-size:6.5px}
+  .chip{width:24px;height:24px;font-size:8.5px}
   .act{min-height:32px;font-size:11px}
 }
 </style>
 </head>
 <body>
 <header class="topbar">
-  <div><span class="brand-main">Dealer Simulator</span><span class="brand-sub">バカラ</span></div>
+  <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">バカラ</span></div>
   <div class="meta" id="meta"></div>
+  <button class="btn-ghost" data-act="toggleChat" aria-expanded="false" id="btnChat">質問</button>
   <button class="btn-ghost" data-act="toggleSettings" aria-expanded="false" id="btnSettings">設定<span class="lg">・成績</span></button>
   <div class="settings" id="settings" hidden></div>
 </header>
@@ -357,6 +386,15 @@ button{font:inherit}
   </div>
   <aside class="log" id="log" aria-label="進行ログ"></aside>
 </main>
+<section class="chat" id="chat" hidden aria-label="質問チャット">
+  <div class="chat-head"><b>質問チャット</b><span class="chat-sub">通信なし・卓の状況を読んで回答</span><button type="button" class="chat-x" data-act="toggleChat" aria-label="閉じる">×</button></div>
+  <div class="chat-body" id="chatBody" aria-live="polite"></div>
+  <div class="chat-sug" id="chatSug"></div>
+  <form class="chat-form" id="chatForm" autocomplete="off">
+    <input id="chatInput" type="text" maxlength="200" placeholder="例：バンカー4でプレイヤーの3枚目が8なら？" aria-label="質問を入力">
+    <button type="submit" class="act primary">送信</button>
+  </form>
+</section>
 
 <script>
 /*ENGINE_START*/
@@ -364,9 +402,8 @@ button{font:inherit}
 const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SUITS=[{m:'♠',c:'black'},{m:'♥',c:'red'},{m:'♦',c:'red'},{m:'♣',c:'black'}];
 const DECKS=8;
-/* 実際のミニ／ミディ・バカラ台と同じ7ポジション。設定の「人数」は着席数で、
-   空席のポジションもレイアウト上は常に描く。 */
-const TABLE_SEATS=7;
+/* 3人掛けの台（3ポジション）。全員が着席している前提で進行する。 */
+const TABLE_SEATS=3;
 /* バカラはルーレットより高額ベットが動くため、$1000チップまで用意する
    （タイ9:1などで配当が数千ドルになる場面の枚数を現実的な範囲に収める） */
 const CHIPS=[1000,500,100,25,5,1];
@@ -417,9 +454,14 @@ const HOUSE_RULES=[
 ];
 const TIE_PAYS=[8,9];
 
-function makeTableRule(prev){
-  let r=rnd(HOUSE_RULES);
-  if(prev&&HOUSE_RULES.length>1){let g=0;while(r.id===prev.rule.id&&g++<8)r=rnd(HOUSE_RULES);}
+/* mode が 'random' 以外なら、そのコミッション方式に固定する（設定で選択）。
+   タイ配当とパーフェクトペアの有無は、テーブルを作り直すたびに引き直す。 */
+function makeTableRule(prev,mode){
+  let r=HOUSE_RULES.find(x=>x.id===mode);
+  if(!r){
+    r=rnd(HOUSE_RULES);
+    if(prev&&HOUSE_RULES.length>1){let g=0;while(r.id===prev.rule.id&&g++<8)r=rnd(HOUSE_RULES);}
+  }
   return{rule:r,tiePay:rnd(TIE_PAYS),perfectPair:Math.random()<0.4};
 }
 function ruleSummary(T){
@@ -453,8 +495,7 @@ const LABEL={
   noMoreBets:'ノー・モア・ベットを宣言',
   dealPlayer:'プレイヤーへ1枚配る',
   dealBanker:'バンカーへ1枚配る',
-  squeezePlayer:'プレイヤーの手札を絞って開く',
-  squeezeBanker:'バンカーの手札を絞って開く',
+  selectSqueezer:'絞る客を指名する',
   callTotals:'両者の点数をコール',
   declareNatural:'ナチュラルを宣言',
   playerDraw:'プレイヤーは引く',
@@ -559,11 +600,15 @@ function bankerReasonSet(bTotal,p3){
 
 /* ===== ゲーム状態 ===== */
 function createGame(opts){
-  return{opts:Object.assign({seats:3,randomRule:true,showDrawHints:true,showZoneHints:true,
-      showDealer:true,voice:true,dealerSpeed:1,adaptiveDifficulty:true,drawFocus:true},opts||{}),
-    roundNo:0,phase:'idle',shoe:newShoe(),discard:0,bets:[],seatNos:[],
+  const o=Object.assign({ruleMode:'random',showDrawHints:true,showZoneHints:true,
+      showDealer:true,voice:true,dealerSpeed:1,adaptiveDifficulty:true,drawFocus:true},opts||{});
+  /* 旧設定（ハウスルールのランダム切替をオフにしていた）の引き継ぎ */
+  if(opts&&opts.randomRule===false&&!opts.ruleMode)o.ruleMode='comm5';
+  if(o.ruleMode!=='random'&&!HOUSE_RULES.some(r=>r.id===o.ruleMode))o.ruleMode='random';
+  return{opts:o,
+    roundNo:0,phase:'idle',shoe:newShoe(),discard:0,bets:[],seatNos:[],squeezer:{p:null,b:null},squeezeFlash:null,
     pCards:[],bCards:[],p3:null,winner:null,
-    table:makeTableRule(null),ruleChanged:false,prevRule:null,signOpen:false,
+    table:makeTableRule(null,o.ruleMode),ruleChanged:false,prevRule:null,signOpen:false,
     commissionDue:0,commissionTaken:0,commissionBox:0,
     flags:{},payIdx:null,pending:null,round:null,log:[],lastFb:null,
     caption:C('','ラウンドを開始すると、ディーラーの発声がここに表示されます'),capQueue:[]};
@@ -578,20 +623,40 @@ function makeBet(kind,seat,id,df,side){
     win:null,push:false,mult:0,payAmt:0,settled:false,collected:false};
 }
 
-/* 7つの座席のうち、設定した人数ぶんをテーブル中央寄りから埋める
-   （実際の台も端の席から埋まることは少ない） */
-function occupiedSeats(n){
-  const start=Math.floor((TABLE_SEATS-n)/2)+1;
-  return Array.from({length:n},(_,i)=>start+i);
+/* 3人掛けの台。全ポジションに客が着席している */
+function occupiedSeats(){return Array.from({length:TABLE_SEATS},(_,i)=>i+1);}
+
+/* 絞る客を決めるための「最高額ベッター」。プレイヤーの手札はプレイヤー側に、
+   バンカーの手札はバンカー側に賭けている客のうち、賭け額が最大の席が絞る。
+   buildBets が同額を作らないので、必ず1席に決まる。 */
+function squeezerFor(G,side){
+  const kind=side==='p'?'player':'banker';
+  const bs=G.bets.filter(b=>b.kind===kind);
+  if(!bs.length)return null;
+  return bs.reduce((a,b)=>b.amount>a.amount?b:a);
 }
 function buildBets(G,df){
   const bets=[];let id=0;
+  /* メインは必ず1口。プレイヤー側・バンカー側の両方に最低1人は賭けさせる
+     （絞る客を指名する訓練が成立しなくなるため）。 */
+  const kinds=G.seatNos.map(()=>Math.random()<0.52?'banker':'player');
+  if(kinds.every(k=>k===kinds[0]))kinds[Math.floor(Math.random()*kinds.length)]=kinds[0]==='banker'?'player':'banker';
+  let si=0;
   for(const s of G.seatNos){
-    /* メインは必ず1口。タイは単独では置かず、メインに添える形で入る。 */
-    bets.push(makeBet(Math.random()<0.52?'banker':'player',s,'b'+(id++),df));
+    bets.push(makeBet(kinds[si++],s,'b'+(id++),df));
     if(Math.random()<df.tieChance)bets.push(makeBet('tie',s,'b'+(id++),df));
     if(Math.random()<df.sideChance)bets.push(makeBet(Math.random()<0.5?'ppair':'bpair',s,'b'+(id++),df));
     if(Math.random()<df.sideChance*0.6)bets.push(makeBet('dragon',s,'b'+(id++),df,Math.random()<0.5?'player':'banker'));
+  }
+  /* 同じ側のメインベットは額をずらして、最高額が1席に決まるようにする */
+  for(const kind of ['player','banker']){
+    const used=new Set();
+    bets.filter(b=>b.kind===kind).forEach(b=>{
+      let a=b.amount,g=0;
+      while(used.has(a)&&g++<30)a=rnd(df.main);
+      if(used.has(a)){const f=df.main.find(x=>!used.has(x));if(f!==undefined)a=f;}
+      b.amount=a;used.add(a);
+    });
   }
   return bets;
 }
@@ -622,10 +687,13 @@ function startRound(G){
   /* ハウスルールの切替。1ラウンド目は必ず掲示して、今日のテーブルの条件を頭に入れさせる。 */
   G.prevRule=G.table;G.ruleChanged=false;
   if(G.roundNo===1)G.ruleChanged=true;
-  else if(G.opts.randomRule&&Math.random()<df.ruleChance){G.table=makeTableRule(G.table);G.ruleChanged=true;}
+  else if(G.opts.ruleMode!=='random'){
+    if(G.table.rule.id!==G.opts.ruleMode){G.table=makeTableRule(G.table,G.opts.ruleMode);G.ruleChanged=true;}
+  }
+  else if(Math.random()<df.ruleChance){G.table=makeTableRule(G.table,'random');G.ruleChanged=true;}
   G.signOpen=G.ruleChanged;
 
-  G.seatNos=occupiedSeats(Math.max(1,Math.min(TABLE_SEATS,G.opts.seats)));
+  G.seatNos=occupiedSeats();G.squeezer={p:null,b:null};G.squeezeFlash=null;
   G.bets=buildBets(G,df);
   const h=drawInitial(G);
   G.pCards=h.p;G.bCards=h.b;G.p3=null;G.winner=null;
@@ -636,7 +704,7 @@ function startRound(G){
     bDecided:false,bDrew:false,bCard3:false,bReasonDone:false,
     calledResult:false,tookOuter:false,tookInner:false,commDone:false,cleaned:false};
   G.phase='bet';
-  G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[]};
+  G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[],hints:0};
   if(G.ruleChanged){
     addLog(G,{t:'rule',el:`ハウスルール：${ruleSummary(G.table)}`,
       why:G.table.rule.desc});
@@ -773,7 +841,7 @@ function E(key,cat,why,call,extra){return Object.assign({key,cat,why,call:call||
 
 /* 回収も配当も「外周（ディーラーから遠い）→内側（手前）」。手前を先に片付けると、
    外周へ手を伸ばすたびに処理済みのチップの上を越えることになり事故が増える。
-   各リング内は1番席から7番席へ、必ず同じ向きに回して払い忘れと二重払いを防ぐ。 */
+   各リング内は1番席から3番席へ、必ず同じ向きに回して払い忘れと二重払いを防ぐ。 */
 function payGroup(b){return BET_META[b.kind].ring==='outer'?0:1;}
 const PAY_GROUP_NAME=[RING_NAME.outer,RING_NAME.inner];
 function payCandidates(G){
@@ -809,12 +877,22 @@ function expected(G){
     }
 
     case 'open':{
-      if(!F.openedP)return E('squeezePlayer','squeeze',
-        'プレイヤーの手札から先に開きます。カードの短辺から少しずつずらしてピップ（マーク）の数を確かめ、次に90度回して長辺から絞る、これがスクイーズです。焦らず、必ず全員から見える位置で開くこと。手元に引き込んで開くとすり替えを疑われます。',
-        C('Player.','プレイヤー'));
-      if(!F.openedB)return E('squeezeBanker','squeeze',
-        '続いてバンカーの手札を開きます。順番はプレイヤーが先で固定です。開いたカードは重ねず、全員と天井カメラから2枚とも見える形で並べます。',
-        C('Banker.','バンカー'));
+      /* 絞るのはディーラーではなく客。その手札と同じ側に最も多く賭けている席に渡す。
+         プレイヤーの手札が先、バンカーの手札が後（配り順・判定順と同じ）。 */
+      const side=!F.openedP?'p':!F.openedB?'b':null;
+      if(side){
+        const top=squeezerFor(G,side),sideJa=side==='p'?'プレイヤー':'バンカー';
+        const others=G.bets.filter(b=>b.kind===(side==='p'?'player':'banker')).sort((a,b)=>b.amount-a.amount)
+          .map(b=>`${b.seat}番席${fmt$(b.amount)}`).join('、');
+        const why=`${sideJa}の手札は、${sideJa}側に賭けている客のうち賭け額が最も大きい席に絞ってもらいます。今回の${sideJa}側は ${others} で、最高額は${top.seat}番席（${fmt$(top.amount)}）です。`
+          +'最も大きなリスクを負っている客に開ける権利を渡すのが慣習で、客が自分の手で確かめることで「ディーラーがカードをすり替えた」という疑念も生まれにくくなります。'
+          +'絞っている間もディーラーは札から目を離さず、折り曲げや傷（マーキング）がないか、札が卓の外へ持ち出されないかを監視します。'
+          +'絞り終えたカードは必ずその場で返してもらい、2枚とも全員と天井カメラから見える形で並べます。';
+        return E('selectSqueezer','squeeze',why,
+          C(side==='p'?'Player card. Squeeze, please.':'Banker card. Squeeze, please.',
+            side==='p'?'プレイヤーのカード、どうぞお絞りください':'バンカーのカード、どうぞお絞りください'),
+          {side,correct:top.seat,topAmount:top.amount,sideJa});
+      }
       G.phase='count';return expected(G);
     }
 
@@ -902,7 +980,7 @@ function expected(G){
       if(cands.length){
         if(G.payIdx===null){
           const g=payGroup(cands[0]);
-          const why=`配当も回収と同じ「${PAY_GROUP_NAME[0]}→${PAY_GROUP_NAME[1]}」の順、各リング内は1番席から7番席へ一方向に回します。次は${PAY_GROUP_NAME[g]}、${cands[0].seat}番席です。テーブル上の該当チップを選んでください。`;
+          const why=`配当も回収と同じ「${PAY_GROUP_NAME[0]}→${PAY_GROUP_NAME[1]}」の順、各リング内は1番席から3番席へ一方向に回します。次は${PAY_GROUP_NAME[g]}、${cands[0].seat}番席です。テーブル上の該当チップを選んでください。`;
           return E('select','pay',why,null,{picks:cands.map(b=>b.id)});
         }
         const b=G.bets.find(x=>x.id===G.payIdx);
@@ -964,8 +1042,13 @@ function apply(G,ex,amount){
         extra=`（${cardText(c)}＝${cardPoint(c.rank)}点、合計${handTotal(G.bCards)}）`;
         cap=C(`Banker draws ${c.rank}. Banker has ${handTotal(G.bCards)}.`,`バンカー3枚目 ${cardText(c)}、合計${handTotal(G.bCards)}`);}
       break;
-    case 'squeezePlayer':F.openedP=true;extra=`（${handText(G.pCards)}＝${handTotal(G.pCards)}）`;break;
-    case 'squeezeBanker':F.openedB=true;extra=`（${handText(G.bCards)}＝${handTotal(G.bCards)}）`;break;
+    case 'selectSqueezer':{
+      const cards=ex.side==='p'?G.pCards:G.bCards;
+      if(ex.side==='p')F.openedP=true;else F.openedB=true;
+      G.squeezer[ex.side]=ex.correct;G.squeezeFlash=ex.side;
+      extra=`（${ex.correct}番席が絞る＝${ex.sideJa}側の最高額${fmt$(ex.topAmount)}：${handText(cards)}＝${handTotal(cards)}）`;
+      break;
+    }
     case 'callTotals':F.calledTotal=true;
       cap=C(ex.callSet.right+'.',`プレイヤー${handTotal(G.pCards)}、バンカー${handTotal(G.bCards)}`);break;
     case 'declareNatural':F.naturalDone=true;break;
@@ -1036,6 +1119,7 @@ function act(G,key,arg){
     recordErr(G,cat,p.ex.why,`金額が違います（出したチップ：${fmt$(sum)}）。${p.ex.hint}`);
     return{cat,ok:false};
   }
+  G.squeezeFlash=null;
   const ex=expected(G);if(!ex)return null;
   if(ex.unscored){if(key==='start'){apply(G,ex);G.lastFb=null;}return null;}
 
@@ -1054,6 +1138,15 @@ function act(G,key,arg){
   if(ex.key==='bankerReason'&&arg!==ex.reasonSet.right){
     recordErr(G,'draw',ex.why,`根拠が違います。正しくは「${ex.reasonSet.right}」。${ex.why}`);
     return{cat:'draw',ok:false};
+  }
+  if(ex.key==='selectSqueezer'&&String(arg)!==String(ex.correct)){
+    const kind=ex.side==='p'?'player':'banker';
+    const mine=G.bets.find(b=>b.kind===kind&&String(b.seat)===String(arg));
+    const head=mine
+      ?`${arg}番席の${ex.sideJa}側の賭け額は${fmt$(mine.amount)}ですが、最高額は${ex.correct}番席の${fmt$(ex.topAmount)}です。`
+      :`${arg}番席は${ex.sideJa}側に賭けていません。`;
+    recordErr(G,'squeeze',ex.why,`絞る客が違います。${head}${ex.why}`);
+    return{cat:'squeeze',ok:false};
   }
   if(ex.key==='select'){
     if(!ex.picks.includes(arg)){
@@ -1081,6 +1174,261 @@ function act(G,key,arg){
   return{cat:ex.cat,ok:true};
 }
 /*ENGINE_END*/
+
+/*CHAT_START*/
+/* ===== アプリ内Q&A（オフライン）=====
+   外部のAPIには接続しない。このファイルに入れた知識と、いま卓に「見えている」情報
+   （開いたカード・ベット額・ルール）だけで答える。単一HTMLで完結させる前提のうえ、
+   公開ファイルにAPIキーを埋め込めないための設計。伏せたままのカードは答えに使わない。
+   答えに正解が含まれる質問（「今バンカーは引く？」など）は hint:true を返し、
+   ラウンド終了時に「ヒント使用」として数える。 */
+const CHAT_SUGGEST=[
+  'バンカーの3枚目の条件は？',
+  '今バンカーは引く？',
+  '誰が絞るの？',
+  'バンカー350のコミッションは？',
+  'タイ200の配当は？',
+  '今のルールは？',
+  '次は何をすればいい？'
+];
+const CHAT_INTRO='バカラの手順・3枚目の条件表・配当・コミッションについて質問できます。今の卓で開いているカードや賭け額も踏まえて答えます。'
+  +'通信は使わず、このアプリに入っている知識だけで答えるので、範囲外の質問には答えられません。\n'
+  +'例：「バンカー4でプレイヤーの3枚目が8なら？」「バンカー350のコミッションは？」「ドラゴンボーナスの配当は？」';
+
+function chatNorm(s){return String(s||'').normalize('NFKC').toLowerCase().replace(/[\s　]+/g,' ').trim();}
+/* 金額の抽出。%・倍率・点数・枚数などの数字は先に取り除く */
+function chatAmount(q){
+  const t=q.replace(/\d+(?:\.\d+)?\s*(?:%|倍|枚|点差|点|番席|人|回|:\d+)/g,' ')
+    .replace(/(?:点差|合計|トータル)\s*\d+/g,' ');
+  const m=t.match(/\d[\d,]*/);
+  if(!m)return null;
+  const v=+m[0].replace(/,/g,'');
+  return v>0?v:null;
+}
+function ruleById(id){return HOUSE_RULES.find(r=>r.id===id);}
+
+/* 「バンカー4でプレイヤーの3枚目が8」のように状況を言われたときの判定 */
+function chatDrawCalc(q){
+  const mb=q.match(/バンカー\D{0,6}?(\d)(?![\d枚])/);
+  if(!mb)return null;
+  const bt=+mb[1];
+  const mp=q.match(/(?:3枚目|三枚目|サード)\D{0,6}?(\d)(?!\d)/);
+  const stand=/スタンド|引かなかった|引かず|引いていない|3枚目(?:は|が)?(?:なし|無し)/.test(q);
+  if(!mp&&!stand&&!/引く|ヒット|ドロー/.test(q))return null;
+  if(bt>=8)return{text:`バンカーが${bt}ならナチュラルです。両者とも3枚目は引かず、その場で勝敗が決まります。`};
+  const p3=mp?+mp[1]:null;
+  const hit=bankerDraws(bt,p3);
+  return{text:`判定：バンカー${bt}、プレイヤーは${p3===null?'スタンド（3枚目なし）':'3枚目が'+p3}\n→ バンカーは${hit?'ヒット（引く）':'スタンド（引かない）'}です。\n${bankerWhy(bt,p3)}`};
+}
+
+/* いま卓に開いているカードだけを見て答える「今バンカーは引く？」 */
+function chatDrawContext(G,q){
+  const F=G.flags||{};
+  if(!/引く|引き|引かない|ヒット|スタンド|ドロー/.test(q))return null;
+  if(!/バンカー|プレイヤー/.test(q))return null;
+  if(G.phase!=='draw'||!F.openedP||!F.openedB){
+    /* 「今」と聞かれたときだけ状況を答える。一般的な質問は知識ベースに任せる */
+    if(!/今|いま|この|現在/.test(q))return null;
+    return{text:'3枚目の判定に入る前（またはカードが開く前）なので、いまは判定できません。カードを開いてから聞いてください。\n一般則は「バンカーの3枚目の条件は？」で確認できます。'};
+  }
+  const pt=handTotal(G.pCards.slice(0,2)),bt=handTotal(G.bCards.slice(0,2));
+  if(pt>=8||bt>=8)return{hint:true,text:`プレイヤー${pt}、バンカー${bt}。どちらかが2枚で8か9のナチュラルなので、両者とも引かずに終了です。`};
+  if(/バンカー/.test(q)){
+    if(!F.pDecided)return{text:`先にプレイヤーの判定です（プレイヤーは${pt}）。バンカーはプレイヤーの結果を見てから決めます。`};
+    if(F.pDrew&&!F.pCard3)return{text:'プレイヤーの3枚目を配ってから、バンカーを判定します。'};
+    const p3=F.pDrew?G.p3:null;
+    return{hint:true,text:`バンカー${bt}、プレイヤーは${p3===null?'スタンド':'3枚目が'+p3}。\n→ バンカーは${bankerDraws(bt,p3)?'ヒット（引く）':'スタンド（引かない）'}です。\n${bankerWhy(bt,p3)}`};
+  }
+  return{hint:true,text:`プレイヤーは${pt}。\n→ ${playerDraws(pt)?'0〜5なのでヒット（引く）':'6〜7なのでスタンド'}です。`};
+}
+
+function chatCalc(G,q){
+  const amt=chatAmount(q);
+  if(!amt)return null;
+  const T=G.table,money=fmt$(amt);
+  let mode=T.rule;
+  if(/ノーコミ|no ?comm|コミッション(?:なし|無し)/.test(q))mode=ruleById('nocomm');
+  else if(/\bez\b|イージー/.test(q))mode=ruleById('ez');
+  else if(/(?:^|\D)4 ?%/.test(q))mode=ruleById('comm4');
+  else if(/(?:^|\D)5 ?%/.test(q))mode=ruleById('comm5');
+  if(/パーフェクト|ペア|pair/.test(q)){
+    const perfect=/パーフェクト|スート/.test(q);const m=perfect?25:11;
+    return{text:`${perfect?'パーフェクトペア':'ペア'} ${money}（${m}:1）\n→ 配当 ${fmt$(amt*m)}\n${payTip(m,amt)}`
+      +(perfect?'':'\n※スートまで一致したペアだけ25:1になるテーブルもあります（パーフェクトペアあり）。')};
+  }
+  if(/ドラゴン|dragon/.test(q)){
+    const mm=q.match(/(\d)\s*点差|点差\s*(\d)/);
+    if(/ナチュラル/.test(q))return{text:`ドラゴンボーナス ${money}\nナチュラル（2枚で8か9）で勝った場合は点差に関係なく1:1 → 配当 ${money}\n${payTip(1,amt)}`};
+    if(mm){
+      const margin=+(mm[1]||mm[2]),pay=dragonPay(margin);
+      return pay?{text:`ドラゴンボーナス ${money}、点差${margin}（${pay}:1）\n→ 配当 ${fmt$(amt*pay)}\n${payTip(pay,amt)}`}
+        :{text:`点差${margin}はドラゴンボーナスの配当表にありません（点差3以下のハズレ、または表外）。配当表は「ドラゴンボーナスの配当は？」で確認できます。`};
+    }
+    return null;
+  }
+  if(/タイ|tie/.test(q)){
+    const mm=q.match(/(8|9)\s*(?:倍|:1)/);const m=mm?+mm[1]:T.tiePay;
+    return{text:`タイ ${money}（${m}:1${mm?'':'＝今のテーブルの設定'}）\n→ 配当 ${fmt$(amt*m)}\n${payTip(m,amt)}`};
+  }
+  if(/バンカー|banker/.test(q)){
+    const rate=mode.commission;
+    if(rate>0){
+      const c=commissionOf(rate,amt);
+      return{text:`バンカー勝ち ${money}（${mode.name}）\n・配当：1:1 → ${money}\n・コミッション：${commTip(rate,amt)}\n→ 客の手元に残る差引額は ${fmt$(amt-c)}\n※配当を払ってから、コミッションを別に徴収します。`};
+    }
+    if(mode.sixHalf)return{text:`バンカー勝ち ${money}（${mode.name}）\n・通常の勝ち：1:1 → ${money}\n・バンカー合計6で勝った場合：半額（1:2）→ ${fmt$(amt*0.5)}\n${payTip(0.5,amt)}`};
+    return{text:`バンカー勝ち ${money}（${mode.name}）\n・通常の勝ち：1:1 → ${money}\n・バンカーが3枚で合計7の勝ち（ドラゴン7）：プッシュ。元金を返すだけで配当はありません。`};
+  }
+  if(/プレイヤー|player/.test(q))return{text:`プレイヤー勝ち ${money}（1:1）\n→ 配当 ${money}\n${payTip(1,amt)}`};
+  if(/コミッション|手数料|%/.test(q)){
+    const rm=q.match(/(\d+(?:\.\d+)?)\s*%/);
+    const rate=rm?+rm[1]/100:(mode.commission||0.05);
+    if(!(rate>0&&rate<1))return null;
+    return{text:`${money}に対するコミッション${Math.round(rate*1000)/10}%\n${commTip(rate,amt)}`};
+  }
+  return null;
+}
+
+/* 「次は何をすればいい？」：いまの場面の正解と理由。答えそのものなのでヒント扱い */
+function chatNextStep(G){
+  if(G.pending){
+    const ex=G.pending.ex;
+    return{hint:true,text:`いまはチップトレイで「${LABEL[ex.key]}」の金額を出す場面です。\n${ex.hint||ex.why}`};
+  }
+  const ex=expected(G);
+  if(!ex)return{text:'いまの状況は判定できません。'};
+  if(ex.unscored)return{text:G.phase==='idle'?'まず「ラウンドを開始」を押して、ベットを募ってください。':'「次のラウンドへ」で次のゲームを始められます。'};
+  return{hint:true,text:`いまの場面の正しい操作は「${LABEL[ex.key]}」です。\n${ex.why}`};
+}
+
+function chatSqueezerAnswer(G,q){
+  const F=G.flags||{};
+  const past=/絞った|絞りました|絞ってた|絞っていた/.test(q||'');
+  const gen='絞るのはディーラーではなく客です。プレイヤーの手札はプレイヤー側に賭けた客のうち賭け額が最大の席、バンカーの手札はバンカー側に賭けた客のうち賭け額が最大の席に絞ってもらいます（プレイヤーの手札が先）。'
+    +'\n最も大きなリスクを負っている客に開ける権利を渡す慣習で、客が自分で確かめることで「すり替えた」という疑念も生まれにくくなります。絞っている間もディーラーは札から目を離さず、折り曲げや傷（マーキング）がないか、札が卓の外へ出ないかを監視します。';
+  if(!past&&G.phase==='open'&&G.bets.length){
+    const side=!F.openedP?'p':'b',t=squeezerFor(G,side),sj=side==='p'?'プレイヤー':'バンカー';
+    const list=G.bets.filter(b=>b.kind===(side==='p'?'player':'banker')).sort((a,b)=>b.amount-a.amount).map(b=>`${b.seat}番席${fmt$(b.amount)}`).join('、');
+    return{hint:true,text:`いまは${sj}の手札です。${sj}側に賭けているのは ${list}。最高額は${t.seat}番席（${fmt$(t.amount)}）なので、その席に絞ってもらいます。\n\n${gen}`};
+  }
+  const done=[F.openedP&&G.squeezer.p?`プレイヤーの手札は${G.squeezer.p}番席`:'',F.openedB&&G.squeezer.b?`バンカーの手札は${G.squeezer.b}番席`:''].filter(Boolean);
+  return{text:(done.length?`このラウンドは、${done.join('、')}が絞りました。\n\n`:'')+gen};
+}
+
+function chatFlowText(){
+  return '1ラウンドの流れ\n'
+    +'1. ベット受付 → 「No more bets」で締切\n'
+    +'2. 配る：プレイヤー→バンカー→プレイヤー→バンカーの順に2枚ずつ（裏向き）\n'
+    +'3. 絞り：各サイドの最高額の客に絞ってもらう（プレイヤーの手札が先）\n'
+    +'4. 両者の点数をコール\n'
+    +'5. どちらかがナチュラル（2枚で8か9）なら3枚目なしで終了。そうでなければ、プレイヤー→バンカーの順で3枚目を判定（3枚目は表向き）\n'
+    +'6. 勝敗をコール（勝った側・高い点・負けた点）\n'
+    +'7. ハズレ回収：外周（プレイヤー/バンカー枠）→内側（タイ・ペア・ドラゴン）\n'
+    +'8. 配当：外周→内側、各リング内は1番席から順に\n'
+    +'9. コミッション徴収（コミッション方式のテーブルのみ）\n'
+    +'10. クリーンハンド → カードを片付ける';
+}
+
+const CHAT_KB=[
+  {id:'draw_banker',k:[/バンカー.*(3枚目|三枚目|引(?!き分)|ヒット|ドロー|条件)/,/条件表/,/サードカード|third/],
+   a:'バンカーの3枚目は、プレイヤーが3枚目を引いたかどうかで分かれます。\n'
+    +'■ プレイヤーがスタンドした場合：バンカーもプレイヤーと同じ。0〜5でヒット、6〜7でスタンド。\n'
+    +'■ プレイヤーが3枚目を引いた場合（その3枚目の点数で判断）\n'
+    +'・バンカー0〜2：必ずヒット\n・バンカー3：3枚目が8以外ならヒット\n・バンカー4：3枚目が2〜7ならヒット\n・バンカー5：3枚目が4〜7ならヒット\n・バンカー6：3枚目が6〜7ならヒット\n・バンカー7：必ずスタンド\n'
+    +'覚え方：3は8だけ避ける／4は2〜7／5は4〜7／6は6〜7。ヒットする範囲が両端から1つずつ狭まっていきます。\n'
+    +'状況を書いてもらえれば判定します（例：「バンカー4でプレイヤーの3枚目が8」）。'},
+  {id:'draw_player',k:[/プレイヤー.*(引(?!き分)|ヒット|スタンド|ドロー|3枚目)/],
+   a:'プレイヤー側のルールは単純です。合計0〜5ならヒット（3枚目を引く）、6〜7ならスタンド。8か9はナチュラルなので引きません。\n判定は必ずプレイヤーが先で、プレイヤーの3枚目の数字がバンカー側の条件表の入力になります。'},
+  {id:'natural',k:[/ナチュラル|natural/],
+   a:'どちらかが最初の2枚で合計8か9ならナチュラルです。その時点で両者とも3枚目を引かず、勝敗が決まります（9が8に勝つ。同点はタイ）。3枚目を配ってしまうのがよくある事故なので、点数を数えたら真っ先にナチュラルの有無を確認します。'},
+  {id:'points',k:[/点数|絵札|合計|下1桁|何点|数え方|数え/,/エース|\bace\b/],
+   a:'10・J・Q・Kは0点、Aは1点、2〜9は額面どおり。合計は下1桁だけを見ます（15なら5、20なら0）。声に出す前に「二桁になったら10を引く」を必ず1回やります。'},
+  {id:'deal',k:[/配り順|配る順|配り方|ディール|deal/],
+   a:'配り順は「プレイヤー→バンカー→プレイヤー→バンカー」の固定です。最初の2枚ずつは裏向き、3枚目は表向きで配ります。順番を崩すとどちらの手札か分からなくなり、監視カメラの検証もできなくなります。'},
+  {id:'squeeze',k:[/絞|スクイーズ|squeeze|めくり|開け|開く/],a:chatSqueezerAnswer},
+  {id:'commission',k:[/コミッション|手数料|commission/,/5 ?%|4 ?%/],
+   a:'コミッションは、バンカー勝ちを1:1で払ったうえで、ベット額の一定率（5%か4%）を客から徴収する方式です。\n'
+    +'・5%は「10%の半分」、4%は「1%の4倍」で暗算します。\n・このアプリでは端数を$1単位に切り上げます（実際の端数処理は所属するカジノの規定に従ってください）。\n・配当とコミッションは相殺せず、配当を払い終えてからまとめて徴収します。\n・台にはコミッションボックスが席ごとにあります（この台は1〜3番）。\n'
+    +'金額を書いてもらえれば計算します（例：「バンカー350のコミッションは？」）。'},
+  {id:'nocomm_ez',k:[/ノーコミ|半額|ez|イージー|ドラゴン7|スーパー6|super ?6/],
+   a:'コミッションを取らない方式が2つあります。\n・ノーコミッション：バンカーが合計6で勝った場合だけ配当が半額（1:2）。\n・EZバカラ：バンカーが3枚で合計7で勝った場合（通称ドラゴン7）はバンカーベットがプッシュ（元金返却）。\nどちらも徴収がない代わりに、配当額の暗算が要になります。'},
+  {id:'tie',k:[/タイ|tie|引き分け|プッシュ|push/],
+   a:G=>`タイ（プレイヤーとバンカーが同点）の配当は${G.table.tiePay}:1（今のテーブル）です。カジノにより8:1と9:1があります。\nタイのときプレイヤー／バンカーのベットはプッシュ（引き分け）で、客のものなので回収も配当もしません。`
+    +(G.table.rule.ezPush7?'\n※EZバカラでは、バンカーが3枚で合計7の勝ちのときもバンカーベットはプッシュです。':'')},
+  {id:'pair',k:[/ペア|pair|パーフェクト/],
+   a:G=>`ペアは、最初の2枚が同じランクのときに当たるサイドベットです（プレイヤーペア／バンカーペア）。配当は11:1。\n${G.table.perfectPair?'今のテーブルはパーフェクトペアあり：スートまで一致したペアは25:1です。':'今のテーブルはパーフェクトペアなしで、ペアは一律11:1です。'}\n11倍は「10倍＋元金1回分」、25倍は「100倍を4で割る」で暗算します。`},
+  {id:'dragon',k:[/ドラゴン|dragon/],
+   a:'ドラゴンボーナスは、賭けた側が勝ったときの点差で配当が決まるサイドベットです。\n'
+    +'・点差9：30:1／8：10:1／7：6:1／6：4:1／5：2:1／4：1:1（点差3以下はハズレ）\n・賭けた側がナチュラルで勝てば、点差に関係なく1:1\n・ナチュラル同士のタイはプッシュ\n・賭けた側が負けるか、通常のタイならハズレ\n点差を書いてもらえれば計算します（例：「ドラゴン100で点差7」）。'},
+  {id:'payout',k:[/配当|払い戻|倍率|何倍|いくら|ペイアウト|payout/],
+   a:G=>`配当の一覧（今のテーブル：${ruleSummary(G.table)}）\n・プレイヤー：1:1\n・バンカー：`
+    +(G.table.rule.commission>0?`1:1（あとでコミッション${Math.round(G.table.rule.commission*100)}%を徴収）`:G.table.rule.sixHalf?'1:1（合計6で勝つと半額の1:2）':'1:1（3枚で合計7の勝ちはプッシュ）')
+    +`\n・タイ：${G.table.tiePay}:1\n・ペア：11:1${G.table.perfectPair?'（スート一致は25:1）':''}\n・ドラゴンボーナス：点差により最大30:1\n金額を書いてもらえれば計算します。`},
+  {id:'order',k:[/回収/,/配当.*(順|先)|払.*(順|先)|支払.*(順|先)/,/順序|順番|外周|内側|どっちから|どちらから/],
+   a:'回収も配当も「外周（客側のプレイヤー/バンカー枠）→内側（タイ・ペア・ドラゴン）」の順で、各リング内は1番席から3番席へ一方向に回します。\n内側を先に片付けると、外周へ手を伸ばすたびに処理済みのチップの上を越えることになり、崩した・すり替えたと言われる原因になります。回収を終えるまで配当は始めません。プッシュのチップには触りません。'},
+  {id:'calls',k:[/コール|発声|英語|call|セリフ|言い方|何て言|なんて言/],
+   a:'主なコール（英語／意味）\n・Place your bets, please.／お賭けください\n・No more bets.／締切\n・Card for the Player. / Card for the Banker.／プレイヤー／バンカーへ1枚\n・Squeeze, please.／お客様に絞っていただく\n・Player 7, Banker 4.／両者の点数\n・Natural 9.／ナチュラル\n・Player draws. / Player stands.／プレイヤーは引く／スタンド\n・Banker draws. / Banker stands.／バンカーは引く／スタンド\n・Banker wins, 7 over 5.／勝った側・高い点・負けた点の順\n・Tie, 6 all.／タイ\n・Winner.／当たり（配当時）\n・Commission, please.／コミッションを頂戴します\n・Clean hands.／クリーンハンド'},
+  {id:'clean',k:[/クリーン|clean|手のひら|手を見せ/],
+   a:'配当と徴収をすべて終えてチップから手を離した瞬間に、両手のひらをカメラとお客様へ大きく開いて見せます。手の中にチップを隠していないことを示す最重要のセキュリティ所作で、1ラウンドにつき必ず1回入れます。'},
+  {id:'cards',k:[/片付|ディスカード|discard|シュー|shoe|カット|捨て/],
+   a:'シューは8デッキ（416枚）です。使ったカードは、プレイヤー側とバンカー側を分けず、順番も戻さずにまとめてディスカードホルダーへ入れます（並びから次の出目を読ませないため）。このアプリではシューが残り20枚を切ったら新しいシューに交換します。'},
+  {id:'security',k:[/セキュリティ|不正|監視|カメラ|すり替|マーキング|なぜ.*所作/],
+   a:'バカラの所作の多くは、不正の防止と、後から映像で検証できるようにするために決まっています。\n・配り順の固定：どの札がどの手札か、映像で検証できる\n・客に絞らせる：客の目で確認でき、すり替えの疑念が生じない。絞っている間もディーラーは札を監視（折り曲げ・傷＝マーキングの防止）\n・外周→内側の一方向の回収と配当：払い忘れ・二重払い・チップの上を越える動作を防ぐ\n・クリーンハンド：チップを隠していないことの証明'},
+  {id:'flow',k:[/流れ|手順|全体|フロー|進行|何をする/],a:chatFlowText},
+  {id:'house',k:[/ハウスルール|カジノ.*(違|ルール)|マカオ|ラスベガス|方式/],
+   a:'バカラはカジノごとにバンカー勝ちの扱いが変わります。このアプリでは次の4方式を切り替えて練習できます（設定の「コミッション方式」で固定も可能）。\n・5%コミッション\n・4%コミッション\n・ノーコミッション（バンカー6は半額）\n・EZバカラ（3枚で7の勝ちはプッシュ）\nタイ配当（8:1か9:1）とパーフェクトペアの有無もテーブルごとに違います。どのテーブルに立っているかを最初に確認する習慣が大切です。'},
+  {id:'seats',k:[/席|人数|何人|ポジション|座席/],
+   a:'この台は3人掛けです。席は円弧に沿って1番席→3番席の順に並びます。各席の前には、外周からプレイヤー枠・バンカー枠、その内側にタイ・ペア・ドラゴンの枠があります。'},
+  {id:'chips',k:[/チップ|枚数|最少|1000/],
+   a:'支払いは金額が合っていれば正解ですが、最少枚数（大きい額面から順に）で払えているかも見ています。最少でない場合は減点なしで「最少枚数はN枚」と案内します。バカラは動く金額が大きいので$1000チップも使います。'},
+  {id:'difficulty',k:[/難易度|basic|standard|advanced|expert|レベル/],
+   a:'ラウンドを重ねると難易度が自動で上がります。BASIC（R1〜2）→STANDARD（R3〜5）→ADVANCED（R6〜9）→EXPERT（R10〜）。進むほど金額が半端になり、サイドベットが増え、ADVANCED以降はドロー条件表のヒントが消えて、判断の根拠も選ぶ形になります。ハウスルールの切替頻度も上がります。'},
+  {id:'howto',k:[/使い方|操作|どうやって|どう使う|このアプリ|できること|何ができ/],
+   a:'テーブルを見て、その場面で正しい所作を選びます。間違えると理由つきで教えます。手順の順序そのものが練習の対象です。\n・絞る客の指名：テーブルの賭け額を見比べて席を選ぶ\n・3枚目の判定：条件表に沿って引く／スタンド（ADVANCED以降は根拠も選ぶ）\n・回収・配当：外周から内側へ。配当はチップトレイで出す\n設定でコミッション方式の固定・ヒント表示・所作の再生速度を変えられます。'}
+];
+
+const CHAT_FALLBACK='うまく読み取れませんでした。次のような質問に答えられます。\n'
+  +'・バンカーの3枚目の条件は？／バンカー4でプレイヤーの3枚目が8なら？\n・今バンカーは引く？（3枚目の判定の場面で）\n・誰が絞るの？\n・バンカー350のコミッションは？／タイ200の配当は？\n・ドラゴンボーナスの配当は？\n・回収と配当の順番は？\n・英語のコール一覧／今のルールは？／次は何をすればいい？';
+
+function chatAnswer(G,raw){
+  const q=chatNorm(raw);
+  if(!q)return{text:'質問を入力してください。'};
+  try{
+    /* 1. 状況を指定した3枚目の判定（数字が入っているもの） */
+    let r=chatDrawCalc(q);if(r)return r;
+    /* 2. いま卓に見えているカードでの判定 */
+    r=chatDrawContext(G,q);if(r)return r;
+    /* 3. 金額つきの配当・コミッション計算（「今の…350」のような聞き方でもルール質問より先に拾う） */
+    r=chatCalc(G,q);if(r)return r;
+    /* 4. 次の一手・ヒット */
+    if(/次(?:は|に|って)?\s*(?:何|なに|どう)|つぎ(?:は)?\s*(?:何|なに)|何をすれば|どうすれば|何すれば|ヒント|わからん|分からない|わからない|詰まった/.test(q))return chatNextStep(G);
+    /* 5. 今のルール・今の点数 */
+    if(/(今|いま|現在|このテーブル|この台).*(ルール|コミッション|方式)/.test(q)||/^ルール(は|を)?/.test(q)){
+      const T=G.table;return{text:`いまのテーブル：${ruleSummary(T)}\n${T.rule.desc}`};
+    }
+    if(/(今|いま|現在).*(点数|合計|何点)/.test(q)){
+      const F=G.flags||{};
+      if(!F.openedP&&!F.openedB)return{text:'まだカードが開いていないので、点数は答えられません。'};
+      const p=F.openedP?`プレイヤー${handTotal(G.pCards)}（${handText(G.pCards)}）`:'プレイヤー未オープン';
+      const b=F.openedB?`バンカー${handTotal(G.bCards)}（${handText(G.bCards)}）`:'バンカー未オープン';
+      return{text:`${p}、${b}`};
+    }
+    /* 6. 知識ベース（キーワードの当たり数が多いものを採用。同点は先頭の項目） */
+    let best=null,bestN=0;
+    for(const e of CHAT_KB){
+      const n=e.k.reduce((a,re)=>a+(re.test(q)?1:0),0);
+      if(n>bestN){best=e;bestN=n;}
+    }
+    if(best){
+      const a=typeof best.a==='function'?best.a(G,q):best.a;
+      return typeof a==='object'?a:{text:a,hint:false};
+    }
+    return{text:CHAT_FALLBACK};
+  }catch(err){
+    return{text:'回答の生成中に問題が起きました。質問の言い方を変えてみてください。'};
+  }
+}
+/*CHAT_END*/
 
 /* ===================== UI ===================== */
 const STORE_OPTS='dsim_bc_opts',STORE_STATS='dsim_bc_stats';
@@ -1296,7 +1644,10 @@ const Dealer={
     const sc=1+p.open*0.5;
     A.hand.setAttribute('transform',`translate(${Hd.x} ${Hd.y}) rotate(${ang*180/Math.PI}) scale(${sc} ${1+p.open*0.2})`);
     /* スクイーズだけは両手で持つので、左手にも札を描く */
-    const carried=(side==='r')||p.prop==='cards'||p.prop==='card';
+    /* 持ち物（札・チップ・レーキ）は既定では右手。左側の席へ出すときは左手（hold:'l'）、
+       札をまとめて片付けるときは両手（hold:'both'）で持つ。休んでいる手には描かない */
+    const hold=p.hold||'r';
+    const carried=hold==='both'?true:hold===side;
     Object.keys(A.carry).forEach(k=>{A.carry[k].style.display=(carried&&p.prop===k)?'block':'none';});
     const sh=this.q.shadow[side];
     sh.setAttribute('cx',Hd.x+4);sh.setAttribute('cy',Hd.y+13);
@@ -1317,7 +1668,8 @@ const Dealer={
         rx:f.r?f.r.x:cur.rx,ry:f.r?f.r.y:cur.ry,
         open:f.open!==undefined?f.open:cur.open,
         nod:f.nod!==undefined?f.nod:cur.nod,
-        prop:f.prop!==undefined?f.prop:cur.prop});
+        prop:f.prop!==undefined?f.prop:cur.prop,
+        hold:f.hold!==undefined?f.hold:cur.hold});
       return Object.assign({t:f.t},cur);
     });
     this.last={frames,label};
@@ -1334,7 +1686,7 @@ const Dealer={
       let i=0;while(i<seq.length-2&&seq[i+1].t<=tm)i++;
       const a=seq[i],b=seq[i+1],span=Math.max(1,b.t-a.t),k=ease(Math.min(1,(tm-a.t)/span));
       this.setPose({lx:lerp(a.lx,b.lx,k),ly:lerp(a.ly,b.ly,k),rx:lerp(a.rx,b.rx,k),ry:lerp(a.ry,b.ry,k),
-        open:lerp(a.open,b.open,k),nod:lerp(a.nod,b.nod,k),prop:a.prop});
+        open:lerp(a.open,b.open,k),nod:lerp(a.nod,b.nod,k),prop:a.prop,hold:a.hold});
       this.raf=requestAnimationFrame(step);
     };
     this.raf=requestAnimationFrame(step);
@@ -1382,18 +1734,29 @@ function buildMotion(key,arg,pre){
         {t:930,r:P(slot.x,slot.y),prop:''},
         {t:1220,r:P(R.rx,R.ry)}];
     }
-    case 'squeezePlayer':case 'squeezeBanker':{
-      const c=handPt(key==='squeezePlayer'?'p':'b');if(!c)return null;
-      const up=P(c.x,c.y-26);
-      /* 両手で持ち、短辺から絞る → 90度回して長辺から絞る → 開く */
-      return[{t:0,prop:''},
-        {t:240,r:P(c.x+16,c.y+6),l:P(c.x-16,c.y+6),prop:'cards'},
-        {t:460,r:P(up.x+20,up.y+4),l:P(up.x-20,up.y-4),prop:'cards'},
-        {t:700,r:P(up.x+14,up.y-10),l:P(up.x-22,up.y+10),prop:'cards'},
-        {t:940,r:P(up.x+22,up.y+8),l:P(up.x-14,up.y-10),prop:'cards'},
-        {t:1180,r:P(c.x+18,c.y),l:P(c.x-18,c.y),prop:'cards'},
-        {t:1320,r:P(c.x+18,c.y),l:P(c.x-18,c.y),prop:'',open:.8},
-        {t:1620,r:P(R.rx,R.ry),l:P(R.lx,R.ly),open:0}];
+    case 'selectSqueezer':{
+      /* ディーラーは絞らない。手札を指名した客のポジションまで運んで渡し、
+         客が絞っている間はその場で待ち、絞り終えた札を受け取って元の位置へ戻す */
+      const side=pre.side||'p';
+      const c=handPt(side);
+      const seat=+arg,kind=side==='p'?'player':'banker';
+      const spot=svgPt(spotPt(kind,seat));
+      if(!c||!spot)return null;
+      const at=P(spot.x,spot.y-10);
+      /* 体の中心より左の席には左手、右の席には右手を出す（体の前を腕が横切らない） */
+      const h=at.x<Dealer.cx-6?'l':'r';
+      const F=(t,pt,x)=>Object.assign({t,hold:h,[h]:pt},x||{});
+      return[{t:0,prop:'',hold:h},
+        F(260,P(c.x,c.y),{prop:''}),
+        F(420,P(c.x,c.y),{prop:'cards'}),
+        F(900,P((c.x+at.x)/2,Math.min(c.y,at.y)-16),{prop:'cards'}),
+        F(1300,at,{prop:'cards'}),
+        F(1420,at,{prop:'',open:.7}),
+        F(2100,P(at.x,at.y-4),{prop:'',open:.7}),
+        F(2260,P(at.x,at.y),{prop:'cards',open:0}),
+        F(2800,P(c.x,c.y),{prop:'cards'}),
+        F(2930,P(c.x,c.y),{prop:''}),
+        {t:3300,r:P(R.rx,R.ry),l:P(R.lx,R.ly),open:0}];
     }
     case 'callTotals':case 'callResult':case 'declareNatural':
       return[{t:0,nod:0},{t:240,nod:1},{t:560,nod:0},{t:780,nod:0}];
@@ -1426,7 +1789,9 @@ function buildMotion(key,arg,pre){
     }
     case 'select':{
       const c=ptOf(`[data-bet="${arg}"]`);if(!c)return null;
-      return[{t:0},{t:300,r:P(c.x,c.y-14)},{t:480,r:P(c.x,c.y-4)},{t:800,r:P(R.rx,R.ry)}];
+      const h=c.x<Dealer.cx-6?'l':'r';
+      return[{t:0,hold:h},{t:300,hold:h,[h]:P(c.x,c.y-14)},{t:480,hold:h,[h]:P(c.x,c.y-4)},
+        {t:800,r:P(R.rx,R.ry),l:P(R.lx,R.ly)}];
     }
     case 'chipPay':{
       const c=pre.betId?ptOf(`[data-bet="${pre.betId}"]`):null;
@@ -1439,9 +1804,12 @@ function buildMotion(key,arg,pre){
           {t:1000,r:P(cb.x,cb.y),prop:'chips'},{t:1140,r:P(cb.x,cb.y),prop:''},
           {t:1440,r:P(R.rx,R.ry)}];
       }
-      return[{t:0,prop:'chips'},{t:200,r:P(rk.x,rk.y),prop:'chips'},
-        {t:560,r:P(c.x+22,c.y-22),prop:'chips'},{t:760,r:P(c.x+12,c.y+2),prop:'chips'},
-        {t:900,r:P(c.x+12,c.y+2),prop:''},{t:1250,r:P(R.rx,R.ry)}];
+      /* 配当を置く席が体の中心より左なら、左手でラックから取って左手で置く */
+      const h=c.x<Dealer.cx-6?'l':'r',rack=h==='l'?rkL:rk,dx=h==='l'?-22:22;
+      const F=(t,pt,x)=>Object.assign({t,hold:h,[h]:pt},x||{});
+      return[{t:0,prop:'chips',hold:h},F(200,P(rack.x,rack.y),{prop:'chips'}),
+        F(560,P(c.x+dx,c.y-22),{prop:'chips'}),F(760,P(c.x+dx/2,c.y+2),{prop:'chips'}),
+        F(900,P(c.x+dx/2,c.y+2),{prop:''}),{t:1250,r:P(R.rx,R.ry),l:P(R.lx,R.ly)}];
     }
     case 'cleanHands':{
       const y=Math.max(Dealer.band*0.42,Dealer.band-56),w=64*Dealer.s;
@@ -1454,7 +1822,7 @@ function buildMotion(key,arg,pre){
       const dp=pre.pHand||handPt('p'),db=pre.bHand||handPt('b'),dc=ptOf('#discardBox');
       if(!dp||!db||!dc)return null;
       const mid=P((dp.x+db.x)/2,(dp.y+db.y)/2);
-      return[{t:0,prop:''},
+      return[{t:0,prop:'',hold:'both'},
         {t:240,r:P(db.x,db.y),l:P(dp.x,dp.y),open:.6},
         {t:480,r:P(mid.x+10,mid.y),l:P(mid.x-10,mid.y),open:.3,prop:'cards'},
         {t:760,r:P(mid.x,mid.y-18),prop:'cards'},
@@ -1479,26 +1847,29 @@ function handHTML(G,side){
   const dealtCount=Math.min(2,Math.max(0,side==='p'?Math.ceil(F.dealt/2):Math.floor(F.dealt/2)));
   const third=(side==='p'?F.pCard3:F.bCard3)?1:0;
   let html='';
+  /* 絞った直後の手札だけ、客が札を絞るアニメーションを付ける */
+  const sq=G.squeezeFlash===side?' squeezing':'';
   for(let i=0;i<2;i++){
-    if(i<dealtCount)html+=cardHTML(cards[i],opened,'dealt');
+    if(i<dealtCount)html+=cardHTML(cards[i],opened,'dealt'+sq);
     else html+='<div class="card-slot"></div>';
   }
   if(third)html+=cardHTML(cards[2],true,'third dealt');
   const total=opened?handTotal(cards.slice(0,dealtCount+third)):null;
   const win=F.calledResult&&G.winner===(side==='p'?'player':'banker');
   const name=side==='p'?'PLAYER':'BANKER';
+  const sqSeat=G.squeezer[side];
   return `<div class="hand h-${side}${win?' win':''}${F.cleared?' cleared':''}">
-    <div class="hand-cap"><span>${name}</span>${total===null?'<span class="pend">未オープン</span>':`<b>${total}</b>`}</div>
+    <div class="hand-cap"><span>${name}${sqSeat?`<small>絞り ${sqSeat}番席</small>`:''}</span>${total===null?'<span class="pend">未オープン</span>':`<b>${total}</b>`}</div>
     <div class="cards">${html}</div>
   </div>`;
 }
 
 /* ===== テーブル・レイアウト（実物と同じハーフムーン型）=====
-   ディーラーは半円の直線側（上辺）に立ち、客は円弧側に7ポジション並ぶ。
+   ディーラーは半円の直線側（上辺）に立ち、客は円弧側に3ポジション並ぶ。
    1ポジションあたり、外周から PLAYER → BANKER、その内側に TIE と
    P/B ペア、さらに内側にドラゴンボーナスの丸枠。直線側にはシュー・
    ディスカードホルダー・1〜7番のコミッションボックスが並ぶ。
-   回収と配当の「外周→内側」「1番席→7番席」はこの配置がそのまま根拠になる。 */
+   回収と配当の「外周→内側」「1番席→3番席」はこの配置がそのまま根拠になる。 */
 const TBL={W:1060,H:620,cx:530,cy:146,rx:514,ry:458,tA:168,tB:12};
 function TP(fr,deg){const t=deg*Math.PI/180;return{x:TBL.cx+TBL.rx*fr*Math.cos(t),y:TBL.cy+TBL.ry*fr*Math.sin(t)};}
 function arcPts(fr,d0,d1,n){
@@ -1509,7 +1880,7 @@ function arcPts(fr,d0,d1,n){
 function poly(pts){return pts.map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ');}
 
 /* 楕円の円弧は角度を等分しても弧の長さが等分にならず、端のポジションだけ枠が
-   潰れて重なる。実物の台は7ポジションが等間隔に並ぶので、弧長で等分した位置
+   潰れて重なる。実物の台はポジションが等間隔に並ぶので、弧長で等分した位置
    （u：左端0〜右端1）を座標の基準にする。 */
 const ARCT={};
 function arcTable(fr){
@@ -1537,10 +1908,10 @@ function seatU(seat){return (seat-0.5)*SEAT_W;}
 const SPOT={
   player:{fr:.860,du:0,band:true,hw:.070,label:'PLAYER'},
   banker:{fr:.715,du:0,band:true,hw:.063,label:'BANKER'},
-  tie:{fr:.600,du:0,r:24,label:'TIE'},
-  ppair:{fr:.495,du:-0.24,r:19,label:'P'},
-  bpair:{fr:.440,du:0.24,r:19,label:'B'},
-  dragon:{fr:.330,du:0,r:20,label:'DRG'}
+  tie:{fr:.585,du:0,r:26,label:'TIE'},
+  ppair:{fr:.495,du:-0.22,r:22,label:'P'},
+  bpair:{fr:.440,du:0.22,r:22,label:'B'},
+  dragon:{fr:.325,du:0,r:24,label:'DRG'}
 };
 const SPOT_ORDER=['player','banker','tie','ppair','bpair','dragon'];
 function spotPt(kind,seat){
@@ -1561,6 +1932,7 @@ function feltPath(){
 function tableSvgHTML(G){
   const F=G.flags,ex=G.pending?null:expected(G);
   const hlRing=G.opts.showZoneHints&&ex&&ex.ring?ex.ring:null;
+  const sqKind=ex&&ex.key==='selectSqueezer'?(ex.side==='p'?'player':'banker'):null;
   const occupied=new Set(G.seatNos);
   let cells='',labels='';
   const rot=(q,dy)=>`x="${q.x.toFixed(1)}" y="${(q.y+(dy||0)).toFixed(1)}" transform="rotate(${(q.deg-90).toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)})"`;
@@ -1569,7 +1941,9 @@ function tableSvgHTML(G){
     for(const kind of SPOT_ORDER){
       const sp=SPOT[kind],m=BET_META[kind];
       const lose=live&&G.bets.some(b=>b.seat===seat&&b.kind===kind&&b.win===false&&!b.push&&!b.collected);
-      const hl=hlRing&&m.ring===hlRing&&lose?' hl':'';
+      /* 回収の対象リング、または絞る客を選ぶ側のベット枠を強調する */
+      const sqHit=sqKind===kind&&G.bets.some(b=>b.seat===seat&&b.kind===kind);
+      const hl=(hlRing&&m.ring===hlRing&&lose)||sqHit?' hl':'';
       const dim=live?'':' idle';
       const q=spotPt(kind,seat);
       if(sp.band){
@@ -1583,9 +1957,9 @@ function tableSvgHTML(G){
     const n=atU(.962,seatU(seat));
     labels+=`<text class="seat-num${live?' live':''}" ${rot(n,7)}>${seat}</text>`;
   }
-  /* コミッションボックス（1〜7）。バンカー勝ちのコミッションを席ごとに管理する枠 */
+  /* コミッションボックス（1〜3）。バンカー勝ちのコミッションを席ごとに管理する枠 */
   let comm='';
-  const cw=52,cg=5,cAll=TABLE_SEATS*cw+(TABLE_SEATS-1)*cg,cx0=TBL.cx-cAll/2;
+  const cw=92,cg=8,cAll=TABLE_SEATS*cw+(TABLE_SEATS-1)*cg,cx0=TBL.cx-cAll/2;
   for(let i=0;i<TABLE_SEATS;i++){
     const x=cx0+i*(cw+cg);
     comm+=`<rect class="comm-cell${occupied.has(i+1)?' live':''}" x="${x}" y="30" width="${cw}" height="34" rx="3"/>`
@@ -1728,7 +2102,7 @@ function actionKeys(G,ex){
   switch(G.phase){
     case 'bet':return['noMoreBets'];
     case 'deal':return['dealPlayer','dealBanker'];
-    case 'open':return['squeezePlayer','squeezeBanker'];
+    case 'open':return[];
     case 'draw':
       if(ex.key==='dealPlayer'||ex.key==='dealBanker')return['dealPlayer','dealBanker'];
       if(ex.key==='bankerDraw'||ex.key==='bankerStand')return['bankerDraw','bankerStand'];
@@ -1766,14 +2140,14 @@ function drawTableHTML(G,ex){
 const PHASE_PROMPT={
   bet:['ベットが出そろいました。締切を宣言してください。','宣言してからでないとカードは出せない。'],
   deal:['配り順どおりにカードを出してください。','プレイヤー→バンカー→プレイヤー→バンカーの4枚。'],
-  open:['手札を開いてください。','プレイヤー側が先。絞ってから全員に見える形で開く。'],
+  open:['手札を絞ってもらう客を選んでください。','プレイヤー側が先。その側で最も賭け額が大きい席。'],
   take:['ハズレチップを回収してください。','外周（P/B枠）→内側（タイ・ペア）の順。プッシュには触らない。'],
   comm:['コミッションを徴収してください。','配当を払い終えてから。端数は$1単位に切り上げ。'],
   close:['締めの所作を選んでください。','クリーンハンド → カードを片付ける。']
 };
 
 function renderConsole(){
-  const P={idle:'待機中',bet:'ベット受付',deal:'カードを配る',open:'スクイーズ・オープン',
+  const P={idle:'待機中',bet:'ベット受付',deal:'カードを配る',open:'スクイーズ（絞る客の指名）',
     count:'点数のコール',draw:'3枚目の判定',result:'勝敗のコール',take:'ハズレ回収',
     pay:'配当支払い',comm:'コミッション徴収',close:'締め',done:'ラウンド終了'};
   let prompt='',actions='',extra='';
@@ -1794,7 +2168,8 @@ function renderConsole(){
     const errs=r.errors.length?`<ul>${r.errors.map(e=>`<li>【${CAT_NAME[e.cat]}】${esc(e.why)}</li>`).join('')}</ul>`:'<p>ミスなし。全手順を正しく進行できました。</p>';
     const rows=Object.entries(STATS.cats).map(([k,c])=>{const t=c.ok+c.ng;return `<tr><td>${CAT_NAME[k]}</td><td>${c.ok}</td><td>${c.ng}</td><td>${t?Math.round(c.ok/t*100)+'%':'—'}</td></tr>`;}).join('');
     const notes=r.notes.length?`<div class="phase">チップの出し方（減点なし）</div><ul>${r.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:'';
-    prompt=`<div class="summary"><div class="next-top">${btn('start','次のラウンドへ','primary')}</div><h3>ラウンド${r.no} 終了：正解${r.ok}／ミス${r.err}</h3>${errs}${notes}<div class="phase stats-label">通算成績（カテゴリ別）</div><table class="stat-table"><thead><tr><th>カテゴリ</th><th>正解</th><th>ミス</th><th>正答率</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const hints=r.hints?`<p>質問チャットでヒントを使った回数：${r.hints}回（答えを見た場面は、自力で判断できたか振り返ってください）</p>`:'';
+    prompt=`<div class="summary"><div class="next-top">${btn('start','次のラウンドへ','primary')}</div><h3>ラウンド${r.no} 終了：正解${r.ok}／ミス${r.err}</h3>${errs}${hints}${notes}<div class="phase stats-label">通算成績（カテゴリ別）</div><table class="stat-table"><thead><tr><th>カテゴリ</th><th>正解</th><th>ミス</th><th>正答率</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     actions=btn('start','次のラウンドへ','primary');
   }else if(G.phase==='idle'){
     prompt='ラウンドを開始して、プレイヤーにベットを促してください。';
@@ -1809,6 +2184,9 @@ function renderConsole(){
     prompt='その判断の根拠を選んでください。<span class="hint">条件表のどの行を使ったか。</span>';
     if(hintsOn)extra=drawTableHTML(G,ex);
     actions=ex.reasonSet.opts.map((o,i)=>btn('bankerReason',o,'wide',o)).join('');
+  }else if(ex&&ex.key==='selectSqueezer'){
+    prompt=`${ex.sideJa}の手札は、どの席のお客様に絞っていただきますか。<span class="hint">${ex.sideJa}側に賭けている席のうち、賭け額が最も大きい席。テーブル上の金額を見比べる。</span>`;
+    actions=G.seatNos.map(s=>btn('selectSqueezer',`${s}番席`,'',String(s))).join('');
   }else if(ex&&ex.key==='select'){
     prompt='支払う対象をテーブル上のチップから選んでください。<span class="hint">外周（P/B枠）→内側（タイ・ペア・ドラゴン）の順。各リング内は1番席から順に。</span>';
     actions='';
@@ -1843,16 +2221,16 @@ function renderSettings(){
   const o=G.opts,hasTTS='speechSynthesis' in window,df=currentDifficulty(G),T=G.table;
   const bankerRow=[['0〜2','すべて'],['3','8以外'],['4','2〜7'],['5','4〜7'],['6','6〜7'],['7','なし']];
   $('settings').innerHTML=`<h3>設定</h3>
-    <div class="row"><label for="optSeats">着席人数（台は7ポジション）</label><select id="optSeats">${[1,2,3,4,5,6,7].map(n=>`<option value="${n}"${o.seats===n?' selected':''}>${n}人</option>`).join('')}</select></div>
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
-    <div class="row"><label for="optRule">ハウスルールをランダムに切り替える</label><input type="checkbox" id="optRule"${o.randomRule!==false?' checked':''}></div>
+    <div class="row"><label for="optRuleMode">コミッション方式</label><select id="optRuleMode">${[['random','ランダムに切り替える']].concat(HOUSE_RULES.map(r=>[r.id,r.name])).map(v=>`<option value="${v[0]}"${o.ruleMode===v[0]?' selected':''}>${esc(v[1])}</option>`).join('')}</select></div>
     <div class="row"><label for="optDrawFocus">ドロー判定が起きる手札を多めに配る</label><input type="checkbox" id="optDrawFocus"${o.drawFocus!==false?' checked':''}></div>
     <div class="row"><label for="optHints">ドロー条件表のヒントを表示</label><input type="checkbox" id="optHints"${o.showDrawHints!==false?' checked':''}></div>
     <div class="row"><label for="optZone">回収エリアを強調表示</label><input type="checkbox" id="optZone"${o.showZoneHints?' checked':''}></div>
     <div class="row"><label for="optDealer">ディーラーを表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
     <div class="row"><label for="optSpeed">所作の再生速度</label><select id="optSpeed">${[[1,'標準'],[0.6,'ゆっくり'],[0.35,'とてもゆっくり']].map(v=>`<option value="${v[0]}"${(o.dealerSpeed||1)===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>
     <div class="row"><label for="optSpeech">発声を読み上げる${hasTTS?'':'（このブラウザは非対応）'}</label><input type="checkbox" id="optSpeech"${o.voice?' checked':''}${hasTTS?'':' disabled'}></div>
-    <p class="note">席数は次のラウンドから反映されます。ドロー条件表のヒントは難易度ADVANCED以降では自動的に消えます（現在：<b>${df.label}</b>）。</p>
+    <p class="note">コミッション方式は次のラウンドから反映されます。「ランダム」の場合、方式が切り替わるたびに大きく掲示されます。特定の方式だけを繰り返し練習したいときは、方式を選んで固定してください。</p>
+    <p class="note">テーブルは3人掛けです。ドロー条件表のヒントは難易度ADVANCED以降では自動的に消えます（現在：<b>${df.label}</b>）。</p>
     <p class="note">「ドロー判定が起きる手札を多めに配る」をオンにすると、ナチュラルで即終了になる配りを減らして3枚目の判定を練習できます。実際の出現率どおりに回したい場合はオフにしてください。</p>
 
     <h4>現在のテーブルルール</h4>
@@ -1885,6 +2263,35 @@ function renderSettings(){
 
 function render(){renderMeta();renderTable();renderCaption();renderConsole();renderLog();}
 
+/* ---- 質問チャット ---- */
+const CHAT=[];
+function chatPush(who,text,hint){CHAT.push({who,text,hint:!!hint});if(CHAT.length>80)CHAT.shift();}
+function renderChat(){
+  const box=$('chatBody');if(!box)return;
+  box.innerHTML=CHAT.map(m=>`<div class="cm ${m.who}${m.hint?' hint':''}">${esc(m.text).replace(/\n/g,'<br>')}</div>`).join('');
+  box.scrollTop=box.scrollHeight;
+  $('chatSug').innerHTML=CHAT_SUGGEST.map(s=>`<button type="button" data-act="chatAsk" data-arg="${esc(s)}">${esc(s)}</button>`).join('');
+}
+function chatSend(text){
+  text=String(text||'').trim();if(!text)return;
+  chatPush('me',text);
+  const r=chatAnswer(G,text);
+  chatPush('bot',r.text,r.hint);
+  /* 答えに正解が含まれた質問は、そのラウンドの「ヒント使用」として数える */
+  if(r.hint&&G.round&&G.phase!=='done'){G.round.hints=(G.round.hints||0)+1;}
+  renderChat();
+}
+function toggleChat(open){
+  const p=$('chat'),show=open===undefined?p.hidden:open;
+  p.hidden=!show;$('btnChat').setAttribute('aria-expanded',String(show));
+  if(show){
+    if(!CHAT.length)chatPush('bot',CHAT_INTRO);
+    renderChat();
+    /* スマホでは開いた途端にキーボードが出て画面を覆うため、自動フォーカスは広い画面だけ */
+    if(window.matchMedia('(min-width:601px)').matches)$('chatInput').focus();
+  }
+}
+
 let signTimer=0;
 function scheduleSignClose(){
   clearTimeout(signTimer);
@@ -1898,6 +2305,7 @@ function doAct(key,arg){
   const pre={
     betId:G.pending&&G.pending.ex?G.pending.ex.betId:null,
     group:exNow&&exNow.group?exNow.group:null,
+    side:exNow&&exNow.side?exNow.side:null,
     pHand:ptOf('.hand.h-p .cards'),
     bHand:ptOf('.hand.h-b .cards')
   };
@@ -1929,6 +2337,8 @@ document.addEventListener('click',e=>{
     if('speechSynthesis' in window){if(G.opts.voice)speak([G.caption].filter(c=>c.en));else speechSynthesis.cancel();}
     renderCaption();return;
   }
+  if(a==='toggleChat'){toggleChat();return;}
+  if(a==='chatAsk'){chatSend(el.dataset.arg);return;}
   if(a==='closeSign'){G.signOpen=false;clearTimeout(signTimer);render();return;}
   if(a==='replay'){Dealer.replay();return;}
   if(a==='resetStats'){STATS=emptyStats();save(STORE_STATS,STATS);render();return;}
@@ -1936,9 +2346,8 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const id=e.target.id;
-  if(id==='optSeats')G.opts.seats=+e.target.value;
-  else if(id==='optAdaptive')G.opts.adaptiveDifficulty=e.target.checked;
-  else if(id==='optRule')G.opts.randomRule=e.target.checked;
+  if(id==='optAdaptive')G.opts.adaptiveDifficulty=e.target.checked;
+  else if(id==='optRuleMode')G.opts.ruleMode=e.target.value;
   else if(id==='optDrawFocus')G.opts.drawFocus=e.target.checked;
   else if(id==='optHints')G.opts.showDrawHints=e.target.checked;
   else if(id==='optZone')G.opts.showZoneHints=e.target.checked;
@@ -1947,6 +2356,14 @@ document.addEventListener('change',e=>{
   else if(id==='optSpeech'){G.opts.voice=e.target.checked;if(!G.opts.voice&&'speechSynthesis' in window)speechSynthesis.cancel();}
   else return;
   save(STORE_OPTS,G.opts);render();
+});
+$('chatForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const i=$('chatInput');chatSend(i.value);i.value='';
+  if(window.matchMedia('(min-width:601px)').matches)i.focus();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('chat').hidden)toggleChat(false);
 });
 render();
 </script>
