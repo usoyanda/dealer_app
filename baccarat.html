@@ -70,8 +70,12 @@ button{font:inherit}
 .chat-form input{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px;border:1.5px solid #9AA5B0;border-radius:8px}
 .chat-form .act{min-height:40px;padding:6px 16px}
 
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;padding:16px 20px;max-width:1360px;margin:0 auto}
-.main-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+/* 既定（狭幅）は縦1列。col-main / col-side は箱を作らず、中の要素をそのまま
+   テーブル→字幕→コンソール→ログの順に並べる。広い画面では下の「1画面レイアウト」で2カラムにする */
+.wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 16px;max-width:1500px;margin:0 auto}
+.col-main,.col-side{display:contents}
+.back{text-decoration:none;white-space:nowrap;flex:none}
+.table-slot{width:100%}
 
 /* テーブルそのものは SVG が描くので、外枠は台を置く床として控えめにする */
 .felt{position:relative;background:linear-gradient(180deg,#223A33,#16281F);border:10px solid #2A1C12;border-radius:14px;padding:12px 14px 14px;box-shadow:inset 0 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px}
@@ -229,7 +233,16 @@ button{font:inherit}
 .ch-5{background:#B83A3A}.ch-25{background:#2E7D4F}.ch-100{background:#1C1C1C}.ch-500{background:#6B3FA0}
 .ch-1000{background:#C9952B;color:#2A1D05 !important;border-color:#7A5A12 !important}
 .stack{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1.5px dashed #9AA5B0;border-radius:10px;padding:8px 12px;margin-bottom:10px;min-height:56px}
-.stack-row{display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0}
+.stack-row{display:flex;flex-wrap:wrap;gap:4px 14px;flex:1;min-width:0}
+.sg{display:inline-flex;align-items:center;gap:5px}
+.sg-chips{display:inline-flex;gap:3px;flex-wrap:wrap}
+.mini-chip.g5{margin-right:9px}
+.sg-n{font-size:12px;color:var(--muted);white-space:nowrap}
+.fb,.entry .why{white-space:pre-line}
+.coach{background:#FFF8E1;border:1px solid #E7D49A;border-radius:8px;padding:5px 10px;margin-bottom:8px;font-size:12.5px;line-height:1.5;color:#4A3B0B}
+.coach summary{cursor:pointer;font-weight:bold;font-size:12.5px;list-style-position:inside}
+.coach ul{margin:4px 0 2px;padding-left:18px}
+.coach li{margin-bottom:2px}
 .mini-chip{width:32px;height:32px;border-radius:50%;border:3px dashed rgba(255,255,255,.85);color:#fff;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif}
 .stack-empty{font-size:13px;color:var(--muted)}
 .stack-total{font-size:14px;white-space:nowrap}
@@ -244,7 +257,7 @@ button{font:inherit}
 .drawcard{background:#fff;border:1px solid #CDD3D9;border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12.5px;line-height:1.5}
 .drawcard .dc-h{font-size:12px;color:var(--muted);margin-bottom:3px}
 
-.log{background:#222B34;color:#D8DEE4;border-radius:10px;padding:12px 14px;max-height:calc(100vh - 100px);overflow:auto;position:sticky;top:12px;align-self:start}
+.log{background:#222B34;color:#D8DEE4;border-radius:10px;padding:12px 14px;max-height:320px;overflow:auto}
 .log h2{font-size:14px;margin:0 0 6px;color:#fff}
 .entry{padding:7px 0;border-bottom:1px solid #33404B;font-size:13px;line-height:1.5}
 .entry .el{color:#fff}
@@ -267,7 +280,65 @@ button{font:inherit}
   .hand{min-height:116px;padding:6px 8px 8px}
   .hand-cap b{font-size:25px}
 }
-@media (max-width:1040px){.wrap{grid-template-columns:1fr}.log{position:static;max-height:320px}}
+/* ===== 1画面レイアウト（PC・横長タブレット）=====
+   スクロールなしで全体を見渡せるよう、画面の高さに合わせて2カラムに組む。
+   左：テーブル（高さに合わせて自動で縮む）／右：字幕・コンソール・ログ。
+   ログとコンソールの長い内容は、ページではなくそれぞれの枠の中でスクロールする。
+   高さが600px未満の画面だけは、縮めすぎて読めなくなるため通常のスクロール表示に戻す。 */
+@media (min-width:900px) and (min-height:600px){
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .topbar{flex:none;padding:8px 16px}
+  .wrap{flex:1;min-height:0;width:100%;grid-template-columns:minmax(0,1fr) 380px;grid-template-rows:minmax(0,1fr);padding:10px 16px 12px;gap:12px}
+  .col-main,.col-side{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .col-side{gap:10px}
+  .felt{flex:1;min-height:0;padding:10px 12px 10px;gap:8px}
+  .felt.has-dealer{padding-top:var(--band,100px)}
+  /* テーブルは、残っている縦横の広さに収まる最大サイズ（縦横比は固定）にする */
+  .table-slot{flex:1 1 0;min-height:0;container-type:size;display:flex;justify-content:center;align-items:center}
+  .table-wrap{flex:none;margin:0;max-width:none;width:min(100cqw,calc(100cqh * 1060 / 620));container-type:inline-size}
+  .chip{width:clamp(24px,6.4cqw,40px);height:clamp(24px,6.4cqw,40px);font-size:clamp(8.5px,2.3cqw,13px)}
+  .hands{max-width:680px}
+  .hand{min-height:0;padding:4px 7px 5px}
+  .hand-cap{margin-bottom:3px}
+  .hand-cap b{font-size:19px}
+  .cards{min-height:62px;gap:5px}
+  .card,.card-slot{width:44px;height:62px}
+  .card .r{font-size:18px}.card .s{font-size:14px}
+  .table-foot{flex:none;font-size:11.5px;gap:4px 12px}
+  .caption{flex:none;padding:8px 92px 8px 16px;min-height:0}
+  .caption .who{display:none}
+  .caption .en{font-size:20px}
+  .console{flex:0 1 auto;min-height:0;overflow:hidden;max-height:calc(100% - 128px);padding:12px 14px 14px;display:flex;flex-direction:column}
+  .con-body{flex:1 1 auto;min-height:0;overflow:auto}
+  .con-foot{flex:none;padding-top:8px}
+  /* 「1枚戻す／すべて戻す／確定する」は1行にまとめて、本文の高さを確保する */
+  .act.wide.pay{flex:1 1 130px}
+  .stack{min-height:44px;padding:6px 10px;margin-bottom:8px}
+  .tray{margin-bottom:8px}
+  .log{flex:1 1 0;min-height:90px;max-height:none}
+  .tray{gap:8px;padding:10px}
+  .tray-chip{width:48px;height:48px;font-size:12px;border-width:4px}
+}
+@media (min-width:900px) and (min-height:600px) and (min-height:780px){
+  :root{--band:118px}
+  .card,.card-slot{width:52px;height:74px}
+  .cards{min-height:76px}
+  .card .r{font-size:22px}.card .s{font-size:17px}
+  .hand-cap b{font-size:22px}
+}
+@media (min-width:900px) and (min-height:900px){
+  :root{--band:134px}
+  .card,.card-slot{width:56px;height:80px}
+  .cards{min-height:82px}
+  .card .r{font-size:24px}.card .s{font-size:19px}
+  .console{padding:14px 16px 16px}
+}
+@media (min-width:1280px) and (min-height:600px){
+  .wrap{grid-template-columns:minmax(0,1fr) 440px}
+  .tray-chip{width:56px;height:56px;font-size:13px}
+}
+@media (max-width:899px),(max-height:599px){.log{max-height:320px}}
 @media (max-width:760px){
   .felt{padding:10px 8px 12px;border-width:8px;gap:8px}
   .felt.has-dealer{padding-top:104px}
@@ -282,7 +353,7 @@ button{font:inherit}
   .meta .only-lg{display:none}
   .rule-pill,.difficulty-pill{padding:2px 6px}
   .btn-ghost{padding:4px 8px;font-size:12px;white-space:nowrap}.btn-ghost .lg{display:none}
-  .wrap{padding:6px;gap:6px}.main-col{gap:6px}
+  .wrap{padding:6px;gap:6px}
   .settings{right:8px;width:calc(100% - 16px)}
   .caption{padding:5px 66px 5px 10px !important;min-height:0;border-left-width:3px}
   .caption .who{display:none}
@@ -293,6 +364,7 @@ button{font:inherit}
   .phase{display:none}
   .prompt{font-size:13px;margin:0 0 5px;line-height:1.45}
   .fb{font-size:11.5px;padding:4px 8px;margin-bottom:5px}
+  .fb-more{display:none}
   .fb.ok,.fb.info{display:none}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
   .act{font-size:12px;padding:4px 6px;min-height:38px;line-height:1.3}
@@ -361,6 +433,7 @@ button{font:inherit}
   .rule-pill b,.difficulty-pill b{font-size:10.5px}
   .btn-ghost{padding:4px 6px;font-size:11px}
 }
+@media (max-width:340px){.brand-main{display:none}}
 @media (max-width:390px){
   .card{width:28px;height:40px}
   .card .r{font-size:12px}
@@ -372,6 +445,7 @@ button{font:inherit}
 </head>
 <body>
 <header class="topbar">
+  <a class="btn-ghost back" href="index.html" aria-label="目次（テーブル選択）に戻る">◀<span class="lg"> 目次</span></a>
   <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">バカラ</span></div>
   <div class="meta" id="meta"></div>
   <button class="btn-ghost" data-act="toggleChat" aria-expanded="false" id="btnChat">質問</button>
@@ -379,12 +453,14 @@ button{font:inherit}
   <div class="settings" id="settings" hidden></div>
 </header>
 <main class="wrap">
-  <div class="main-col">
+  <div class="col-main">
     <section class="felt" id="table" aria-label="テーブル"></section>
+  </div>
+  <div class="col-side">
     <div class="caption" id="caption" aria-live="polite"></div>
     <section class="console" id="console"></section>
+    <aside class="log" id="log" aria-label="進行ログ"></aside>
   </div>
-  <aside class="log" id="log" aria-label="進行ログ"></aside>
 </main>
 <section class="chat" id="chat" hidden aria-label="質問チャット">
   <div class="chat-head"><b>質問チャット</b><span class="chat-sub">通信なし・卓の状況を読んで回答</span><button type="button" class="chat-x" data-act="toggleChat" aria-label="閉じる">×</button></div>
@@ -540,19 +616,81 @@ function commTip(rate,amount){
 }
 function commissionOf(rate,amount){return Math.ceil(amount*rate-1e-9);}
 
+/* ===== チップ・カウンティングのコツ =====
+   金額を暗算で出したあと、それを「何のチップを何枚」に落とし込み、数え間違いなく
+   出すまでが一続きの技術。コツは次の4つに絞って、出す場面ごとに表示する。
+   ①手を出す前に分解する ②高額の額面から取る ③5枚1組で数える ④出したら高さと色で検算する。 */
+const CHIP_COLOR={1:'白',5:'赤',25:'緑',100:'黒',500:'紫',1000:'金'};
+function chipCounts(arr){const m={};arr.forEach(d=>{m[d]=(m[d]||0)+1;});return m;}
+/* 最少枚数での内訳 [{d:額面,n:枚数}, …]（高額から） */
+function chipPlan(amount){const m=chipCounts(minChips(amount));return CHIPS.filter(d=>m[d]).map(x=>({d:x,n:m[x]}));}
+function planText(amount){
+  const pl=chipPlan(amount),n=pl.reduce((a,x)=>a+x.n,0);
+  return `${fmt$(amount)} ＝ ${pl.map(x=>`$${x.d}×${x.n}`).join(' ＋ ')}（${n}枚）`;
+}
+/* n枚を5枚単位に区切った数え方。7→「5＋2」、12→「5＋5＋2」、20→「5×4」 */
+function groupBy5(n){
+  if(n<=5)return String(n);
+  const full=Math.floor(n/5),rest=n%5;
+  const head=full<=3?Array(full).fill(5).join('＋'):`5×${full}`;
+  return rest?`${head}＋${rest}`:head;
+}
+/* 出した枚数と金額のズレから、枚数の数え間違いか金額の暗算ミスかを切り分ける */
+function chipDiagnosis(sum,amount){
+  const diff=Math.round((sum-amount)*100)/100,ad=Math.abs(diff),more=diff>0?'多い':'少ない';
+  if(CHIPS.includes(ad))
+    return `差は${fmt$(ad)}（$${ad}チップ1枚ぶん${more}）。枚数の数え間違いの可能性が高い。5枚ずつ区切って数え直す。`;
+  if(minChips(ad).length<=3&&Number.isInteger(ad))
+    return `差は${fmt$(ad)}（${chipsText(minChips(ad))}）${more}。額面の取り違えか、2〜3枚の数え間違い。色で確かめて数え直す。`;
+  return `差は${fmt$(ad)}${more}と大きい。配当額の暗算がずれている可能性。分解からやり直す。`;
+}
+/* 額面の換算（1つ上の額面に何枚で替わるか）。スタックの価値を素早く読むための基本 */
+const CHIP_UP={1:[5,'赤$5'],5:[5,'緑$25'],25:[4,'黒$100'],100:[5,'紫$500'],500:[2,'金$1000']};
+function chipEquiv(d){const u=CHIP_UP[d];return u?`${CHIP_COLOR[d]}$${d}は${u[0]}枚で${u[1]}`:null;}
+/* 20枚スタックの価値（暗記用） */
+const STACK20='20枚の価値：白$20／赤$100／緑$500／黒$2,000／紫$10,000';
+/* チップの出し方のコツ（表示用の行）。withPlan が偽なら内訳そのものは伏せる。 */
+function chipCoach(amount,info,withPlan){
+  const lines=[],pl=chipPlan(amount),kind=info&&info.kind,mult=info&&info.mult;
+  if(withPlan)lines.push(`内訳：${planText(amount)}。高額の額面から順に取る。`);
+  else lines.push('手を出す前に、金額を「額面×枚数」に分解する。高額の額面（$1000→$500→$100→$25→$5→$1）から順に取る。');
+  const eq=pl.filter(x=>x.d!==1000).map(x=>chipEquiv(x.d)).filter(Boolean).slice(0,2);
+  lines.push(withPlan&&eq.length?`換算：${eq.join('、')}。同じ額面が並んだら、1つ上の額面に替えて数える。`
+    :'換算：赤5枚＝緑1枚、緑4枚＝黒1枚、黒5枚＝紫1枚。同じ額面が並んだら、1つ上の額面に替えて数える。');
+  if(kind==='commission')lines.push('コミッションは小額のチップが中心。$1・$5は5枚ずつの組にしてから出すと数え間違いが減る。');
+  else if(mult===1)lines.push('1:1は元金と同額。元金のチップの色と高さを見て、同じ並びを横にそろえる（ミラー）。高さが揃えば検算になる。');
+  else if(mult===0.5)lines.push('半額は元金のスタックを半分に分ける。割り切れない額面は、小さい額面に崩して作る。');
+  else lines.push('倍率の大きい配当は、先に暗算で金額を確定してから分解する。チップを出しながら足し算し直さない。');
+  lines.push('出し終えたら額面ごとに「黒4、緑3」と声に出して照合し、最後に合計を言う。');
+  return lines;
+}
+const CHIP_GUIDE=[
+  ['手を出す前に分解する','「金額＝額面×枚数」を先に決める（例：$475＝$100×4＋$25×3）。チップを触りながら足し算しない。'],
+  ['高額の額面から取る','$1000→$500→$100→$25→$5→$1の順。枚数が減り、数え間違いも減る。このアプリも最少枚数かどうかを見ている。'],
+  ['額面の換算を体で覚える','赤$5は5枚で緑$25、緑$25は4枚で黒$100、黒$100は5枚で紫$500、紫$500は2枚で金$1000。スタックの価値は、同じ額面を1つ上の額面に替えながら読むと速い。'],
+  ['20枚スタックの価値を暗記する','20枚で1山が基本の単位。白$20／赤$100／緑$500／黒$2,000／紫$10,000。山の数と端数（5枚単位）から価値を逆算できる。'],
+  ['5枚を1組で数える','同じ額面が並ぶときは1枚ずつ数えず、5枚ずつ区切る（5、10、15、20）。7枚なら「5＋2」。このアプリは出したチップを5枚ごとに間をあけて表示する。'],
+  ['色で額面を即断する','このアプリの配色は白$1／赤$5／緑$25／黒$100／紫$500／金$1000（実際の色はカジノにより異なる）。額面の文字を読む前に、色で手が動くようにする。'],
+  ['1:1はミラーで検算','元金と同じ色の並び・同じ高さを横に作る。数えなくても見比べるだけで検算できる。'],
+  ['半額は半分に分ける','元金のスタックを半分に分ける。割り切れない額面は小さい額面に崩す（例：$175＝$100＋$25×3）。'],
+  ['声に出して照合する','出し終えたら額面ごとに「黒4、緑3」と読み、最後に合計を言う。口に出すと数え間違いに気づきやすい。'],
+  ['練習の順序','①正確さ→②最少枚数→③速さ。ミスしたら「枚数の数え間違い」か「金額の暗算ミス」かを切り分ける（このアプリは差額から判定して表示する）。'],
+  ['所属先の流儀に従う','スタックの単位・切り方・端数の扱いはカジノやスクールで違う。ここに書いたのは共通して使える基本。']
+];
+
 /* ===== 難易度自動アップ =====
    繰り返すと手順を体が覚えてしまうため、進むほど金額が半端になり、
    サイドベットが増え、ドロー条件表のヒントが消え、ハウスルールの切替頻度も上がる。 */
 function difficultyFor(roundNo){
   const r=Math.max(1,roundNo||1);
   if(r<=2)return{level:1,label:'BASIC',main:[100,200,300,400,500],side:[25,50,100],
-    sideChance:.25,tieChance:.15,showDrawTable:true,askReason:false,ruleChance:0,extraCallOption:false};
+    sideChance:.25,tieChance:.15,showDrawTable:true,showChipPlan:true,askReason:false,ruleChance:0,extraCallOption:false};
   if(r<=5)return{level:2,label:'STANDARD',main:[150,250,350,450,600,750],side:[25,50,75,100],
-    sideChance:.45,tieChance:.25,showDrawTable:true,askReason:false,ruleChance:.3,extraCallOption:false};
+    sideChance:.45,tieChance:.25,showDrawTable:true,showChipPlan:true,askReason:false,ruleChance:.3,extraCallOption:false};
   if(r<=9)return{level:3,label:'ADVANCED',main:[130,170,230,290,330,470,610],side:[35,45,65,85,125],
-    sideChance:.6,tieChance:.3,showDrawTable:false,askReason:true,ruleChance:.4,extraCallOption:true};
+    sideChance:.6,tieChance:.3,showDrawTable:false,showChipPlan:false,askReason:true,ruleChance:.4,extraCallOption:true};
   return{level:4,label:'EXPERT',main:[130,190,270,410,530,670,870,930],side:[30,55,70,95,115,145],
-    sideChance:.75,tieChance:.35,showDrawTable:false,askReason:true,ruleChance:.55,extraCallOption:true};
+    sideChance:.75,tieChance:.35,showDrawTable:false,showChipPlan:false,askReason:true,ruleChance:.55,extraCallOption:true};
 }
 function currentDifficulty(G){return G.opts.adaptiveDifficulty===false?difficultyFor(1):difficultyFor(G.roundNo);}
 
@@ -600,7 +738,7 @@ function bankerReasonSet(bTotal,p3){
 
 /* ===== ゲーム状態 ===== */
 function createGame(opts){
-  const o=Object.assign({ruleMode:'random',showDrawHints:true,showZoneHints:true,
+  const o=Object.assign({ruleMode:'random',showChipCoach:true,showDrawHints:true,showZoneHints:true,
       showDealer:true,voice:true,dealerSpeed:1,adaptiveDifficulty:true,drawFocus:true},opts||{});
   /* 旧設定（ハウスルールのランダム切替をオフにしていた）の引き継ぎ */
   if(opts&&opts.randomRule===false&&!opts.ruleMode)o.ruleMode='comm5';
@@ -986,7 +1124,7 @@ function expected(G){
         const b=G.bets.find(x=>x.id===G.payIdx);
         return E('pay','pay',`${betTitle(b)}は${payMultLabel(G,b)}の配当です。${payWhy(G,b)}元金はテーブル上に残したまま、配当分だけを出します。`,
           C('Winner.','お客様の当たりです'),
-          {amount:Math.round(b.amount*b.mult*100)/100,amountLabel:'支払う金額',
+          {amount:Math.round(b.amount*b.mult*100)/100,amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:b.mult},
            hint:`${BET_META[b.kind].label}は${payMultLabel(G,b)}。${payWhy(G,b)}`,betId:b.id});
       }
       G.phase='comm';return expected(G);
@@ -999,7 +1137,7 @@ function expected(G){
         return E('takeCommission','commission',
           `${T.rule.name}のテーブルです。バンカー勝ちの配当を払い終えたあと、コミッションを徴収します（配当と同時に相殺しないのは、客が自分の配当額を確認できるようにするため）。内訳：${lines}。合計${fmt$(G.commissionDue)}。${commTip(rate,G.bets.filter(b=>b.kind==='banker'&&b.win)[0].amount)}`,
           C('Commission, please.','コミッションを頂戴します'),
-          {amount:G.commissionDue,amountLabel:'徴収する金額',
+          {amount:G.commissionDue,amountLabel:'徴収する金額',chipInfo:{kind:'commission'},
            hint:`コミッションは${Math.round(rate*100)}%、端数は$1単位に切り上げ。${commTip(rate,G.bets.filter(b=>b.kind==='banker'&&b.win)[0].amount)}`});
       }
       G.phase='close';return expected(G);
@@ -1109,14 +1247,16 @@ function act(G,key,arg){
       G.pending=null;G.round.ok++;
       apply(G,p.ex,sum);
       if(used.length>min.length){
-        const note=`${LABEL[p.ex.key]} ${fmt$(sum)}：金額は正解。ただし最少枚数は${min.length}枚（${chipsText(min)}）。今回は${used.length}枚（${chipsText(used)}）。`;
+        const note=`${LABEL[p.ex.key]} ${fmt$(sum)}：金額は正解。ただし最少枚数は${min.length}枚（${chipsText(min)}）。今回は${used.length}枚（${chipsText(used)}）。高額の額面から取ると、枚数も数え間違いも減ります。`;
         G.round.notes.push(note);G.lastFb={t:'warn',text:note};
       }else{
         G.lastFb=G.phase==='done'?null:{t:'ok',text:`正解：${fmt$(sum)}（${chipsText(used)}）`};
       }
       return{cat,ok:true};
     }
-    recordErr(G,cat,p.ex.why,`金額が違います（出したチップ：${fmt$(sum)}）。${p.ex.hint}`);
+    /* 間違えたあとは、内訳（最少枚数の出し方）と、枚数ミスか暗算ミスかの切り分けを必ず返す */
+    p.errs=(p.errs||0)+1;
+    recordErr(G,cat,p.ex.why,`金額が違います（出したチップ ${fmt$(sum)}）。${chipDiagnosis(sum,p.ex.amount)}\n正しい出し方：${planText(p.ex.amount)}\n${p.ex.hint}`);
     return{cat,ok:false};
   }
   G.squeezeFlash=null;
@@ -1187,7 +1327,7 @@ const CHAT_SUGGEST=[
   '今バンカーは引く？',
   '誰が絞るの？',
   'バンカー350のコミッションは？',
-  'タイ200の配当は？',
+  'チップの数え方のコツは？',
   '今のルールは？',
   '次は何をすればいい？'
 ];
@@ -1246,6 +1386,11 @@ function chatCalc(G,q){
   const amt=chatAmount(q);
   if(!amt)return null;
   const T=G.table,money=fmt$(amt);
+  /* 「$475のチップの出し方」：賭けの種類が書かれていなければ、内訳と出し方のコツを返す */
+  if(/チップ|内訳|分解|出し方|何枚|崩/.test(q)&&!/ペア|ドラゴン|タイ|バンカー|プレイヤー|コミッション|配当|tie|pair|dragon/.test(q)){
+    const ls=chipCoach(amt,{},true);
+    return{text:`${planText(amt)}\n${ls[0]}\n${ls[1]}\n${ls[ls.length-1]}`};
+  }
   let mode=T.rule;
   if(/ノーコミ|no ?comm|コミッション(?:なし|無し)/.test(q))mode=ruleById('nocomm');
   else if(/\bez\b|イージー/.test(q))mode=ruleById('ez');
@@ -1379,8 +1524,9 @@ const CHAT_KB=[
    a:'バカラはカジノごとにバンカー勝ちの扱いが変わります。このアプリでは次の4方式を切り替えて練習できます（設定の「コミッション方式」で固定も可能）。\n・5%コミッション\n・4%コミッション\n・ノーコミッション（バンカー6は半額）\n・EZバカラ（3枚で7の勝ちはプッシュ）\nタイ配当（8:1か9:1）とパーフェクトペアの有無もテーブルごとに違います。どのテーブルに立っているかを最初に確認する習慣が大切です。'},
   {id:'seats',k:[/席|人数|何人|ポジション|座席/],
    a:'この台は3人掛けです。席は円弧に沿って1番席→3番席の順に並びます。各席の前には、外周からプレイヤー枠・バンカー枠、その内側にタイ・ペア・ドラゴンの枠があります。'},
-  {id:'chips',k:[/チップ|枚数|最少|1000/],
-   a:'支払いは金額が合っていれば正解ですが、最少枚数（大きい額面から順に）で払えているかも見ています。最少でない場合は減点なしで「最少枚数はN枚」と案内します。バカラは動く金額が大きいので$1000チップも使います。'},
+  {id:'chips',k:[/チップ/,/カウント|カッティング|数え方|切り方|コツ|換算|スタック|山|早見/],
+   a:()=>'チップ・カウンティングのコツ\n'+CHIP_GUIDE.map((g,i)=>`${i+1}. ${g[0]}：${g[1]}`).join('\n')
+    +'\n\n金額を書いてもらえれば、内訳と出し方を答えます（例：「$475のチップの出し方」）。'},
   {id:'difficulty',k:[/難易度|basic|standard|advanced|expert|レベル/],
    a:'ラウンドを重ねると難易度が自動で上がります。BASIC（R1〜2）→STANDARD（R3〜5）→ADVANCED（R6〜9）→EXPERT（R10〜）。進むほど金額が半端になり、サイドベットが増え、ADVANCED以降はドロー条件表のヒントが消えて、判断の根拠も選ぶ形になります。ハウスルールの切替頻度も上がります。'},
   {id:'howto',k:[/使い方|操作|どうやって|どう使う|このアプリ|できること|何ができ/],
@@ -2036,10 +2182,10 @@ function renderTable(){
   $('table').innerHTML=`
     ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
     <div class="hands">${handHTML(G,'p')}${handHTML(G,'b')}</div>
-    <div class="table-wrap">
+    <div class="table-slot"><div class="table-wrap">
       ${tableSvgHTML(G)}
       <div class="chip-layer">${chipLayerHTML(G)}</div>
-    </div>
+    </div></div>
     <div class="table-foot">
       <span class="zone-tag">${esc(ruleSummary(G.table))}</span>
       <span class="seatkey">${seatKey}</span>
@@ -2151,7 +2297,13 @@ function renderConsole(){
     count:'点数のコール',draw:'3枚目の判定',result:'勝敗のコール',take:'ハズレ回収',
     pay:'配当支払い',comm:'コミッション徴収',close:'締め',done:'ラウンド終了'};
   let prompt='',actions='',extra='';
-  const fb=G.lastFb?`<div class="fb ${G.lastFb.t}">${esc(G.lastFb.text)}</div>`:'';
+  /* フィードバックは先頭2行（結論と正しい出し方）を常に表示し、3行目以降（暗算の長い解説）は
+     スマホでは畳む（1画面に収めるため）。全文は進行ログに残る。 */
+  let fb='';
+  if(G.lastFb){
+    const ls=G.lastFb.text.split('\n');
+    fb=`<div class="fb ${G.lastFb.t}">${esc(ls.slice(0,2).join('\n'))}${ls.length>2?`<span class="fb-more">\n${esc(ls.slice(2).join('\n'))}</span>`:''}</div>`;
+  }
   const ex=G.pending?null:expected(G);
   const df=currentDifficulty(G);
   const hintsOn=G.opts.showDrawHints&&df.showDrawTable;
@@ -2159,10 +2311,23 @@ function renderConsole(){
   if(G.pending){
     const p=G.pending,sum=p.chips.reduce((a,b)=>a+b,0);
     prompt=p.ex.key==='takeCommission'?'徴収するコミッション分のチップを出してください':'チップトレイから配当分のチップを出してください';
-    const stack=p.chips.length?p.chips.map(d=>`<span class="mini-chip ch-${d}">${d}</span>`).join(''):'<span class="stack-empty">まだチップがありません</span>';
+    /* 出したチップは額面ごとにまとめ、5枚ごとに間をあけて表示する（5枚1組で数える練習のため） */
+    const cnt=chipCounts(p.chips);
+    const stack=p.chips.length?CHIPS.filter(d=>cnt[d]).map(d=>
+      `<span class="sg" aria-label="$${d}が${cnt[d]}枚"><span class="sg-chips">${Array.from({length:cnt[d]},(_,i)=>`<span class="mini-chip ch-${d}${i%5===4&&i<cnt[d]-1?' g5':''}">${d}</span>`).join('')}</span><span class="sg-n">×${cnt[d]}${cnt[d]>5?`（${groupBy5(cnt[d])}）`:''}</span></span>`).join('')
+      :'<span class="stack-empty">まだチップがありません</span>';
+    /* チップのコツ。内訳そのものはBASIC/STANDARDか、一度間違えたあとだけ出す */
+    let coach='';
+    if(G.opts.showChipCoach!==false){
+      const withPlan=!!df.showChipPlan||(p.errs||0)>0;
+      /* スマホでは1画面に収めるため、既定では閉じておく（タップで開く） */
+      const narrow=window.matchMedia('(max-width:600px)').matches;
+      coach=`<details class="coach"${df.showChipPlan&&!narrow&&!(p.errs>0)?' open':''}><summary>チップのコツ${withPlan?'':'（内訳は伏せています）'}</summary><ul>${chipCoach(p.ex.amount,p.ex.chipInfo,withPlan).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></details>`;
+    }
+    extra=coach;
     actions=`<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
       <div class="stack"><div class="stack-row">${stack}</div><div class="stack-total">合計 <b>${fmt$(sum)}</b>／${p.chips.length}枚</div></div>
-      <div class="actions">${btn('chipUndo','1枚戻す')}${btn('chipClear','すべて戻す')}${btn('chipPay','確定する','primary wide')}</div>`;
+      <div class="actions">${btn('chipUndo','1枚戻す')}${btn('chipClear','すべて戻す')}${btn('chipPay','確定する','primary wide pay')}</div>`;
   }else if(G.phase==='done'){
     const r=G.round;
     const errs=r.errors.length?`<ul>${r.errors.map(e=>`<li>【${CAT_NAME[e.cat]}】${esc(e.why)}</li>`).join('')}</ul>`:'<p>ミスなし。全手順を正しく進行できました。</p>';
@@ -2209,7 +2374,8 @@ function renderConsole(){
     }
   }
   const wrapActs=G.pending?actions:`<div class="actions">${actions}</div>`;
-  $('console').innerHTML=`<div class="phase">${P[G.phase]||''}</div>${G.phase==='done'&&!G.pending?prompt:`<div class="prompt">${prompt}</div>`}${fb}${extra}${wrapActs}`;
+  /* 本文（長くなったらここだけスクロール）と、操作エリア（常に見える位置に固定）に分ける */
+  $('console').innerHTML=`<div class="con-body"><div class="phase">${P[G.phase]||''}</div>${G.phase==='done'&&!G.pending?prompt:`<div class="prompt">${prompt}</div>`}${fb}${extra}</div><div class="con-foot">${wrapActs}</div>`;
 }
 
 function renderLog(){
@@ -2224,6 +2390,7 @@ function renderSettings(){
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
     <div class="row"><label for="optRuleMode">コミッション方式</label><select id="optRuleMode">${[['random','ランダムに切り替える']].concat(HOUSE_RULES.map(r=>[r.id,r.name])).map(v=>`<option value="${v[0]}"${o.ruleMode===v[0]?' selected':''}>${esc(v[1])}</option>`).join('')}</select></div>
     <div class="row"><label for="optDrawFocus">ドロー判定が起きる手札を多めに配る</label><input type="checkbox" id="optDrawFocus"${o.drawFocus!==false?' checked':''}></div>
+    <div class="row"><label for="optChipCoach">チップを出す画面に「チップのコツ」を表示</label><input type="checkbox" id="optChipCoach"${o.showChipCoach!==false?' checked':''}></div>
     <div class="row"><label for="optHints">ドロー条件表のヒントを表示</label><input type="checkbox" id="optHints"${o.showDrawHints!==false?' checked':''}></div>
     <div class="row"><label for="optZone">回収エリアを強調表示</label><input type="checkbox" id="optZone"${o.showZoneHints?' checked':''}></div>
     <div class="row"><label for="optDealer">ディーラーを表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
@@ -2245,6 +2412,11 @@ function renderSettings(){
     <p class="note">プレイヤーが3枚目を引かなかった（6・7でスタンドした）場合は、この表は使いません。バンカーもプレイヤーと同じく<b>0〜5でヒット、6〜7でスタンド</b>になります。</p>
     <p class="note">覚え方：<b>3は8だけ避ける／4は2〜7／5は4〜7／6は6〜7</b>。ヒットする範囲が「両端から1つずつ狭くなっていく」と捉えると、4→5→6の並びが頭に入ります。0〜2は必ず引く、7は必ず引かない。</p>
 
+    <div class="payout-guide">
+      <div class="phase">チップ・カウンティングのコツ</div>
+      <ul>${CHIP_GUIDE.map(g=>`<li><b>${esc(g[0])}</b>：${esc(g[1])}</li>`).join('')}</ul>
+      <p class="note">金額を出す場面では、今回の金額に合わせた内訳・換算・出し方を表示します（BASIC／STANDARDは内訳つき、ADVANCED以降は内訳を伏せ、間違えたときだけ表示）。間違えたときは、差額から「枚数の数え間違い」か「金額の暗算ミス」かを切り分けて示します。</p>
+    </div>
     <div class="payout-guide">
       <div class="phase">配当と暗算のコツ</div>
       <ul>
@@ -2322,8 +2494,8 @@ function doAct(key,arg){
     const frames=buildMotion(key,arg,pre);
     if(frames)Dealer.play(frames,MOTION_LABEL[key]||'');
   }
-  if((G.phase==='done'&&prevPhase!=='done')||(G.pending&&!prevPending)){
-    const el=G.pending?document.querySelector('.tray'):$('console');
+  if((G.phase==='done'&&prevPhase!=='done')||(G.pending&&!prevPending)||(G.pending&&r&&!r.ok)){
+    const el=G.pending?document.querySelector('.con-foot'):$('console');
     if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
 }
@@ -2350,6 +2522,7 @@ document.addEventListener('change',e=>{
   else if(id==='optRuleMode')G.opts.ruleMode=e.target.value;
   else if(id==='optDrawFocus')G.opts.drawFocus=e.target.checked;
   else if(id==='optHints')G.opts.showDrawHints=e.target.checked;
+  else if(id==='optChipCoach')G.opts.showChipCoach=e.target.checked;
   else if(id==='optZone')G.opts.showZoneHints=e.target.checked;
   else if(id==='optDealer'){G.opts.showDealer=e.target.checked;Dealer.stop();}
   else if(id==='optSpeed')G.opts.dealerSpeed=+e.target.value;
