@@ -20,6 +20,7 @@ button{font:inherit}
 .meta b{color:#fff;font-size:15px;margin-left:4px;font-weight:bold}
 .btn-ghost{background:transparent;border:1px solid #56626E;color:#E9EDF1;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
 .btn-ghost:hover{border-color:#fff}
+.back{text-decoration:none;white-space:nowrap;flex:none}
 .btn-ghost:focus-visible,.act:focus-visible,.seat:focus-visible,.hand:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 
 .settings{position:absolute;right:20px;top:100%;z-index:20;background:#fff;color:var(--ink);border-radius:10px;padding:16px 18px;width:320px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
@@ -213,11 +214,16 @@ button{font:inherit}
   .log{max-height:none}
 }
 @media (prefers-reduced-motion:reduce){.card.new,.caption.flash .en,.caption.flash .ja{animation:none}}
+.bm-sm{display:none}
+/* 戻るボタンのぶん、狭い画面ではロゴを短縮してヘッダーを1行に収める */
+@media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}.topbar{gap:6px}}
+@media (max-width:340px){.brand-main{display:none}}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <div><span class="brand-main">Dealer Simulator</span><span class="brand-sub">ブラックジャック</span></div>
+  <a class="btn-ghost back" href="index.html" aria-label="目次（テーブル選択）に戻る">◀<span class="lg"> 目次</span></a>
+  <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">ブラックジャック</span></div>
   <div class="meta" id="meta"></div>
   <button class="btn-ghost" data-act="toggleSettings" aria-expanded="false" id="btnSettings">設定<span class="lg">・成績</span></button>
   <div class="settings" id="settings" hidden></div>
