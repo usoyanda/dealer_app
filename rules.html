@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1015">
+<title>Dealer Simulator | ルールブック</title>
+<style>
+:root{
+  --bg:#0B1015;--surface:#17202A;--surface2:#1E2934;--surface3:#263341;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+  --text:#E9EEF3;--text2:#A7B4C1;--text3:#7D8B99;
+  --gold:#D9B25F;--gold2:#F4DA94;--ok:#43C98B;--ng:#FF7062;--warn:#F3BD4E;--info:#82B4FF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:110px}
+html,body{margin:0}
+body{background:radial-gradient(1200px 520px at 50% -12%,#1B2734 0%,var(--bg) 62%) fixed,var(--bg);color:var(--text);
+  font-family:"BIZ UDPGothic","Meiryo","Hiragino Sans","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.75;padding-bottom:env(safe-area-inset-bottom)}
+a{color:var(--gold2)}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;padding-top:max(8px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(18,25,33,.97),rgba(11,16,21,.97));border-bottom:1px solid rgba(217,178,95,.22)}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--text);padding:6px 14px;border-radius:999px;font-size:13px;text-decoration:none;white-space:nowrap}
+.btn-ghost:hover{border-color:var(--gold)}
+.brand-main{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;background:linear-gradient(180deg,#FBE7B0 0%,#D9B25F 55%,#A9812F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-sub{margin-left:10px;font-size:13px;color:var(--text2)}
+.bm-sm{display:none}
+.tabs{position:sticky;top:0;z-index:10;display:flex;gap:6px;overflow-x:auto;padding:8px 16px;background:rgba(11,16,21,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:1px solid var(--line2);background:rgba(255,255,255,.03);border-radius:999px;padding:6px 14px;cursor:pointer;color:var(--text2);font-size:13.5px;white-space:nowrap}
+.tabs button.on{background:linear-gradient(180deg,#F1D58D,#C9A24B);color:#1C1405;border-color:#8E6C26;font-weight:bold}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.toc a{font-size:12px;text-decoration:none;color:var(--text2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:rgba(255,255,255,.02)}
+.toc a:hover{border-color:var(--gold);color:var(--gold2)}
+main{max-width:860px;margin:0 auto;padding:14px 16px 60px}
+.page{display:none}
+.page.on{display:block;animation:pin .2s ease-out}
+@keyframes pin{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ph{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;background:radial-gradient(ellipse at 20% 0%,#17644B 0%,#0C3B2D 60%,#082A20 100%);border:1px solid rgba(217,178,95,.28);box-shadow:inset 0 0 40px rgba(0,0,0,.35)}
+.ph .en{font-family:Georgia,serif;font-size:11.5px;letter-spacing:.26em;color:rgba(244,218,148,.75)}
+.ph h1{margin:0;font-size:22px;color:var(--gold2);letter-spacing:.04em}
+.ph p{margin:4px 0 0;font-size:13.5px;color:#D4E2DA;line-height:1.7}
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:14px;padding:14px 16px;margin-top:12px}
+.card h2{margin:0 0 8px;font-size:16px;color:var(--gold2);display:flex;align-items:center;gap:8px}
+.card h2 .n{font-family:Georgia,serif;font-size:12px;color:#1C1405;background:var(--gold);border-radius:999px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.card h3{margin:14px 0 6px;font-size:14px;color:var(--text)}
+.card p{margin:6px 0}
+.card ul,.card ol{margin:6px 0;padding-left:22px}
+.card li{margin:3px 0}
+.note{font-size:12.5px;color:var(--text2)}
+.why{font-size:12.5px;color:#C9DCFF;background:rgba(130,180,255,.08);border-left:3px solid var(--info);border-radius:0 8px 8px 0;padding:6px 10px;margin:8px 0}
+.why b{color:#fff}
+.tbl{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0}
+.tbl th,.tbl td{border-bottom:1px solid var(--line2);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{color:var(--text2);font-weight:normal;font-size:12.5px;background:rgba(255,255,255,.03)}
+.tbl td.pay{font-family:Georgia,serif;font-size:16px;color:var(--gold2);white-space:nowrap}
+.tbl .hit{color:#8FE7BE;font-weight:bold}.tbl .stand{color:#FFB3AA;font-weight:bold}
+.scroll{overflow-x:auto}
+.steps{list-style:none;padding:0 !important;margin:6px 0;counter-reset:st}
+.steps li{position:relative;padding:8px 10px 8px 42px;border-bottom:1px solid var(--line);counter-increment:st}
+.steps li::before{content:counter(st);position:absolute;left:6px;top:9px;width:24px;height:24px;border-radius:50%;background:var(--surface3);border:1px solid rgba(217,178,95,.5);color:var(--gold2);font:bold 12px/22px Georgia,serif;text-align:center}
+.call{display:inline-block;margin-top:3px;font-family:Georgia,serif;font-size:14px;color:var(--gold2);background:rgba(217,178,95,.08);border:1px solid rgba(217,178,95,.28);border-radius:8px;padding:0 8px}
+.call small{font-family:"BIZ UDPGothic",sans-serif;color:var(--text2);margin-left:6px;font-size:11.5px}
+.miss li::marker{color:var(--ng)}
+.irr{display:grid;gap:8px;margin-top:6px}
+.irr .it{border:1px solid var(--line2);border-radius:12px;padding:9px 12px;background:var(--surface2)}
+.irr .it b{display:block;font-size:14px;color:#fff}
+.irr .it .do{font-size:13.5px;margin-top:2px}
+.irr .it .do::before{content:"対応　";color:var(--ok);font-weight:bold}
+.irr .it .rs{font-size:12.5px;color:var(--text2);margin-top:2px}
+.irr .it .rs::before{content:"理由　";color:var(--info);font-weight:bold}
+.tag{display:inline-block;font-size:10.5px;border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:2px;border:1px solid var(--line2);color:var(--text2)}
+.tag.var{border-color:rgba(243,189,78,.5);color:var(--warn)}
+.cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.cta a{flex:1 1 200px;text-align:center;text-decoration:none;border-radius:12px;padding:10px 14px;font-weight:bold;border:1.5px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#2A3846,#22303C);color:var(--text)}
+.cta a.primary{background:linear-gradient(180deg,#F1D58D 0%,#D9B25F 55%,#B88E3B 100%);border-color:#8E6C26;color:#1C1405}
+.cdot{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-3px;margin-right:6px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+.diagram{display:block;width:100%;max-width:520px;height:auto;margin:8px auto}
+.legend2{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--text2);justify-content:center}
+.glos dt{font-weight:bold;color:var(--gold2);margin-top:10px}
+.glos dt small{font-family:Georgia,serif;font-weight:normal;color:var(--text3);margin-left:8px}
+.glos dd{margin:2px 0 0 0;font-size:13.5px}
+.disclaimer{font-size:12px;color:var(--text3);margin-top:18px;line-height:1.7}
+body.embed .topbar,body.embed .cta,body.embed .hide-embed{display:none}
+body.embed main{padding-top:10px}
+@media (max-width:600px){
+  .topbar{gap:8px;padding:6px 10px}
+  .btn-ghost{padding:4px 9px;font-size:12px}.btn-ghost .lg{display:none}
+  .brand-main{font-size:15px}
+  .tabs{padding:7px 10px}
+  .tabs button{font-size:12.5px;padding:5px 11px}
+  main{padding:10px 10px 48px}
+  .ph{padding:12px}.ph h1{font-size:19px}
+  .card{padding:12px}
+  .tbl{font-size:12.5px}
+}
+@media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="btn-ghost" href="index.html" aria-label="ホームに戻る">◀<span class="lg"> 目次</span></a>
+  <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">ルールブック</span></div>
+</header>
+<nav class="tabs" id="tabs" aria-label="ゲームの切り替え">
+  <button data-t="roulette">ルーレット</button>
+  <button data-t="baccarat">バカラ</button>
+  <button data-t="blackjack">ブラックジャック</button>
+  <button data-t="poker">ポーカー</button>
+  <button data-t="chips">チップ</button>
+  <button data-t="glossary">用語集</button>
+</nav>
+<main>
+
+<!-- ================= ルーレット ================= -->
+<section class="page" id="p-roulette" data-t="roulette">
+  <div class="ph"><div><div class="en">ROULETTE</div><h1>ルーレット（ヨーロピアン・シングルゼロ）</h1>
+    <p>0〜36の37ポケット。ディーラーはボールを投入し、締切を宣言し、当選番号をコールして、ハズレの回収と当たりへの配当を行う。</p></div></div>
+  <div class="toc"><a href="#rl-pay">配当表</a><a href="#rl-flow">進行の流れ</a><a href="#rl-order">回収と配当の順番</a><a href="#rl-miss">よくあるミス</a><a href="#rl-irr">イレギュラー対応</a></div>
+
+  <div class="card" id="rl-pay"><h2><span class="n">1</span>配当表</h2>
+    <div class="scroll"><table class="tbl">
+      <tr><th>ベット</th><th>カバーする数字</th><th>置く場所</th><th>配当</th></tr>
+      <tr><td>ストレートアップ</td><td>1つ</td><td>数字の中央</td><td class="pay">35:1</td></tr>
+      <tr><td>スプリット</td><td>隣り合う2つ</td><td>2つの数字の境の線上</td><td class="pay">17:1</td></tr>
+      <tr><td>ストリート</td><td>1列の3つ（0-1-2・0-2-3も）</td><td>列の外側の端の線上</td><td class="pay">11:1</td></tr>
+      <tr><td>コーナー（スクエア）</td><td>4つ</td><td>4つの数字が接する交点</td><td class="pay">8:1</td></tr>
+      <tr><td>シックスライン</td><td>2列の6つ</td><td>2列の境の、外側の端</td><td class="pay">5:1</td></tr>
+      <tr><td>ダズン／カラム</td><td>12個</td><td>1st12〜3rd12／2:1の枠</td><td class="pay">2:1</td></tr>
+      <tr><td>赤黒・奇偶・1-18／19-36</td><td>18個</td><td>アウトサイドの枠</td><td class="pay">1:1</td></tr>
+    </table></div>
+    <svg class="diagram" id="rlDiagram" viewBox="0 0 420 210" role="img" aria-label="インサイドベットの置き方"></svg>
+    <div class="legend2"><span>S＝ストレート</span><span>Sp＝スプリット</span><span>C＝コーナー</span><span>St＝ストリート</span><span>6L＝シックスライン</span></div>
+    <p class="note">配当は「元金をレイアウトに残したまま、配当分を横に置く」のが基本（客が元金ごと引き上げる）。0が出るとアウトサイド（赤黒・奇偶など）はすべてハズレ。0のときにイーブンマネーを半額返す「ラ・パルタージュ」を採用するカジノもある。</p>
+    <div class="why"><b>暗算のコツ</b>　35倍＝36倍−1回分（36は6×6）／17倍＝20倍−3倍／11倍＝10倍＋1回分／8倍＝倍々を3回／5倍＝10倍の半分。<b>ピクチャーベット</b>（当選番号の周りの複数ベット）は、チップ枚数×倍率で「ユニット」を数えてから1ユニットの額を掛ける。</div>
+  </div>
+
+  <div class="card" id="rl-flow"><h2><span class="n">2</span>進行の流れ（ディーラー目線）</h2>
+    <ol class="steps">
+      <li>ベットを募る。<br><span class="call">Place your bets, please.<small>お賭けください</small></span></li>
+      <li><b>スピン</b>：ウィールの回転と<b>逆方向</b>にボールを投入する。投げたらウィールではなくレイアウトを見る（後賭けの監視）。</li>
+      <li><b>締切</b>：ボールが落ちる数周前に、手のひらを下にしてレイアウトの上を左右に振りながら宣言。<br><span class="call">No more bets.<small>締切です</small></span></li>
+      <li><b>コール</b>：ボールがポケットで止まったら、番号・色・奇偶を通る声で。0は色も奇偶も言わない。<br><span class="call">17, black, odd.<small>17、黒、奇数</small></span></li>
+      <li><b>ドリー</b>を当選番号の上に置く（パームアップで上から垂直に）。ドリーがある間は客はチップに触れない。</li>
+      <li><b>回収</b>：ハズレを外側（遠いアウトサイド）→手前のアウトサイド→インサイドの順に。</li>
+      <li><b>マッキング</b>：回収したチップを色ごとに20枚の山にまとめる。</li>
+      <li><b>配当</b>：アウトサイド→インサイド。インサイドは奥の席から手前の席へ。<br><span class="call">Winner.<small>お当たりです</small></span></li>
+      <li><b>クリーンハンド</b>：両手のひらを開いてカメラと客に見せる。</li>
+      <li><b>ドリーを外す</b>＝次のゲームのベット開始の合図。</li>
+    </ol>
+  </div>
+
+  <div class="card" id="rl-order"><h2><span class="n">3</span>回収と配当の順番</h2>
+    <p>回収も配当も「<b>外側（ディーラーから遠い）→内側（手前）</b>」。手前を先に片付けると、奥へ手を伸ばすたびに処理済みのチップの上を越え、崩した・すり替えたという疑いの元になる。</p>
+    <ul>
+      <li>当選番号に接するスプリット・コーナー・ストリートは当たり。インサイドの回収では当たりに関わるチップに触れないよう、ハズレだけを抜く。</li>
+      <li>配当は計算が単純なアウトサイドから。インサイドは奥の席から順に、1か所ずつ「どのベットの配当か」が見える位置に置く。</li>
+    </ul>
+    <div class="why"><b>なぜ</b>　手順が毎回同じだと、監視カメラの映像で「何をどの順で処理したか」を後から検証できる。客も自分の番が来る順番がわかり、払い忘れの指摘がしやすい。</div>
+  </div>
+
+  <div class="card" id="rl-miss"><h2><span class="n">4</span>よくあるミス</h2>
+    <ul class="miss">
+      <li>締切の宣言が遅れて、後賭けを許してしまう。</li>
+      <li>0を「レッド」「イーブン」などと呼ぶ（0はどちらでもない）。</li>
+      <li>回収が終わる前に配当を始める。回収の順番が内側から。</li>
+      <li>当選番号に接するスプリット・コーナーを回収してしまう。</li>
+      <li>35倍・17倍の暗算ミス。チップを出しながら計算し直す。</li>
+      <li>配当のあとにクリーンハンドを省く。</li>
+    </ul>
+  </div>
+
+  <div class="card" id="rl-irr"><h2><span class="n">5</span>イレギュラー対応</h2>
+    <div class="irr">
+      <div class="it"><b>ボールがウィールの外へ飛び出した</b><div class="do">「ノースピン」を宣言し、ボールを回収して投げ直す。ベットはそのまま。</div><div class="rs">そのゲームは無効。出目を決め直すことをはっきり告げないと、客がどの番号で精算されるか混乱する。</div></div>
+      <div class="it"><b>ボールの周回が足りない／ウィールが止まっていた／ウィールと同じ向きに投げた</b><div class="do">「ノースピン」を宣言して投げ直す。</div><div class="rs">偏った出目（狙い投げの疑い）を防ぐため、規定どおりの投入でないスピンは無効にする。</div></div>
+      <div class="it"><b>締切後にチップを置かれた（後賭け）</b><div class="do">受け付けず、チップを本人の前へ戻して「締切後です」と伝える。繰り返す客はフロアへ報告。</div><div class="rs">結果が見えかけてからの後賭けは不正（パストポスティング）の典型。例外を作らない。</div></div>
+      <div class="it"><b>ドリーを置いた後に客がチップへ手を伸ばした</b><div class="do">手を止めて、精算が終わるまで触らないよう伝える。もめたらフロアを呼ぶ。</div><div class="rs">精算中にチップを動かされると、当たりへの上乗せ（キャッピング）や付け替えと区別できない。</div></div>
+      <div class="it"><b>ベットの持ち主で2人がもめている</b><div class="do">自分で判断せず、チップを動かさずにフロアを呼ぶ。<span class="tag">フロア判断</span></div><div class="rs">監視カメラの映像で確認するのはフロアの仕事。ディーラーが裁くと公平性を疑われる。</div></div>
+      <div class="it"><b>当選番号を言い間違えた</b><div class="do">気づいた時点ですぐ訂正のコールをし直す。回収・配当に着手していたら手を止めてフロアを呼ぶ。</div><div class="rs">間違ったコールのまま精算すると取り消しが難しい。訂正は早いほど影響が小さい。</div></div>
+    </div>
+    <p class="note">ノースピンの条件（最低周回数など）や報告の手順はカジノの規定に従う。</p>
+  </div>
+  <div class="cta"><a class="primary" href="roulette.html" target="_top">ルーレットで実習する</a><a href="irregular.html#roulette" target="_top">イレギュラー対応ドリル</a></div>
+</section>
+
+<!-- ================= バカラ ================= -->
+<section class="page" id="p-baccarat" data-t="baccarat">
+  <div class="ph"><div><div class="en">BACCARAT</div><h1>バカラ（プント・バンコ）</h1>
+    <p>プレイヤーとバンカー、どちらの手が9に近いかを当てる。3枚目を引くかどうかはルールで決まっていて、客にもディーラーにも選択肢はない。ディーラーの仕事は、決まった手順でカードを扱い、正確にコールし、精算すること。</p></div></div>
+  <div class="toc"><a href="#bc-pt">点数</a><a href="#bc-draw">3枚目のルール</a><a href="#bc-pay">配当とハウスルール</a><a href="#bc-flow">進行の流れ</a><a href="#bc-miss">よくあるミス</a><a href="#bc-irr">イレギュラー対応</a></div>
+
+  <div class="card" id="bc-pt"><h2><span class="n">1</span>点数の数え方</h2>
+    <ul><li>A＝1点、2〜9＝額面どおり、10・J・Q・K＝0点。</li><li>合計の<b>下1桁</b>だけを見る（7＋8＝15→5点）。</li><li>最初の2枚で8か9は<b>ナチュラル</b>。どちらかがナチュラルなら、両者とも3枚目を引かずに勝敗が決まる。</li></ul>
+  </div>
+
+  <div class="card" id="bc-draw"><h2><span class="n">2</span>3枚目のルール</h2>
+    <h3>プレイヤー（先に判定）</h3>
+    <table class="tbl"><tr><th>プレイヤーの2枚の合計</th><th>判定</th></tr><tr><td>0〜5</td><td class="hit">引く</td></tr><tr><td>6・7</td><td class="stand">スタンド</td></tr><tr><td>8・9</td><td>ナチュラル（両者とも引かない）</td></tr></table>
+    <h3>バンカー</h3>
+    <p>プレイヤーが<b>スタンドした</b>とき：プレイヤーと同じく0〜5で引く、6・7でスタンド。<br>プレイヤーが<b>3枚目を引いた</b>とき：その3枚目の数字で決まる。</p>
+    <div class="scroll"><table class="tbl">
+      <tr><th>バンカーの合計</th><th>引くのは、プレイヤーの3枚目が…</th></tr>
+      <tr><td>0・1・2</td><td class="hit">何であっても引く</td></tr>
+      <tr><td>3</td><td class="hit">8以外</td></tr>
+      <tr><td>4</td><td class="hit">2〜7</td></tr>
+      <tr><td>5</td><td class="hit">4〜7</td></tr>
+      <tr><td>6</td><td class="hit">6・7</td></tr>
+      <tr><td>7</td><td class="stand">何であってもスタンド</td></tr>
+    </table></div>
+    <div class="why"><b>覚え方</b>　3は8だけ避ける／4は2〜7／5は4〜7／6は6〜7。引く範囲が下から1つずつ狭まっていく。</div>
+  </div>
+
+  <div class="card" id="bc-pay"><h2><span class="n">3</span>配当とハウスルール</h2>
+    <div class="scroll"><table class="tbl">
+      <tr><th>ベット</th><th>配当</th><th>補足</th></tr>
+      <tr><td>プレイヤー</td><td class="pay">1:1</td><td>タイのときはプッシュ（返却）</td></tr>
+      <tr><td>バンカー</td><td class="pay">1:1</td><td>方式により異なる（下表）。タイのときはプッシュ</td></tr>
+      <tr><td>タイ</td><td class="pay">8:1</td><td>9:1のカジノもある</td></tr>
+      <tr><td>プレイヤーペア／バンカーペア</td><td class="pay">11:1</td><td>最初の2枚が同じランク。スートまで同じなら25:1（パーフェクトペア）の卓もある</td></tr>
+      <tr><td>ドラゴンボーナス</td><td class="pay">最大30:1</td><td>勝った側の点差9＝30:1、8＝10:1、7＝6:1、6＝4:1、5＝2:1、4＝1:1。ナチュラル勝ちは1:1、ナチュラル同士のタイはプッシュ</td></tr>
+    </table></div>
+    <h3>バンカー勝ちの扱い（ハウスルール）</h3>
+    <div class="scroll"><table class="tbl">
+      <tr><th>方式</th><th>バンカー勝ち</th></tr>
+      <tr><td>5%コミッション</td><td>1:1で払い、ベット額の5%を別に徴収</td></tr>
+      <tr><td>4%コミッション</td><td>率が4%になるだけで手順は同じ</td></tr>
+      <tr><td>ノーコミッション</td><td>徴収なし。バンカーが<b>6で勝ったときだけ半額（1:2）</b></td></tr>
+      <tr><td>EZバカラ</td><td>徴収なし。バンカーが<b>3枚で7の勝ち（ドラゴン7）はプッシュ</b></td></tr>
+    </table></div>
+    <p class="note">コミッションの端数処理（$1単位の切り上げ・25セント単位など）はカジノにより異なる。このアプリは$1単位に切り上げる。</p>
+  </div>
+
+  <div class="card" id="bc-flow"><h2><span class="n">4</span>進行の流れ（ディーラー目線）</h2>
+    <ol class="steps">
+      <li>ベットを募り、締切を宣言。<br><span class="call">No more bets.<small>締切です</small></span></li>
+      <li><b>配る</b>：シューから プレイヤー→バンカー→プレイヤー→バンカー の順に裏向きで。<br><span class="call">Card for the Player. / Card for the Banker.</span></li>
+      <li><b>絞り（スクイーズ）</b>：そのサイドに最も多く賭けた客に開けてもらう（プレイヤー側が先）。卓によってはディーラーが開く。<br><span class="call">Player card. Squeeze, please.</span></li>
+      <li><b>点数をコール</b>。<br><span class="call">Player 5, Banker 3.</span></li>
+      <li><b>ナチュラル確認</b>→なければプレイヤー→バンカーの順に3枚目を判定。3枚目は表向きで配る。<br><span class="call">Player draws. / Banker stands.</span></li>
+      <li><b>勝敗をコール</b>：勝った側・高い点・負けた点の順。<br><span class="call">Banker wins, 7 over 5.<small>バンカーの勝ち、7対5</small></span></li>
+      <li><b>回収</b>：外周（プレイヤー／バンカー枠）→内側（タイ・ペア・ドラゴン）。プッシュのチップには触らない。</li>
+      <li><b>配当</b>：外周→内側、各リングは1番席から順に。</li>
+      <li><b>コミッション徴収</b>（コミッション方式の卓）。配当と相殺せず、払い終えてから。<br><span class="call">Commission, please.</span></li>
+      <li><b>クリーンハンド</b>→カードをまとめてディスカードへ（並びを戻さない）。</li>
+    </ol>
+  </div>
+
+  <div class="card" id="bc-miss"><h2><span class="n">5</span>よくあるミス</h2>
+    <ul class="miss">
+      <li>ナチュラルなのに3枚目を配る（点数をコールしたら、真っ先にナチュラルを確認）。</li>
+      <li>バンカーを先に判定する（必ずプレイヤーが先）。</li>
+      <li>合計が二桁のまま呼ぶ（下1桁にし忘れ）。</li>
+      <li>タイのとき、プッシュのプレイヤー／バンカーのチップを回収してしまう。</li>
+      <li>ノーコミッション卓でバンカー6の勝ちを1:1で払う。EZ卓でドラゴン7を払う。</li>
+      <li>コミッションを配当と相殺して払う。</li>
+    </ul>
+  </div>
+
+  <div class="card" id="bc-irr"><h2><span class="n">6</span>イレギュラー対応</h2>
+    <div class="irr">
+      <div class="it"><b>カットカード（黄色いカード）が出た</b><div class="do">そのゲームは最後まで行い、規定に従ってシャッフルへ。「次が最後のゲーム」と告知する卓が多い。<span class="tag var">カジノで差</span></div><div class="rs">ゲームの途中で止めると、配った札の扱いでもめる。いつシャッフルするかを客に先に知らせる。</div></div>
+      <div class="it"><b>配っている途中でカードが表向きになった（露出）</b><div class="do">手を止め、独断で札を入れ替えたり捨てたりせず、フロアを呼んで規定どおりに処理する。<span class="tag">フロア判断</span></div><div class="rs">どの札が誰の手かが変わる処理は、勝敗そのものに関わる。ディーラーが決めると不公平の疑いが残る。</div></div>
+      <div class="it"><b>絞りの最中に客がカードを曲げた・破った</b><div class="do">扱いを丁寧に注意し、フロアへ報告。汚損したカードの扱い（交換・そのゲームの扱い）は規定に従う。</div><div class="rs">傷や折り目は札の目印（マーキング）になり得る。見過ごすと、次のシューで不正に使われる。</div></div>
+      <div class="it"><b>カードが床に落ちた</b><div class="do">自分で拾わず、フロアに知らせて回収してもらう。規定により、その札を使うか捨てるかが決まる。</div><div class="rs">ディーラーが卓から目と手を離すと、その間に卓上のチップやカードを守れない。</div></div>
+      <div class="it"><b>不要な3枚目を配ってしまった（引かない手に配った）</b><div class="do">手を止めてフロアを呼ぶ。札の扱いは規定に従う。</div><div class="rs">3枚目のルールは勝敗に直結する。誤りを自分で戻すと、どの札が本来の札か検証できなくなる。</div></div>
+      <div class="it"><b>勝敗のコールを間違えた</b><div class="do">回収・配当の前なら、すぐに訂正のコールをし直す。着手後ならフロアを呼ぶ。</div><div class="rs">チップを動かした後の訂正は、どのチップが誰のものかの争いになる。</div></div>
+    </div>
+  </div>
+  <div class="cta"><a class="primary" href="baccarat.html" target="_top">バカラで実習する</a><a href="irregular.html#baccarat" target="_top">イレギュラー対応ドリル</a></div>
+</section>
+
+<!-- ================= ブラックジャック ================= -->
+<section class="page" id="p-blackjack" data-t="blackjack">
+  <div class="ph"><div><div class="en">BLACKJACK</div><h1>ブラックジャック</h1>
+    <p>客はディーラーより21に近い手を目指し、21を超えたらバスト（負け）。ディーラーの引き方は決まっていて選択肢はない。ディーラーは配り、合図を読み取り、規定どおりに引き、精算する。</p></div></div>
+  <div class="toc"><a href="#bj-pt">点数</a><a href="#bj-pay">配当</a><a href="#bj-sig">客の選択と合図</a><a href="#bj-flow">進行の流れ</a><a href="#bj-miss">よくあるミス</a><a href="#bj-irr">イレギュラー対応</a></div>
+  <div class="card" id="bj-pt"><h2><span class="n">1</span>点数とディーラーの引き方</h2>
+    <ul><li>2〜10＝額面、J・Q・K＝10、A＝1か11（21を超えない方）。</li>
+      <li>Aを11と数えている手は<b>ソフト</b>（例：A＋6＝ソフト17）。それ以外は<b>ハード</b>。</li>
+      <li>最初の2枚でA＋10点札＝<b>ブラックジャック</b>（スプリット後の21は含まない）。</li>
+      <li>ディーラーは<b>16以下は必ず引き、17以上でスタンド</b>。ソフト17の扱いは卓の表示に従う：<b>S17</b>（スタンド）／<b>H17</b>（ヒット）。</li></ul>
+  </div>
+  <div class="card" id="bj-pay"><h2><span class="n">2</span>配当</h2>
+    <table class="tbl">
+      <tr><th>結果</th><th>配当</th><th>補足</th></tr>
+      <tr><td>通常の勝ち</td><td class="pay">1:1</td><td>ダブルダウンは増やしたベットに対して</td></tr>
+      <tr><td>ブラックジャック</td><td class="pay">3:2</td><td>元金＋その半分。6:5の卓もあるので表示を確認</td></tr>
+      <tr><td>インシュアランス</td><td class="pay">2:1</td><td>ディーラーのアップカードがAのとき。元のベットの半分まで</td></tr>
+      <tr><td>イーブンマネー</td><td class="pay">1:1</td><td>BJの客がディーラーのAに対して選ぶ。その場で1:1を払って終了</td></tr>
+      <tr><td>サレンダー</td><td class="pay">½返却</td><td>ベットの半分を回収、半分を返す</td></tr>
+      <tr><td>同点</td><td class="pay">プッシュ</td><td>ベットはそのまま</td></tr>
+    </table>
+  </div>
+  <div class="card" id="bj-sig"><h2><span class="n">3</span>客の選択と合図（ハンドシグナル）</h2>
+    <table class="tbl">
+      <tr><th>選択</th><th>合図</th></tr>
+      <tr><td>ヒット</td><td>指でテーブルを軽く叩く</td></tr>
+      <tr><td>スタンド</td><td>手のひらを下に向けて横に振る</td></tr>
+      <tr><td>ダブルダウン</td><td>ベットと同額を横に置き、指を1本立てる（カードは1枚だけ、横向き）</td></tr>
+      <tr><td>スプリット</td><td>ベットと同額を横に置き、指を2本立てる</td></tr>
+      <tr><td>サレンダー</td><td>宣言し、ベットの後ろを指で横になぞる</td></tr>
+    </table>
+    <div class="why"><b>なぜ手の合図か</b>　監視カメラには音声が残らない。合図が映像に残っていれば、「ヒットとは言っていない」という争いを映像で解決できる。口頭だけの客には合図をお願いする。</div>
+  </div>
+  <div class="card" id="bj-flow"><h2><span class="n">4</span>進行の流れ（ディーラー目線）</h2>
+    <ol class="steps">
+      <li>ベットを募り、締切。<br><span class="call">No more bets.</span></li>
+      <li>新しいシューの最初はバーン（1枚捨てる）。</li>
+      <li><b>配る</b>：ディーラーから見て左端（ファーストベース）から時計回りに1枚ずつ→ディーラーのアップカード→2周目→ホールカード（裏）。</li>
+      <li>アップカードがAなら<b>インシュアランス</b>を募る（BJの客にはイーブンマネー）。Aか10点札なら<b>ピーク</b>してBJを確認。<br><span class="call">Insurance is open.</span></li>
+      <li><b>客のアクション</b>：ファーストベースから。合図を読み、21を超えたらその場で回収。</li>
+      <li><b>ディーラーの手番</b>：ホールカードを開け、規定どおりに引く。<br><span class="call">Dealer has 16, taking a card.</span></li>
+      <li><b>精算</b>：サードベース（右端）から順に、回収・配当・プッシュ。</li>
+      <li>クリーンハンド→カードを片付ける。</li>
+    </ol>
+  </div>
+  <div class="card" id="bj-miss"><h2><span class="n">5</span>よくあるミス</h2>
+    <ul class="miss">
+      <li>H17/S17を取り違え、ソフト17で引く・引かない。</li>
+      <li>ダブルダウンに2枚以上配る。スプリットしたAに2枚以上配る。</li>
+      <li>3:2の暗算ミス（$35なら$52.50）。</li>
+      <li>バストした手をディーラーの手番まで残す（その場で回収）。</li>
+      <li>合図を待たずに口頭だけでカードを出す。</li>
+    </ul>
+  </div>
+  <div class="card" id="bj-irr"><h2><span class="n">6</span>イレギュラー対応</h2>
+    <div class="irr">
+      <div class="it"><b>客が口頭で「ヒット」とだけ言った</b><div class="do">カードを出す前に、手の合図をお願いする。</div><div class="rs">映像に残らない意思表示は、後で争いになったときに検証できない。</div></div>
+      <div class="it"><b>ホールカードが見えてしまった</b><div class="do">手を止めてフロアを呼ぶ。そのラウンドの扱いは規定に従う。<span class="tag">フロア判断</span></div><div class="rs">客の判断に影響する情報が出たため、ディーラーが勝手に続けると公平性を欠く。</div></div>
+      <div class="it"><b>配る順番を飛ばした／1席に2枚出た</b><div class="do">そのまま続けず、手を止めてフロアを呼ぶ。</div><div class="rs">札を戻したり付け替えたりすると、以降の札の並びが変わる。誰にどの札が行くべきだったかを映像で確認する。</div></div>
+      <div class="it"><b>カットカードが出た</b><div class="do">そのラウンドは最後まで配り、終わったらシャッフルする。</div><div class="rs">ラウンドの途中でシャッフルすると、配るはずの札の並びが変わってしまう。</div></div>
+      <div class="it"><b>スタンドの合図なのに、もう1枚出してしまった</b><div class="do">札を自分で戻さず、手を止めてフロアを呼ぶ。</div><div class="rs">その札の扱い（次の席へ回す・捨てる）で以降の全員の手が変わる。規定と映像で判断する。</div></div>
+      <div class="it"><b>ラウンド中に客がベットに触れた・足した</b><div class="do">変更は認めないと伝え、元に戻してもらう。悪質ならフロアへ。</div><div class="rs">カードを見てからのベット変更は不正の典型。勝ったあとの上乗せ（キャッピング）にも注意。</div></div>
+    </div>
+  </div>
+  <div class="cta"><a class="primary" href="blackjack.html" target="_top">ブラックジャックで実習する</a><a href="irregular.html#blackjack" target="_top">イレギュラー対応ドリル</a></div>
+</section>
+
+<!-- ================= ポーカー ================= -->
+<section class="page" id="p-poker" data-t="poker">
+  <div class="ph"><div><div class="en">POKER</div><h1>ポーカー（テキサス・ホールデム／オマハ）</h1>
+    <p>カジノは勝負に加わらず、ディーラーは進行役になる。ボタンとブラインド、配り、アクションの順番、ベット額の判定、ポットとサイドポット、レーキ、ショーダウンでの勝者判定と払い出しまでを正確に回す。</p></div></div>
+  <div class="toc"><a href="#pk-rank">役の強さ</a><a href="#pk-order">ボタンと順番</a><a href="#pk-bet">ベットのルール</a><a href="#pk-pot">ポットと払い出し</a><a href="#pk-flow">進行の流れ</a><a href="#pk-irr">イレギュラー対応</a></div>
+  <div class="card" id="pk-rank"><h2><span class="n">1</span>役の強さ（強い順）</h2>
+    <ol><li>ストレートフラッシュ（A-K-Q-J-10はロイヤルフラッシュ）</li><li>フォーカード</li><li>フルハウス</li><li>フラッシュ</li><li>ストレート（A-2-3-4-5は最弱の5ハイ）</li><li>スリーカード</li><li>ツーペア</li><li>ワンペア</li><li>ハイカード</li></ol>
+    <p>同じ役なら主になる数字→残りの札（キッカー）の順で比べる。5枚がまったく同じなら引き分けで、ポットを分ける（チョップ）。スートに強弱はない。</p>
+    <div class="why"><b>ホールデムとオマハの違い</b>　ホールデムはホール2枚＋ボード5枚の7枚から最強の5枚。オマハはホール4枚のうち<b>必ず2枚</b>＋ボードから<b>必ず3枚</b>。オマハではボードにフラッシュが4枚出ていても、ホールに同じスートが2枚なければフラッシュにならない。</div>
+  </div>
+  <div class="card" id="pk-order"><h2><span class="n">2</span>ボタン・ブラインド・アクションの順番</h2>
+    <ul><li>ボタンは毎ゲーム、時計回りに1つ進む。ボタンの左隣がスモールブラインド（SB）、その左がビッグブラインド（BB）。</li>
+      <li>配りはSBから時計回りに1枚ずつ（ホールデム2周・オマハ4周）。</li>
+      <li>アクション：<b>プリフロップはBBの左隣（UTG）から</b>。フロップ以降は<b>ボタンの左から</b>、残っている最初の席。</li>
+      <li>各ボードの前に1枚バーン。フロップは3枚同時、ターン・リバーは1枚ずつ。</li></ul>
+  </div>
+  <div class="card" id="pk-bet"><h2><span class="n">3</span>ベットのルール（ノーリミット）</h2>
+    <ul>
+      <li><b>コール額</b>＝最高額−その席がすでに出した額（ブラインドも含む）。</li>
+      <li><b>最小レイズ</b>＝現在の最高額＋直前の増分（最初のベットならBB）。</li>
+      <li>持ち点が足りないオールインは有効。ただし<b>フルレイズに満たないオールインは、すでに行動した人のアクションを再開しない</b>。</li>
+      <li>口頭の宣言は拘束力がある。宣言せずに複数回に分けてチップを出すのは不可（ストリングベット）。</li>
+      <li>ベットに直面して、宣言なしに大きいチップを1枚だけ出したらコール扱い。</li>
+    </ul>
+  </div>
+  <div class="card" id="pk-pot"><h2><span class="n">4</span>ポット・レーキ・払い出し</h2>
+    <ul>
+      <li>ストリートの終わりに、コールされなかった分を本人へ返してからベットを集める。</li>
+      <li><b>サイドポット</b>：一番少ないオールイン額までを全員から切り取ってメインポット。残りの上の層がサイドポット。オールインした人は自分の層より上には参加できない。</li>
+      <li><b>レーキ</b>はポットの一定率（上限あり）。フロップを開かずに終わったゲームは取らない卓が多い。</li>
+      <li><b>ショーダウン</b>：最後にベット／レイズした人から見せる。いなければボタンの左から。勝敗はカードで判定する（カード・スピーク）。</li>
+      <li><b>チョップの端数</b>：割り切れない$1は、ボタンの左から時計回りで先に来る勝者へ。</li>
+      <li>払い出しはメイン→サイドの順。</li>
+    </ul>
+  </div>
+  <div class="card" id="pk-flow"><h2><span class="n">5</span>進行の流れ（ディーラー目線）</h2>
+    <ol class="steps">
+      <li>ボタンを動かし、SB・BBを出してもらう。</li>
+      <li>シャッフル→カット。</li>
+      <li>SBから時計回りに配る。</li>
+      <li>プリフロップ：UTGからアクションを促す。<br><span class="call">Action on seat 4.</span></li>
+      <li>ベットを集めてポット額をコール。<br><span class="call">Pot is 120.</span></li>
+      <li>バーン→フロップ（3枚）→ベッティング→バーン→ターン→バーン→リバー。</li>
+      <li>ショーダウン：見せる順を指し、勝者をコール。<br><span class="call">Seat 2 wins with a flush.</span></li>
+      <li>レーキを徴収し、ポットを払い出す。クリーンハンド→カードを集める。</li>
+    </ol>
+  </div>
+  <div class="card" id="pk-irr"><h2><span class="n">6</span>イレギュラー対応</h2>
+    <p class="note">ここに挙げるのは、ポーカーの標準ルール（TDA・Robert's Rules of Poker）で一般的な扱い。カードルームの規定が優先する。</p>
+    <div class="irr">
+      <div class="it"><b>配りで1枚目か2枚目が表になった</b><div class="do">ミスディール。カードを集めて配り直す。</div><div class="rs">最初の札が見えると、その後の配りの並びを読まれる可能性がある。</div></div>
+      <div class="it"><b>配りで2枚以上が表になった</b><div class="do">ミスディール。配り直す。</div><div class="rs">複数の札の情報が出たゲームは公平に続けられない。</div></div>
+      <div class="it"><b>配りの途中でそれ以外の1枚が表になった</b><div class="do">配り終えてから、デッキの一番上の札と交換する。表になった札は全員に見せてから、次のバーンカードに使う。</div><div class="rs">1枚だけなら、その札をゲームから外せば公平を保てる。配り直すより影響が小さい。</div></div>
+      <div class="it"><b>ベッティングが終わる前にフロップを開いた</b><div class="do">フロップの札をデッキに戻してシャッフル（バーンカードは卓に残す）→カット→バーンせずに新しいフロップ。</div><div class="rs">まだ行動していない人に札の情報を与えてしまったため、そのフロップは使えない。</div></div>
+      <div class="it"><b>ベッティングが終わる前にターンを開いた</b><div class="do">その札は脇に除け、ベッティングを終えてから、バーンして次の札をターンにする。リバーの前に除けた札をデッキに戻してシャッフル・カットし、バーンせずにリバーを出す。</div><div class="rs">見えてしまった札が、そのままボードに使われないようにする。</div></div>
+      <div class="it"><b>宣言なしに何回かに分けてチップを出した（ストリングベット）</b><div class="do">レイズとして認めず、最初の動作の額（多くはコール）として扱う。</div><div class="rs">相手の反応を見てから額を足す行為を防ぐ。</div></div>
+      <div class="it"><b>順番の来ていない客がアクションした（アウトオブターン）</b><div class="do">手を止め、本来の席にアクションを戻す。その席までの状況が変わらなければ、先走った宣言は有効（拘束）になるのが一般的。</div><div class="rs">先に動いた情報で有利・不利が生まれる。どこまで拘束するかの最終判断はフロア。</div></div>
+      <div class="it"><b>客が自分の役を言い間違えた</b><div class="do">カードを読んで判定する（カード・スピーク）。客の言い間違いで勝敗を変えない。</div><div class="rs">ショーダウンの勝敗は、宣言ではなく開いたカードで決まる。</div></div>
+    </div>
+  </div>
+  <div class="cta"><a class="primary" href="poker.html" target="_top">ポーカーで実習する</a><a href="irregular.html#poker" target="_top">イレギュラー対応ドリル</a></div>
+</section>
+
+<!-- ================= チップ ================= -->
+<section class="page" id="p-chips" data-t="chips">
+  <div class="ph"><div><div class="en">CHIPS</div><h1>チップの扱いとカウント</h1>
+    <p>チップは現金と同じ。正確に・速く・カメラと客に見える形で扱う。このアプリの配色と、どのゲームでも共通の基本。</p></div></div>
+  <div class="toc"><a href="#ch-color">色と額面</a><a href="#ch-count">数え方</a><a href="#ch-out">出し方</a><a href="#ch-buy">両替・所作</a></div>
+  <div class="card" id="ch-color"><h2><span class="n">1</span>色と額面（このアプリの配色）</h2>
+    <table class="tbl"><tr><th>色</th><th>1枚</th><th>5枚</th><th>20枚（1山）</th></tr>
+      <tr><td><span class="cdot" style="background:#EFEBE1"></span>白</td><td>$1</td><td>$5</td><td>$20</td></tr>
+      <tr><td><span class="cdot" style="background:#C23B2F"></span>赤</td><td>$5</td><td>$25</td><td>$100</td></tr>
+      <tr><td><span class="cdot" style="background:#2C62C2"></span>青（BJ）</td><td>$10</td><td>$50</td><td>$200</td></tr>
+      <tr><td><span class="cdot" style="background:#23885A"></span>緑</td><td>$25</td><td>$125</td><td>$500</td></tr>
+      <tr><td><span class="cdot" style="background:#D7861C"></span>橙（BJ）</td><td>$50</td><td>$250</td><td>$1,000</td></tr>
+      <tr><td><span class="cdot" style="background:#1C1D22"></span>黒</td><td>$100</td><td>$500</td><td>$2,000</td></tr>
+      <tr><td><span class="cdot" style="background:#6B3FA0"></span>紫</td><td>$500</td><td>$2,500</td><td>$10,000</td></tr>
+      <tr><td><span class="cdot" style="background:#D7A93A"></span>金（バカラ）</td><td>$1,000</td><td>$5,000</td><td>$20,000</td></tr>
+    </table>
+    <p class="note">実際の色はカジノにより異なる。ルーレットでは客ごとに色の違う「カラーチップ」を使い、退席時に現金チップへ戻す。</p>
+  </div>
+  <div class="card" id="ch-count"><h2><span class="n">2</span>数え方（スタック読み）</h2>
+    <ul>
+      <li><b>5枚1組</b>：同じ額面は5枚ずつ区切って数える。7枚は「5＋2」。</li>
+      <li><b>高さで読む（サイジング）</b>：5枚・20枚の高さを目に焼き付け、隣の山と高さを比べて枚数を出す。1枚ずつ数えるのは最後の確認だけ。</li>
+      <li><b>換算で読む</b>：赤4枚＝$20、緑4枚＝$100、黒5枚＝$500。同じ色が並んだら1つ上の額面に替えて考える。</li>
+      <li><b>色の境目で区切る</b>：色が混ざった山は境目ごとに分けて読む。ベットは高額チップを下に積むのが基本。</li>
+      <li><b>額面ごとに足す</b>：黒の山同士、緑の山同士を先にまとめてから合計する。</li>
+    </ul>
+  </div>
+  <div class="card" id="ch-out"><h2><span class="n">3</span>出し方（ペイアウト）</h2>
+    <ol>
+      <li>手を出す前に、金額を「額面×枚数」に分解する（$475＝黒4＋緑3）。</li>
+      <li>高額の額面から取る（枚数が減り、数え間違いも減る）。</li>
+      <li>出したら横に広げて（スプレッド）、枚数がカメラと客に見えるようにする。</li>
+      <li>1:1は元金と同じ並び・同じ高さを横に作る（ミラー）。高さが揃えば検算になる。</li>
+      <li>額面ごとに「黒4、緑3」と照合し、最後に合計を言う。</li>
+    </ol>
+    <div class="why"><b>練習の順序</b>　①正確さ→②最少枚数→③速さ。ミスしたら「枚数の数え間違い」か「金額の暗算ミス」かを切り分ける。差がチップ1枚ぶんなら数え間違い、大きくずれていれば暗算ミス。</div>
+  </div>
+  <div class="card" id="ch-buy"><h2><span class="n">4</span>両替（バイイン）と所作</h2>
+    <ol class="steps">
+      <li>客が出した現金を卓の上で広げ、カメラに額が見えるようにする。</li>
+      <li>額をコールする（高額はフロアの確認を受ける）。<br><span class="call">Change, five hundred.<small>500ドルの両替です</small></span></li>
+      <li>同額のチップを出し、客の前で広げて見せてから渡す。</li>
+      <li>現金はパドル（押し込み板）でドロップボックスへ入れる。</li>
+    </ol>
+    <ul>
+      <li>チップや現金は、手のひらで隠す持ち方をしない。手を卓から離すたびにクリーンハンド。</li>
+      <li>客から直接手渡しで受け取らない。卓の上に置いてもらう。</li>
+    </ul>
+    <p class="note">両替の手順やコールの言い方はカジノにより異なる。</p>
+  </div>
+  <div class="cta"><a class="primary" href="chips.html" target="_top">チップカウント道場で練習する</a></div>
+</section>
+
+<!-- ================= 用語集 ================= -->
+<section class="page" id="p-glossary" data-t="glossary">
+  <div class="ph"><div><div class="en">GLOSSARY</div><h1>用語集</h1><p>現場で使う呼び方。英語のコールと一緒に覚える。</p></div></div>
+  <div class="card"><dl class="glos">
+    <dt>ノー・モア・ベット<small>No more bets</small></dt><dd>締切の宣言。以降のベットは無効。</dd>
+    <dt>ドリー<small>Dolly / Marker</small></dt><dd>ルーレットで当選番号の上に置くマーカー。置いている間は客がチップに触れない。</dd>
+    <dt>ノースピン<small>No spin</small></dt><dd>ルーレットで無効なスピン。ボールの飛び出し・周回不足などで宣言し、投げ直す。</dd>
+    <dt>マッキング<small>Mucking</small></dt><dd>回収したチップを色ごとに20枚の山へ整理すること。ポーカーでは捨て札の山（マック）を指す。</dd>
+    <dt>クリーンハンド<small>Clean hands</small></dt><dd>両手のひらを開いて、何も持っていないことをカメラと客に示す所作。</dd>
+    <dt>ピクチャーベット<small>Picture bet</small></dt><dd>当選番号の周りに張られたストレート・スプリット・コーナーなどの組み合わせ。ユニットで数える。</dd>
+    <dt>パストポスティング<small>Past posting</small></dt><dd>結果が出てからの後賭け。典型的な不正。</dd>
+    <dt>キャッピング<small>Capping</small></dt><dd>勝ったあとにベットへチップを上乗せする不正。</dd>
+    <dt>シュー<small>Shoe</small></dt><dd>複数デッキを入れたカードの箱。バカラは8デッキ、BJは6デッキなど。</dd>
+    <dt>カットカード<small>Cut card</small></dt><dd>シューの終わりの目印になる色付きのカード。出たらシャッフルの準備。</dd>
+    <dt>バーン<small>Burn</small></dt><dd>使わずに1枚捨てること。ポーカーは各ボードの前、BJはシューの最初など。</dd>
+    <dt>スクイーズ<small>Squeeze</small></dt><dd>バカラで客がカードを少しずつめくって開けること。</dd>
+    <dt>ナチュラル<small>Natural</small></dt><dd>バカラで最初の2枚の合計が8か9。両者とも3枚目を引かない。</dd>
+    <dt>コミッション<small>Commission</small></dt><dd>バカラのバンカー勝ちから徴収する手数料（5%など）。</dd>
+    <dt>ピーク<small>Peek</small></dt><dd>BJでアップカードがAか10点札のとき、ホールカードを確認してBJの有無を見ること。</dd>
+    <dt>インシュアランス／イーブンマネー<small>Insurance / Even money</small></dt><dd>ディーラーのAに対する保険（2:1）。BJの客は1:1で即精算するイーブンマネーを選べる。</dd>
+    <dt>ファーストベース／サードベース<small>First base / Third base</small></dt><dd>BJで最初に配る席（ディーラーから見て左端）／最後の席（右端）。</dd>
+    <dt>プッシュ<small>Push</small></dt><dd>引き分け。ベットは返却（据え置き）。</dd>
+    <dt>ボタン／ブラインド<small>Button / Blinds</small></dt><dd>ポーカーでディーラー役の目印と、強制ベット（SB・BB）。</dd>
+    <dt>UTG<small>Under the gun</small></dt><dd>BBの左隣。プリフロップで最初にアクションする席。</dd>
+    <dt>ミスディール<small>Misdeal</small></dt><dd>配りの誤りでゲームを無効にし、配り直すこと。</dd>
+    <dt>カード・スピーク<small>Cards speak</small></dt><dd>ショーダウンの勝敗は宣言ではなくカードで決まるという原則。</dd>
+    <dt>レーキ<small>Rake</small></dt><dd>ポーカーでハウスがポットから取る手数料。</dd>
+    <dt>チョップ<small>Chop</small></dt><dd>同点でポットを分けること。端数はボタンの左から先の勝者へ。</dd>
+    <dt>スプレッド<small>Spread</small></dt><dd>チップや現金を横に広げて、枚数・額をカメラと客に見せること。</dd>
+    <dt>カラーアップ<small>Color up</small></dt><dd>小額チップを高額チップにまとめること。</dd>
+    <dt>フロア／ピット<small>Floor / Pit</small></dt><dd>卓を監督する責任者。判断が要る場面はディーラーが独断せずフロアを呼ぶ。</dd>
+  </dl></div>
+</section>
+
+<p class="disclaimer">このルールブックは訓練用の一般的な手順をまとめたもの。配当・端数処理・イレギュラーの扱いはカジノやスクールの規定で異なり、所属先の規定が常に優先する。</p>
+</main>
+<script>
+/* タブの切り替え。#roulette などで該当タブを開く。?embed=1 はゲーム内のシートで開いたときの表示（ヘッダーとゲームへのリンクを隠す） */
+const TABS=['roulette','baccarat','blackjack','poker','chips','glossary'];
+if(/[?&]embed=1/.test(location.search))document.body.classList.add('embed');
+function show(t,anchor){
+  if(!TABS.includes(t))t='roulette';
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.dataset.t===t));
+  document.querySelectorAll('#tabs button').forEach(b=>{const on=b.dataset.t===t;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);if(on)b.scrollIntoView({inline:'nearest',block:'nearest'});});
+  if(anchor){const el=document.getElementById(anchor);if(el)el.scrollIntoView();}else window.scrollTo(0,0);
+}
+function fromHash(){
+  const h=decodeURIComponent(location.hash.slice(1));
+  if(TABS.includes(h)){show(h);return;}
+  const el=h&&document.getElementById(h);
+  if(el){const pg=el.closest('.page');if(pg){show(pg.dataset.t,h);return;}}
+  show('roulette');
+}
+document.getElementById('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  history.replaceState(null,'','#'+b.dataset.t);show(b.dataset.t);
+});
+document.addEventListener('click',e=>{
+  const a=e.target.closest('.toc a');if(!a)return;
+  e.preventDefault();const id=a.getAttribute('href').slice(1);const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});
+});
+addEventListener('hashchange',fromHash);
+
+/* インサイドベットの置き方の図（17を中心にした3×3） */
+(function(){
+  const svg=document.getElementById('rlDiagram');if(!svg)return;
+  const RED=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+  const val=(r,c)=>r===0?c*3:r===1?c*3-1:c*3-2;
+  const cw=100,ch=50,x0=60,y0=10,cols=[5,6,7];
+  let s='';
+  for(let r=0;r<3;r++)cols.forEach((c,i)=>{const v=val(r,c);
+    s+=`<rect x="${x0+i*cw+1}" y="${y0+r*ch+1}" width="${cw-2}" height="${ch-2}" rx="3" fill="${RED.has(v)?'#B3261E':'#1B1B1B'}" stroke="rgba(250,247,239,.4)"/>`
+      +`<text x="${x0+i*cw+cw/2}" y="${y0+r*ch+ch/2+7}" text-anchor="middle" font-size="20" font-weight="bold" fill="#F4EFE2" font-family="Georgia,serif" opacity=".55">${v}</text>`;});
+  s+=`<rect x="${x0}" y="${y0+ch*3+2}" width="${cw*3}" height="22" fill="rgba(0,0,0,.2)" stroke="rgba(250,247,239,.3)"/><text x="${x0+cw*1.5}" y="${y0+ch*3+17}" text-anchor="middle" font-size="11" fill="rgba(250,247,239,.6)">ダズン側（外側）</text>`;
+  const chip=(x,y,l)=>s+=`<circle cx="${x}" cy="${y}" r="15" fill="#6B3FA0" stroke="#F2D27A" stroke-width="3" stroke-dasharray="4 6.5"/><text x="${x}" y="${y+4.5}" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">${l}</text>`;
+  chip(x0+cw*1.5,y0+ch*1.5,'S');            /* 17 */
+  chip(x0+cw*2,y0+ch*1.5,'Sp');             /* 17-20 */
+  chip(x0+cw*1.5,y0+ch*1,'Sp');             /* 17-18 */
+  chip(x0+cw*1,y0+ch*2,'C');                /* 13-14-16-17 */
+  chip(x0+cw*0.5,y0+ch*3,'St');             /* 13-14-15 */
+  chip(x0+cw*2,y0+ch*3,'6L');               /* 16〜21 */
+  svg.innerHTML=s;
+})();
+fromHash();
+</script>
+</body>
+</html>
