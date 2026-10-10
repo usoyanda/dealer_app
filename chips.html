@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1015">
+<title>Dealer Simulator | チップカウント道場</title>
+<style>
+:root{
+  --bg:#0B1015;--surface:#17202A;--surface2:#1E2934;--surface3:#263341;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+  --text:#E9EEF3;--text2:#A7B4C1;--text3:#7D8B99;
+  --gold:#D9B25F;--gold2:#F4DA94;--goldd:#8E6C26;
+  --ok:#43C98B;--ng:#FF7062;--warn:#F3BD4E;--info:#82B4FF;
+  --felt:#0F5B44;--felt2:#147457;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(1200px 520px at 50% -12%,#1B2734 0%,var(--bg) 62%) fixed,var(--bg);color:var(--text);
+  font-family:"BIZ UDPGothic","Meiryo","Hiragino Sans","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.6;
+  padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+a{color:inherit}
+
+/* ---- ヘッダー（ゲームと共通の見た目） ---- */
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;padding-top:max(8px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(18,25,33,.97),rgba(11,16,21,.97));border-bottom:1px solid rgba(217,178,95,.22);box-shadow:0 4px 18px rgba(0,0,0,.35);position:sticky;top:0;z-index:20}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--text);padding:6px 14px;border-radius:999px;cursor:pointer;font-size:13px;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn-ghost:hover{border-color:var(--gold);background:rgba(217,178,95,.08)}
+.btn-ghost svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.brand-main{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;background:linear-gradient(180deg,#FBE7B0 0%,#D9B25F 55%,#A9812F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-sub{margin-left:10px;font-size:13px;color:var(--text2)}
+.bm-sm{display:none}
+.top-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+@media (max-width:600px){
+  .topbar{gap:8px;padding:6px 10px;padding-top:max(6px,env(safe-area-inset-top))}
+  .btn-ghost{padding:4px 9px;font-size:12px}.btn-ghost .lg{display:none}
+  .brand-main{font-size:15px}.brand-sub{font-size:12px;margin-left:6px}
+}
+@media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}}
+
+/* ---- 共通部品 ---- */
+.wrap{max-width:780px;margin:0 auto;padding:16px 16px 40px}
+.btn{border:1.5px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#2A3846,#22303C);color:var(--text);border-radius:10px;padding:10px 16px;cursor:pointer;min-height:44px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn:hover{border-color:var(--gold)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.primary{background:linear-gradient(180deg,#F1D58D 0%,#D9B25F 55%,#B88E3B 100%);border-color:#8E6C26;color:#1C1405;font-weight:bold;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.btn.primary:hover{background:linear-gradient(180deg,#F7E0A4 0%,#E2BD6B 55%,#C39845 100%)}
+.btn.big{width:100%;font-size:18px;min-height:56px;border-radius:14px;letter-spacing:.06em}
+.btn:focus-visible,.key:focus-visible,.tray-chip:focus-visible,.mode:focus-visible,.seg button:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+.sec{font-size:12px;letter-spacing:.18em;color:var(--gold);margin:22px 0 8px;font-weight:normal;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line2)}
+
+/* ---- ホーム ---- */
+.hero{display:flex;align-items:center;gap:18px;padding:18px;border-radius:18px;
+  background:radial-gradient(ellipse at 30% 0%,#17644B 0%,#0C3B2D 60%,#082A20 100%);border:1px solid rgba(217,178,95,.28);box-shadow:inset 0 0 40px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.45)}
+.hero-art{flex:none;width:150px}
+.hero-art svg{display:block;width:100%;height:auto}
+.hero h1{margin:0;font-size:24px;letter-spacing:.06em;color:var(--gold2)}
+.hero .en{font-family:Georgia,serif;font-size:12px;letter-spacing:.26em;color:rgba(244,218,148,.7)}
+.hero p{margin:6px 0 0;font-size:13.5px;color:#D4E2DA;line-height:1.7}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mode{position:relative;text-align:left;border-radius:14px;padding:12px 12px 12px;cursor:pointer;background:linear-gradient(180deg,#1C2631,#151D26);border:1.5px solid var(--line2);display:flex;flex-direction:column;gap:4px;min-height:150px}
+.mode:hover{border-color:rgba(217,178,95,.6)}
+.mode.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,178,95,.18),0 10px 26px rgba(0,0,0,.4);background:linear-gradient(180deg,#26303A,#1A222B)}
+.mode .m-ico{width:44px;height:44px}
+.mode .m-en{font-family:Georgia,serif;font-size:10.5px;letter-spacing:.2em;color:var(--gold)}
+.mode .m-name{font-size:18px;font-weight:bold}
+.mode .m-desc{font-size:12px;color:var(--text2);line-height:1.55}
+.mode .m-best{margin-top:auto;font-size:11px;color:var(--text3)}
+.mode .m-best b{color:var(--gold2)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:#0F151B;border:1px solid var(--line2);border-radius:12px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 4px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1.3}
+.seg button small{display:block;font-size:10px;color:var(--text3)}
+.seg button.on{background:linear-gradient(180deg,#30404F,#263442);color:#fff;box-shadow:inset 0 0 0 1px rgba(217,178,95,.55)}
+.seg button.on small{color:var(--gold2)}
+.lvdesc{font-size:12.5px;color:var(--text2);margin:6px 2px 0}
+.startrow{margin-top:20px}
+.records{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rec{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 8px;text-align:center}
+.rec .r-lv{font-size:10px;letter-spacing:.08em;color:var(--text3)}
+.rec .r-rank{font-family:Georgia,serif;font-size:24px;line-height:1.1;font-weight:bold;color:var(--text3)}
+.rec .r-sub{font-size:10.5px;color:var(--text2);line-height:1.35}
+.rank-S{color:#F4DA94 !important;text-shadow:0 0 14px rgba(244,218,148,.55)}
+.rank-A{color:#8FE7BE !important}.rank-B{color:#9CC4FF !important}.rank-C{color:#C3CBD3 !important}
+.totals{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--text2);margin-top:8px}
+.totals b{color:#fff;font-size:15px;margin-left:3px}
+.guide{margin-top:18px;background:var(--surface);border:1px solid var(--line2);border-radius:14px;padding:10px 14px}
+.guide summary{cursor:pointer;font-weight:bold;color:var(--gold2)}
+.guide h4{margin:14px 0 6px;font-size:13px;color:var(--gold)}
+.guide ul{margin:4px 0;padding-left:20px;font-size:13px;line-height:1.7}
+.guide p{font-size:13px;color:var(--text2);margin:6px 0}
+.ctable{border-collapse:collapse;width:100%;font-size:12.5px}
+.ctable th,.ctable td{border-bottom:1px solid var(--line2);padding:5px 6px;text-align:left}
+.ctable th{color:var(--text2);font-weight:normal}
+.cdot{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-3px;margin-right:6px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+@media (max-width:600px){
+  .wrap{padding:10px 10px 32px}
+  .hero{padding:12px;gap:12px}
+  .hero-art{width:96px}
+  .hero h1{font-size:19px}
+  .hero p{font-size:12px}
+  .modes{gap:6px}
+  .mode{padding:9px 8px;min-height:0}
+  .mode .m-ico{width:34px;height:34px}
+  .mode .m-name{font-size:15px}
+  .mode .m-desc{display:none}
+  .mode .m-en{font-size:9px;letter-spacing:.12em}
+  .sec{margin:14px 0 6px}
+  .seg button{font-size:12px;padding:7px 2px}
+  .records{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ---- ドリル ---- */
+.drill{display:flex;flex-direction:column;gap:8px;max-width:560px;margin:0 auto;padding:8px 10px 10px;height:calc(100vh - var(--hdr,49px));height:calc(100dvh - var(--hdr,49px))}
+.dbar{display:flex;align-items:center;gap:10px;flex:none}
+.icon-x{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.04);cursor:pointer;font-size:18px;line-height:1;flex:none}
+.icon-x:hover{border-color:var(--gold)}
+.dtitle{display:flex;flex-direction:column;line-height:1.15;flex:none}
+.dtitle b{font-size:14px}
+.dtitle span{font-size:10px;letter-spacing:.14em;color:var(--gold)}
+.dprog{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dprog span{font-size:11px;color:var(--text2)}
+.dprog .bar{height:6px;border-radius:3px;background:#0F151B;overflow:hidden;border:1px solid var(--line)}
+.dprog .bar i{display:block;height:100%;background:linear-gradient(90deg,#B88E3B,#F4DA94);border-radius:3px;transition:width .3s}
+.dprog .bar.time i{background:linear-gradient(90deg,#43C98B,#F3BD4E 70%,#FF7062);transition:none}
+.dstat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;flex:none;min-width:48px}
+.dstat small{font-size:9.5px;letter-spacing:.12em;color:var(--text3)}
+.dstat b{font-family:Georgia,serif;font-size:18px;font-variant-numeric:tabular-nums}
+.dstat .streak{color:var(--warn)}
+.stage{position:relative;flex:1 1 auto;min-height:150px;border-radius:16px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 18%,var(--felt2),var(--felt) 60%,#0A3E2F 100%);border:8px solid #4A2D1C;box-shadow:inset 0 0 40px rgba(0,0,0,.45),0 10px 26px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:6px}
+.stage svg{display:block;width:100%;height:100%}
+.stage .tag{position:absolute;left:10px;top:8px;font-family:Georgia,serif;font-size:11px;letter-spacing:.2em;color:rgba(244,218,148,.8)}
+.panel{flex:none;display:flex;flex-direction:column;gap:7px}
+.qline{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.qline .q{font-size:15px;font-weight:bold}
+.qline .q small{font-weight:normal;color:var(--text2);font-size:12px;margin-left:6px}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--text2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:3px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+.answer{display:flex;align-items:center;justify-content:space-between;background:#0E141A;border:1.5px solid var(--line2);border-radius:12px;padding:6px 14px;min-height:54px}
+.answer .cur{font-size:15px;color:var(--text3)}
+.answer .val{font-family:Georgia,serif;font-size:32px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.answer .val.empty{color:var(--text3)}
+.answer .caret{display:inline-block;width:2px;height:28px;background:var(--gold);margin-left:3px;vertical-align:-4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:52px;gap:6px}
+.key{border:1px solid rgba(255,255,255,.12);border-radius:12px;background:linear-gradient(180deg,#2A3846,#212E3A);font-size:22px;font-family:Georgia,serif;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.4);color:#F2F5F8;user-select:none}
+.key:active,.key.pressed{transform:translateY(1px);box-shadow:none;background:#34465A}
+.key.fn{font-family:inherit;font-size:15px;color:var(--text2)}
+.key.ok{grid-column:4;grid-row:3/5;background:linear-gradient(180deg,#F1D58D 0%,#D9B25F 55%,#B88E3B 100%);color:#1C1405;font-family:inherit;font-size:17px;font-weight:bold;border-color:#8E6C26}
+.fbk{border-radius:14px;padding:10px 12px;background:var(--surface);border:1.5px solid var(--line2);display:flex;flex-direction:column;gap:8px;max-height:min(48vh,380px);min-height:0;animation:fbin .22s ease-out}
+.fbk-scroll{display:flex;flex-direction:column;gap:6px;overflow:auto;min-height:0;flex:1 1 auto}
+@keyframes fbin{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
+.fbk.ok{border-color:rgba(67,201,139,.6);background:linear-gradient(180deg,rgba(67,201,139,.12),var(--surface) 70%)}
+.fbk.ng{border-color:rgba(255,112,98,.6);background:linear-gradient(180deg,rgba(255,112,98,.12),var(--surface) 70%)}
+.fbk.half{border-color:rgba(243,189,78,.6);background:linear-gradient(180deg,rgba(243,189,78,.12),var(--surface) 70%)}
+.fbk-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fbk-mark{font-size:18px;font-weight:bold}
+.fbk.ok .fbk-mark{color:var(--ok)}.fbk.ng .fbk-mark{color:var(--ng)}.fbk.half .fbk-mark{color:var(--warn)}
+.fbk-time{font-size:12px;color:var(--text2)}
+.fbk-time b{color:var(--gold2)}
+.fbk-ans{font-size:13px;color:var(--text2)}
+.fbk-ans b{font-family:Georgia,serif;font-size:20px;color:#fff;margin:0 10px 0 4px}
+.fbk-steps{margin:0;padding-left:18px;font-size:13px;line-height:1.6}
+.fbk-tip{font-size:12.5px;line-height:1.6;background:rgba(217,178,95,.09);border:1px solid rgba(217,178,95,.3);border-radius:9px;padding:6px 9px;color:#F1E2B8}
+.fbk-tip b{color:var(--gold2)}
+.fbk .btn{align-self:stretch;flex:none}
+/* 出すモード：トレイと出したチップ */
+.target{display:flex;align-items:baseline;justify-content:space-between;gap:8px;background:#0E141A;border:1.5px solid var(--line2);border-radius:12px;padding:6px 14px}
+.target .lbl{font-size:12px;color:var(--text2)}
+.target .amt{font-family:Georgia,serif;font-size:30px;color:var(--gold2)}
+.out-note{font-size:12px;color:var(--warn)}
+.stackbox{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.22);border:1.5px dashed var(--line2);border-radius:12px;padding:6px 10px;min-height:46px}
+.stackbox .row{display:flex;flex-wrap:wrap;gap:4px 12px;flex:1;min-width:0}
+.stackbox .tot{font-size:12px;color:var(--text2);white-space:nowrap}
+.stackbox .tot b{font-family:Georgia,serif;font-size:18px;color:#fff}
+.sg{display:inline-flex;align-items:center;gap:5px}
+.sg-chips{display:inline-flex;gap:3px;flex-wrap:wrap}
+.sg-n{font-size:11px;color:var(--text2)}
+.mini-chip.g5{margin-right:8px}
+.tray{display:flex;justify-content:space-between;gap:6px;padding:8px;border-radius:14px;background:linear-gradient(180deg,#2C1F16,#1C130D);box-shadow:inset 0 2px 10px rgba(0,0,0,.6);border:1px solid rgba(217,178,95,.18)}
+.acts{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:6px}
+/* カジノチップの質感（ゲーム側の共通デザインと同じ描き方） */
+.tray-chip,.mini-chip{--c:#7A8794;--spot:#F4F0E6;border-radius:50%;border:4px solid transparent;
+  background:radial-gradient(circle closest-side,transparent 0 60%,rgba(255,255,255,.55) 61% 65%,transparent 66%),
+    radial-gradient(circle closest-side,var(--c) 0 72%,transparent 73%),
+    repeating-conic-gradient(from 8deg,var(--spot) 0 16deg,transparent 16deg 60deg),var(--c);
+  background-origin:border-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 4px rgba(0,0,0,.38),0 2px 4px rgba(0,0,0,.55);
+  color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.55);font-family:Georgia,serif;font-weight:bold;display:inline-flex;align-items:center;justify-content:center}
+.tray-chip{width:54px;height:54px;font-size:12px;cursor:pointer;flex:none;position:relative;transition:transform .08s}
+.tray-chip:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.tray-chip:active{transform:translateY(1px) scale(.96)}
+.tray-chip[disabled]{filter:grayscale(1) brightness(.5);cursor:not-allowed;transform:none}
+.tray-chip[disabled]::after{content:"切れ";position:absolute;inset:auto -4px -6px -4px;font:bold 10px/1.4 "BIZ UDPGothic",sans-serif;color:#fff;background:var(--ng);border-radius:6px;text-shadow:none}
+.mini-chip{width:22px;height:22px;font-size:7.5px;border-width:2px}
+.mini-chip.ghost{background:transparent;box-shadow:none;border:2px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.35);text-shadow:none}
+.ch-1{--c:#EFEBE1;--spot:#3E6A92;color:#1D232B;text-shadow:none}
+.ch-5{--c:#C23B2F;--spot:#F6F1E4}.ch-25{--c:#23885A;--spot:#F6F1E4}.ch-100{--c:#1C1D22;--spot:#E9E2CF}
+.ch-500{--c:#6B3FA0;--spot:#F2D27A}.ch-1000{--c:#D7A93A;--spot:#7C1D1D;color:#2A1D05;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+/* ピクチャーベットなどの説明札 */
+.ticket{width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:14px;padding:8px}
+.tk-art{flex:none;width:clamp(78px,30%,150px);display:flex;align-items:center;justify-content:center;align-self:center}
+.tk-art svg{width:100%;height:auto;max-height:220px}
+.tk-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tk-game{font-family:Georgia,serif;font-size:11px;letter-spacing:.24em;color:var(--gold2)}
+.tk-bet{font-size:20px;font-weight:bold;color:#fff;line-height:1.3}
+.tk-odds{font-family:Georgia,serif;font-size:26px;color:#F4DA94;line-height:1.1}
+.tk-amt{font-size:14px;color:#D4E2DA}
+.tk-amt b{font-family:Georgia,serif;font-size:22px;color:#fff;margin-left:4px}
+.tk-note{font-size:11.5px;color:rgba(212,226,218,.8);line-height:1.5}
+@media (max-width:600px){
+  .drill{padding:6px 8px 8px;gap:6px}
+  .dstat b{font-size:16px}
+  .keypad{grid-auto-rows:46px;gap:5px}
+  .key{font-size:20px}
+  .answer{min-height:46px;padding:4px 12px}
+  .answer .val{font-size:28px}
+  .qline .q{font-size:14px}
+  .tray-chip{width:46px;height:46px;font-size:11px;border-width:3px}
+  .tk-bet{font-size:16px}.tk-odds{font-size:21px}.tk-amt b{font-size:18px}
+  .fbk{max-height:50vh}
+  .acts .btn{font-size:14px;padding:8px 6px}
+}
+@media (max-height:700px){.keypad{grid-auto-rows:42px}.answer{min-height:42px}.answer .val{font-size:26px}}
+/* PC：テーブルを左、解答パネルを右に置く */
+@media (min-width:900px){
+  .drill{max-width:1100px;display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:auto minmax(0,1fr);gap:12px 16px;padding:14px 18px}
+  .dbar{grid-column:1/3}
+  .stage{min-height:0}
+  .panel{justify-content:flex-start;overflow:auto}
+  .keypad{grid-auto-rows:62px}
+  .fbk{max-height:none}
+  .ticket{gap:28px}
+  .tk-bet{font-size:26px}.tk-odds{font-size:34px}.tk-amt{font-size:16px}.tk-amt b{font-size:28px}.tk-note{font-size:13px;max-width:360px}
+}
+
+/* ---- 結果 ---- */
+.result{max-width:640px;margin:0 auto;padding:18px 16px 40px}
+.rhead{text-align:center;padding:18px;border-radius:18px;background:radial-gradient(ellipse at 50% 0%,#1F2B37,#141C24);border:1px solid var(--line2)}
+.rhead .rk{font-family:Georgia,serif;font-size:76px;font-weight:bold;line-height:1;animation:rankin .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes rankin{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.rhead .rt{font-size:13px;color:var(--text2);margin-top:4px}
+.newbest{display:inline-block;margin-top:8px;padding:2px 12px;border-radius:999px;background:linear-gradient(180deg,#F1D58D,#C9A24B);color:#1C1405;font-weight:bold;font-size:12px;letter-spacing:.08em}
+.rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.rstat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.rstat small{display:block;font-size:10.5px;color:var(--text3)}
+.rstat b{font-family:Georgia,serif;font-size:20px}
+.rlist{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.ritem{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ng);border-radius:10px;padding:8px 10px;font-size:13px}
+.ritem.ok{border-left-color:var(--ok)}
+.ritem .rq{font-weight:bold}
+.ritem .ra{color:var(--text2);font-size:12.5px}
+.ritem .ra b{color:#fff}
+.ritem .rtip{font-size:12px;color:#F1E2B8;margin-top:3px}
+.ractions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+@media (max-width:600px){.rstats{grid-template-columns:repeat(2,1fr)}.rhead .rk{font-size:60px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="btn-ghost" href="index.html" aria-label="ホームに戻る">◀<span class="lg"> 目次</span></a>
+  <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">チップカウント道場</span></div>
+  <div class="top-right">
+    <a class="btn-ghost" href="rules.html#chips" aria-label="チップのルールとコツ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v12H8.5A3.5 3.5 0 0 1 5 16.5z"/><path d="M5 16.5A3.5 3.5 0 0 1 8.5 13H19"/></svg><span class="lg">ルール</span></a>
+    <button class="btn-ghost" id="btnSfx" data-a="sfx" aria-pressed="true" aria-label="効果音"></button>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/*ENGINE_START*/
+/* ===== チップカウント道場 =====
+   ディーラーのチップ技術を3つに分けて反復する。
+   ・数える：山の色（額面）と高さ（枚数）を読んで合計を出す（スタック読み）
+   ・払う　：ベットと当たりから配当額を暗算する（ピクチャーベット・3:2・コミッション）
+   ・出す　：指定の金額を最少枚数で出す（高額から取る・チップ切れへの対応）
+   どのモードも「正確さ→速さ」の順に評価する。10問チャレンジは正答率と平均タイム、
+   60秒アタックは時間内の正解数でランクを付ける。 */
+const DENOMS=[1000,500,100,25,5,1];
+const CHIP={1:{c:'#EFEBE1',s:'#3E6A92',name:'白'},5:{c:'#C23B2F',s:'#F6F1E4',name:'赤'},25:{c:'#23885A',s:'#F6F1E4',name:'緑'},
+  100:{c:'#1C1D22',s:'#E9E2CF',name:'黒'},500:{c:'#6B3FA0',s:'#F2D27A',name:'紫'},1000:{c:'#D7A93A',s:'#7C1D1D',name:'金'}};
+const LV_NAME=['','BASIC','STANDARD','ADVANCED','EXPERT'];
+const MODES={
+  count:{name:'数える',en:'STACK COUNT',desc:'チップの山を見て合計額を答える。色で額面、高さで枚数を読む。',q:'この山の合計は？',target:[0,5,7,10,13]},
+  pay:{name:'払う',en:'PAYOUT',desc:'ベットと当たりから配当額を暗算。ピクチャーベット・3:2・コミッションまで。',q:'',target:[0,5,7,10,14]},
+  build:{name:'出す',en:'CHIP OUT',desc:'指定の金額を最少枚数で出す。高額から取る・5枚1組・チップ切れ。',q:'',target:[0,6,8,11,14]}
+};
+const LV_DESC={
+  count:['','1〜2山・白赤緑・10枚まで。5枚ごとの区切りと目盛り線つき。','2〜3山・黒まで・20枚まで。区切りと目盛り線つき。','3〜4山・紫まで。色の混ざった山が出る。区切りなし、左端の目盛りだけ。','4〜5山・金$1000まで。混ざった山が2つ。目盛りなし、高さだけで読む。'],
+  pay:['','ルーレットの基本配当（35・17・11・8・5・2倍）とBJの3:2。切りのいい額。','半端な額が増え、タイ8:1・ペア11:1・ノーコミッションの半額配当も。','ピクチャーベット（ストレート＋スプリット＋コーナー）、5%コミッション、3:2の50セント。','フルに近いピクチャーベット、9:1タイ、インシュアランス、端数のあるコミッション。'],
+  build:['','$99まで・白赤緑の3色。','$495まで・黒を追加。','$2,400まで・紫を追加。出した合計は表示しない（自分で数える）。','$4,800まで・金を追加。チップ切れ（使えない額面）が出る。合計は表示しない。']
+};
+
+function fmt$(x){x=Math.round(x*100)/100;return '$'+(Number.isInteger(x)?x.toLocaleString('en-US'):x.toFixed(2));}
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+function rint(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function wpick(pairs){const t=pairs.reduce((a,p)=>a+p[1],0);let r=Math.random()*t;for(const p of pairs){if((r-=p[1])<0)return p[0];}return pairs[0][0];}
+/* 額面がどれも下の額面の倍数になっている組み合わせなので、高額から取る貪欲法で最少枚数になる */
+function minChips(x,ds){const r=[];for(const d of (ds||DENOMS)){while(x>=d-1e-9){r.push(d);x-=d;}}return r;}
+function counts(arr){const m={};arr.forEach(d=>{m[d]=(m[d]||0)+1;});return m;}
+function planText(x,ds){const m=counts(minChips(x,ds));return (ds||DENOMS).filter(d=>m[d]).map(d=>`$${d}×${m[d]}`).join(' ＋ ');}
+function groupBy5(n){if(n<=5)return String(n);const f=Math.floor(n/5),r=n%5;const h=f<=3?Array(f).fill(5).join('＋'):`5×${f}`;return r?`${h}＋${r}`:h;}
+function chipName(d){return `${CHIP[d].name}$${d}`;}
+
+/* ---- 配当の暗算のコツ（倍率ごとの分解） ---- */
+function payTip(m,a){
+  const f=fmt$;
+  switch(m){
+    case 35:return `35倍は「36倍−1回分」。${f(a)}×36＝${f(a*36)}（36は6×6）、そこから${f(a)}を引いて${f(a*35)}。`;
+    case 17:return `17倍は「20倍−3倍」。${f(a)}×20＝${f(a*20)}、${f(a)}×3＝${f(a*3)}を引いて${f(a*17)}。`;
+    case 11:return `11倍は「10倍＋1回分」。${f(a*10)}＋${f(a)}＝${f(a*11)}。`;
+    case 9:return `9倍は「10倍−1回分」。${f(a*10)}−${f(a)}＝${f(a*9)}。`;
+    case 8:return `8倍は「倍々を3回」。${f(a)}→${f(a*2)}→${f(a*4)}→${f(a*8)}。`;
+    case 5:return `5倍は「10倍の半分」。${f(a*10)}÷2＝${f(a*5)}。`;
+    case 2:return `2倍は元金の並びを2つ作る（ミラーを2回）。${f(a)}＋${f(a)}＝${f(a*2)}。`;
+    case 1.5:return `3:2は「元金＋その半分」。${f(a)}＋${f(a/2)}＝${f(a*1.5)}。`;
+    case 0.5:return `半額は2で割るだけ。${f(a)}÷2＝${f(a/2)}。`;
+    case 1:return `1:1は元金と同額。元金と同じ並び・同じ高さを横に作る。`;
+  }
+  return `${f(a)}×${m}＝${f(a*m)}。`;
+}
+function unitTip(units,u){
+  if(u===1)return `1ユニット$1なので、そのまま${fmt$(units)}。`;
+  if(u===5)return `×5は「×10の半分」。${units}×10＝${units*10}、半分で${fmt$(units*5)}。`;
+  if(u===10)return `×10は桁を1つ上げるだけ。${fmt$(units*10)}。`;
+  if(u===25)return `×25は「×100の4分の1」。${units}×100＝${(units*100).toLocaleString()}、÷4で${fmt$(units*25)}。`;
+  if(u===2)return `×2は倍にするだけ。${fmt$(units*2)}。`;
+  return `${units}×${fmt$(u)}＝${fmt$(units*u)}。`;
+}
+
+/* ===== 数える（スタック読み） ===== */
+const CL={
+  1:{n:[1,2],d:[1,5,25],min:2,max:10,mixed:0,sep:true,lines:true,ticks:true,legend:true},
+  2:{n:[2,3],d:[1,5,25,100],min:3,max:20,mixed:0,sep:true,lines:true,ticks:true,legend:true},
+  3:{n:[3,4],d:[5,25,100,500],min:3,max:20,mixed:1,sep:false,lines:false,ticks:true,legend:false},
+  4:{n:[4,5],d:[1,5,25,100,500,1000],min:2,max:20,mixed:2,sep:false,lines:false,ticks:false,legend:false}
+};
+function genCount(lv){
+  const L=CL[lv],ns=rint(L.n[0],L.n[1]),stacks=[];
+  let mixedNeed=L.mixed?rint(1,L.mixed):0;
+  for(let i=0;i<ns;i++){
+    const left=ns-i;
+    if(mixedNeed>0&&(Math.random()<.5||left<=mixedNeed)){
+      /* 色の混ざった山：ベットと同じく高額チップを下に積む */
+      const k=lv===4&&Math.random()<.4?3:2;
+      const ds=shuffle(L.d.slice()).slice(0,k).sort((a,b)=>b-a);
+      const total=rint(Math.max(k*2,L.min+2),L.max);
+      const parts=[];let rest=total;
+      ds.forEach((d,j)=>{const n=j===ds.length-1?rest:rint(1,rest-(ds.length-1-j));parts.push({d,n});rest-=n;});
+      stacks.push({parts});mixedNeed--;
+    }else{
+      const d=rnd(L.d);stacks.push({parts:[{d,n:rint(L.min,L.max)}]});
+    }
+  }
+  const total=stacks.reduce((a,s)=>a+s.parts.reduce((b,p)=>b+p.d*p.n,0),0);
+  const steps=stacks.map((s,i)=>{
+    const v=s.parts.reduce((b,p)=>b+p.d*p.n,0);
+    const body=s.parts.map(p=>`${chipName(p.d)}×${p.n}${p.n>5?`（${groupBy5(p.n)}）`:''}`).join(' ＋ ');
+    return `${'①②③④⑤⑥'[i]} ${body} ＝ ${fmt$(v)}`;
+  });
+  steps.push(`合計 ${fmt$(total)}`);
+  return{mode:'count',lv,stacks,answer:total,steps,tip:countTip(stacks,lv),qtext:'この山の合計は？',decimal:false,
+    review:`${stacks.length}山（${stacks.map(s=>s.parts.map(p=>`${CHIP[p.d].name}${p.n}`).join('+')).join('・')}）`};
+}
+function countTip(stacks,lv){
+  const all=[];stacks.forEach(s=>s.parts.forEach(p=>all.push(p)));
+  const g25=all.find(p=>p.d===25&&p.n>=4),g5=all.find(p=>p.d===5&&p.n>=4),g500=all.find(p=>p.d===500&&p.n>=2);
+  const tips=[];
+  if(stacks.some(s=>s.parts.length>1))tips.push('色の混ざった山は、色の境目で区切って読む。ベットは高額チップを下に積むのが基本なので、下から読めば大きい額から足していける。');
+  if(g25){const q=Math.floor(g25.n/4),r=g25.n%4;tips.push(`緑$25は4枚で$100。${g25.n}枚＝4×${q}${r?`＋${r}`:''} → ${fmt$(q*100)}${r?`＋${fmt$(r*25)}`:''}＝${fmt$(g25.n*25)}。`);}
+  else if(g5)tips.push(`赤$5は4枚で$20、20枚で$100。${g5.n}枚なら${g5.n>=20?'$100＋':''}${fmt$((g5.n%20)*5)}…と20枚単位で読む。`);
+  if(g500)tips.push(`紫$500は2枚で$1,000。${g500.n}枚＝${fmt$(g500.n*500)}。`);
+  if(stacks.length>=3)tips.push('額面ごとに先にまとめてから足す（黒の山同士、緑の山同士）。山を左から順に足すより暗算が軽い。');
+  tips.push(lv<=2?'5枚ごとの区切りを目印に「5、10、15…」と数える。1枚ずつは数えない。':'5枚の高さを基準に、隣の山と高さを比べて枚数を読む（サイジング）。');
+  return tips.slice(0,2).join('\n');
+}
+
+/* ===== 払う（配当計算） ===== */
+const RL_BETS=[['straight','ストレートアップ',35],['split','スプリット',17],['street','ストリート',11],['corner','コーナー',8],['sixline','シックスライン',5],['dozen','ダズン',2],['column','カラム',2]];
+const RL_AMT={1:[5,10,20,25],2:[5,10,15,20,25,30,40,50],3:[3,7,12,13,17,18,22,35,45],4:[6,9,14,19,23,27,33,37,41,47,55,65]};
+const BJ_AMT={1:[10,20,30,40,50,60],2:[10,20,30,40,50,60,70,80,90,100,150],3:[15,25,35,45,55,65,75,85],4:[12,17,23,35,45,55,65,85,105,125,175,225]};
+function genPay(lv){
+  const kinds={1:[['rl',4],['bj',2]],2:[['rl',3],['bj',2],['tie',1],['pair',1],['half',1]],
+    3:[['rl',2],['pic',3],['bj',2],['comm',2],['tie',1],['pair',1],['half',1]],
+    4:[['pic',4],['rl',1],['bj',2],['comm',2],['tie',1],['pair',1],['ins',1],['half',1]]}[lv];
+  const k=wpick(kinds);
+  if(k==='pic')return genPic(lv);
+  if(k==='rl'){
+    const pool=lv===1?RL_BETS.filter(b=>['straight','split','street','corner','dozen'].includes(b[0])):RL_BETS;
+    const b=rnd(pool),a=rnd(RL_AMT[lv]);
+    return payQ(lv,'ROULETTE',b[1],`${b[2]} : 1`,a,b[2],a*b[2],'配当額は？',['ルーレットの配当は元金をレイアウトに残したまま、配当分だけを横に置く。'],
+      [`${b[1]}は${b[2]}:1`,`${fmt$(a)}×${b[2]}＝${fmt$(a*b[2])}`],payTip(b[2],a));
+  }
+  if(k==='bj'){
+    const a=rnd(BJ_AMT[lv]);
+    return payQ(lv,'BLACKJACK','ブラックジャック','3 : 2',a,1.5,a*1.5,'配当額は？',['最初の2枚で21（ブラックジャック）。'],
+      [`ブラックジャックは3:2（ベット×1.5）`,`${fmt$(a)}＋${fmt$(a/2)}＝${fmt$(a*1.5)}`],payTip(1.5,a)+(a%2?'　半分が$0.50になる額は、$2.50や$0.50のチップで端数を作る（カジノにより扱いが異なる）。':''));
+  }
+  if(k==='ins'){
+    const bet=rnd([20,30,40,50,60,80,100,120,150,200]),ins=bet/2;
+    return payQ(lv,'BLACKJACK','インシュアランス','2 : 1',ins,2,ins*2,'配当額は？',[`ベット${fmt$(bet)}の客がインシュアランスを${fmt$(ins)}。ディーラーはブラックジャック。`],
+      [`インシュアランスは2:1`,`${fmt$(ins)}×2＝${fmt$(ins*2)}`],'インシュアランスは元のベットの半分まで。満額なら配当はちょうど元のベットと同額になる（ベットは負けるので、客の収支はゼロ）。');
+  }
+  if(k==='tie'){
+    const m=lv===4&&Math.random()<.5?9:8,a=rnd(lv<=2?[5,10,20,25,50]:[15,35,45,65,75,85,125]);
+    return payQ(lv,'BACCARAT','タイ',`${m} : 1`,a,m,a*m,'配当額は？',[`このテーブルのタイ配当は${m}:1。`],[`${fmt$(a)}×${m}＝${fmt$(a*m)}`],payTip(m,a));
+  }
+  if(k==='pair'){
+    const a=rnd(lv<=2?[5,10,20,25]:[15,25,35,45,65,85]);
+    return payQ(lv,'BACCARAT','プレイヤーペア','11 : 1',a,11,a*11,'配当額は？',['最初の2枚が同じランク。'],[`${fmt$(a)}×11＝${fmt$(a*11)}`],payTip(11,a));
+  }
+  if(k==='half'){
+    const a=lv<=2?rint(5,60)*10:rint(15,180)*5;
+    return payQ(lv,'BACCARAT','バンカー（6で勝ち）','1 : 2',a,0.5,a/2,'配当額は？',['ノーコミッションのテーブル。バンカーが合計6で勝ったので配当は半額。'],
+      [`${fmt$(a)}÷2＝${fmt$(a/2)}`],payTip(0.5,a));
+  }
+  /* comm：5%コミッション。端数は$1単位に切り上げ（バカラのテーブルと同じ規定） */
+  const a=lv===3?rint(2,40)*20:rint(9,190)*5,raw=a*0.05,c=Math.ceil(raw-1e-9);
+  const steps=[`${fmt$(a)}の10%＝${fmt$(a/10)}、その半分で${fmt$(raw)}`];
+  if(c!==raw)steps.push(`端数は$1単位に切り上げて${fmt$(c)}`);
+  return payQ(lv,'BACCARAT','バンカー勝ちのコミッション','5 %',a,null,c,'徴収するコミッションは？',['5%コミッションのテーブル。配当（1:1）を払ったあと、別に徴収する。'],
+    steps,'5%は「10%の半分」。10%は桁を1つ下げるだけ。'+(c!==raw?'端数の扱いはカジノにより異なる（このアプリは$1単位に切り上げ）。':''));
+}
+function payQ(lv,game,bet,odds,amt,mult,answer,qtext,notes,steps,tip){
+  return{mode:'pay',lv,kind:'ticket',game,bet,odds,amt,mult,answer:Math.round(answer*100)/100,qtext,notes,steps,tip,
+    decimal:!Number.isInteger(Math.round(answer*100)/100),review:`${bet} ${odds}・ベット${fmt$(amt)}`};
+}
+/* ピクチャーベット：当たり番号の周りに張られたチップを「ユニット」で数えてから1ユニットの額を掛ける */
+function valAt(row,col){return row===0?col*3:row===1?col*3-1:col*3-2;}
+function genPic(lv){
+  const unit=lv===3?rnd([1,5]):rnd([5,10,25,2]);
+  const c=rint(2,11),row=rint(0,2),n=valAt(row,c);
+  const items=[];
+  const sk=lv===4?rint(1,3):1;
+  items.push({kind:'straight',m:35,k:sk,at:{t:'cell',r:row,c}});
+  const nb=[];
+  nb.push({t:'v',r:row,c:c-1},{t:'v',r:row,c});           /* 左右の数字とのスプリット（縦の線上） */
+  if(row>0)nb.push({t:'h',r:row-1,c});                      /* 上の数字とのスプリット（横の線上） */
+  if(row<2)nb.push({t:'h',r:row,c});
+  shuffle(nb).slice(0,lv===3?rint(1,2):rint(2,nb.length)).forEach(p=>items.push({kind:'split',m:17,k:lv===4?rint(1,2):1,at:p}));
+  const cr=[];
+  for(const dr of [-1,0])for(const dc of [-1,0]){const r0=row+dr;if(r0<0||r0+1>2)continue;cr.push({t:'x',r:r0,c:c+dc});}
+  shuffle(cr).slice(0,lv===3?rint(0,2):rint(1,cr.length)).forEach(p=>items.push({kind:'corner',m:8,k:lv===4?rint(1,2):1,at:p}));
+  if(lv===4&&Math.random()<.4)items.push({kind:'street',m:11,k:1,at:{t:'st',c}});
+  if(lv===4&&Math.random()<.3)items.push({kind:'sixline',m:5,k:1,at:{t:'sl',c:rnd([c-1,c])}});
+  const NAME={straight:'ストレート',split:'スプリット',corner:'コーナー',street:'ストリート',sixline:'シックスライン'};
+  const agg={};items.forEach(it=>{agg[it.kind]=agg[it.kind]||{m:it.m,k:0};agg[it.kind].k+=it.k;});
+  const units=Object.values(agg).reduce((a,x)=>a+x.k*x.m,0);
+  const steps=Object.keys(agg).map(kd=>`${NAME[kd]} ${agg[kd].k}枚×${agg[kd].m}＝${agg[kd].k*agg[kd].m}`);
+  steps.push(`合計 ${units}ユニット`,`${units}×${fmt$(unit)}＝${fmt$(units*unit)}`);
+  const memo=[];
+  const ks=Object.keys(agg).sort().join(',');
+  if(ks==='split,straight'&&agg.straight.k===1&&agg.split.k===2)memo.push('「ストレート＋スプリット2枚＝69」は頻出の形。丸ごと覚えておく。');
+  if(ks==='split,straight'&&agg.straight.k===1&&agg.split.k===4)memo.push('「ストレート＋スプリット4枚＝103」も頻出の形。');
+  const tip=`ピクチャーベットは、まずチップの枚数×倍率で「ユニット」を数え、最後に1ユニットの額を掛ける。${memo.join('')}${unitTip(units,unit)}`;
+  return{mode:'pay',lv,kind:'pic',num:n,row,c,items,unit,answer:units*unit,qtext:'配当額は？',steps,tip,decimal:false,units,
+    review:`ピクチャーベット ${n}番・${items.length}か所・1ユニット${fmt$(unit)}`};
+}
+
+/* ===== 出す（最少枚数） ===== */
+const BL={1:{min:6,max:99,d:[25,5,1],showTotal:true},2:{min:30,max:495,d:[100,25,5,1],showTotal:true},
+  3:{min:120,max:2400,d:[500,100,25,5,1],showTotal:false},4:{min:150,max:4800,d:[1000,500,100,25,5,1],showTotal:false,out:.5}};
+function genBuild(lv){
+  const L=BL[lv];let amount,src='';
+  if(Math.random()<.5){
+    /* 配当から作る金額（現場でよく出る形） */
+    const f=rnd([[35,'ストレート'],[17,'スプリット'],[11,'ストリート'],[8,'コーナー']]);
+    const bet=rint(1,Math.max(1,Math.floor(L.max/f[0])));
+    amount=bet*f[0];src=`${f[1]} ${fmt$(bet)}の配当`;
+    if(amount<L.min){amount=rint(L.min,L.max);src='';}
+  }else amount=rint(L.min,L.max);
+  let ds=L.d.slice(),out=null;
+  if(L.out&&Math.random()<L.out){out=rnd([25,100,5,500].filter(d=>ds.includes(d)));ds=ds.filter(d=>d!==out);}
+  const best=minChips(amount,ds);
+  return{mode:'build',lv,answer:amount,denoms:ds,all:L.d,out,showTotal:L.showTotal,src,best,
+    qtext:'最少枚数で出す',decimal:false,
+    steps:[`最少枚数：${planText(amount,ds)}（${best.length}枚）`],
+    tip:(out?OUT_TIP[out]+'\n':'')+`高額の額面から順に「いくつ取れるか」を決める。${planText(amount,ds)}。`,
+    review:`${fmt$(amount)}${out?`（${chipName(out)}切れ）`:''}`};
+}
+
+/* チップ切れのときの作り方：切れた額面のぶんを、1つ下の額面の換算枚数で出す */
+const OUT_TIP={
+  5:'赤$5が切れているときは、$5ぶんを白$1×5で作る（緑$25未満の端数は白だけで出す）。',
+  25:'緑$25が切れているときは、$25ぶんを赤$5×5で作る（黒$100未満は赤と白で）。',
+  100:'黒$100が切れているときは、$100ぶんを緑$25×4で作る（紫$500未満は緑以下で）。',
+  500:'紫$500が切れているときは、$500ぶんを黒$100×5で作る。'
+};
+function gen(mode,lv){return mode==='count'?genCount(lv):mode==='pay'?genPay(lv):genBuild(lv);}
+/* 得点：正解100点＋速さボーナス（目標タイムの1.5倍までの残り時間に比例、最大60点）＋連続正解ボーナス */
+function points(ok,sec,target,streak){
+  if(!ok)return 0;
+  const sp=Math.max(0,Math.min(60,Math.round((target*1.5-sec)/(target*1.5)*60)));
+  return 100+sp+Math.min(streak,10)*10;
+}
+function rankTen(acc,avg,target){
+  if(acc>=1&&avg<=target)return 'S';
+  if(acc>=.9&&avg<=target*1.5)return 'A';
+  if(acc>=.7)return 'B';
+  return 'C';
+}
+function rankSprint(ok,target){
+  const s=Math.ceil(60/target);
+  return ok>=s?'S':ok>=Math.ceil(s*.75)?'A':ok>=Math.ceil(s*.5)?'B':'C';
+}
+/*ENGINE_END*/
+
+/* ===================== 描画（SVG） ===================== */
+const CW=56,CH=7,CE=9;
+function svgDefs(){
+  return `<defs>
+    <linearGradient id="shade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".42"/><stop offset=".3" stop-color="#fff" stop-opacity=".16"/>
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+    <radialGradient id="topshine" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>`;
+}
+/* チップ1枚の側面（帯）。上端・下端は手前に膨らむ楕円の弧。縁のエッジスポットは
+   チップごとに位相をずらし、奥へ回り込むほど細く描く（積んだチップらしい見え方） */
+function chipSide(cx,yb,d,i){
+  const C=CHIP[d],rx=CW/2,yt=yb-CH,N=12,pts=[];
+  for(let k=0;k<=N;k++){const t=Math.PI*(1-k/N);pts.push(`${(cx+rx*Math.cos(t)).toFixed(1)},${(yt+CE*Math.sin(t)).toFixed(1)}`);}
+  for(let k=0;k<=N;k++){const t=Math.PI*(k/N);pts.push(`${(cx+rx*Math.cos(t)).toFixed(1)},${(yb+CE*Math.sin(t)).toFixed(1)}`);}
+  const poly=pts.join(' ');
+  let s=`<polygon points="${poly}" fill="${C.c}"/>`;
+  const ph=(i*23)%60;
+  for(let k=0;k<6;k++){
+    const th=(ph+k*60-90)*Math.PI/180;
+    if(Math.cos(th)<.18)continue;
+    const x=cx+rx*Math.sin(th),hw=rx*(Math.sin(th+.14)-Math.sin(th-.14))/2,y=yt+CE*Math.cos(th);
+    s+=`<rect x="${(x-hw).toFixed(1)}" y="${(y+.7).toFixed(1)}" width="${(2*hw).toFixed(1)}" height="${CH-1.4}" fill="${C.s}"/>`;
+  }
+  s+=`<polygon points="${poly}" fill="url(#shade)"/><polyline points="${pts.slice(N+1).join(' ')}" fill="none" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`;
+  return s;
+}
+function chipTop(cx,yt,d){
+  const C=CHIP[d],rx=CW/2;
+  return `<ellipse cx="${cx}" cy="${yt}" rx="${rx}" ry="${CE}" fill="${C.c}"/>`
+    +`<ellipse cx="${cx}" cy="${yt}" rx="${rx-2.6}" ry="${CE-1.2}" fill="none" stroke="${C.s}" stroke-width="3.6" stroke-dasharray="4.6 8.6"/>`
+    +`<ellipse cx="${cx}" cy="${yt}" rx="${rx*.62}" ry="${CE*.6}" fill="${C.c}" stroke="rgba(255,255,255,.55)" stroke-width=".9"/>`
+    +`<ellipse cx="${cx}" cy="${yt}" rx="${rx}" ry="${CE}" fill="url(#topshine)"/>`;
+}
+/* 山の描画。parts は下から順（高額が下）。sep が真なら5枚ごとにすき間をあける */
+function stackSVG(cx,base,parts,sep){
+  const gap=sep?2.6:0;let s=`<ellipse cx="${cx}" cy="${base+CE*.9}" rx="${CW*.66}" ry="${CE*1.25}" fill="rgba(0,0,0,.38)"/>`;
+  let j=0,top=base,lastD=null;
+  parts.forEach(p=>{for(let k=0;k<p.n;k++){const yb=base-j*CH-gap*Math.floor(j/5);s+=chipSide(cx,yb,p.d,j);top=yb-CH;lastD=p.d;j++;}});
+  if(lastD)s+=chipTop(cx,top,lastD);
+  return{svg:s,top};
+}
+function topY(base,n,sep){const gap=sep?2.6:0;return base-n*CH-gap*Math.floor((n-1)/5);}
+
+function countStageSVG(q,reveal){
+  const L=CL[q.lv],ns=q.stacks.length,slot=84,left=L.ticks?34:12;
+  const W=left+ns*slot+12,H=L.max*CH+(L.sep?3*2.6:0)+CE*2+(reveal?58:30),base=H-CE*2-(reveal?22:6);
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax meet" role="img" aria-label="チップの山 ${ns}つ">${svgDefs()}`;
+  if(L.ticks){
+    [5,10,15,20].filter(n=>n<=L.max).forEach(n=>{
+      const y=topY(base,n,L.sep);
+      if(L.lines)s+=`<line x1="${left-4}" x2="${W-6}" y1="${y}" y2="${y}" stroke="rgba(244,218,148,.22)" stroke-dasharray="3 5"/>`;
+      s+=`<line x1="${left-12}" x2="${left-4}" y1="${y}" y2="${y}" stroke="rgba(244,218,148,.6)"/><text x="${left-14}" y="${y+3.5}" text-anchor="end" font-size="10" fill="rgba(244,218,148,.75)" font-family="Georgia,serif">${n}</text>`;
+    });
+  }
+  q.stacks.forEach((st,i)=>{
+    const cx=left+slot*(i+.5),r=stackSVG(cx,base,st.parts,L.sep);s+=r.svg;
+    if(reveal){
+      const v=st.parts.reduce((b,p)=>b+p.d*p.n,0),n=st.parts.reduce((b,p)=>b+p.n,0);
+      s+=`<text x="${cx}" y="${r.top-CE-6}" text-anchor="middle" font-size="13" font-weight="bold" fill="#F4DA94" font-family="Georgia,serif">${fmt$(v)}</text>`;
+      s+=`<text x="${cx}" y="${base+CE*2+12}" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,.8)">${st.parts.map(p=>`${CHIP[p.d].name}${p.n}`).join('+')}枚</text>`;
+    }
+  });
+  return s+'</svg>';
+}
+/* 配当の札：ベット額を最少枚数の山で添える */
+function betArtSVG(amt){
+  const ch=minChips(Math.floor(amt),[500,100,25,5,1]);   /* 高額から並ぶ＝下から積む順（高額が下） */
+  const parts=[];ch.forEach(d=>{const l=parts[parts.length-1];if(l&&l.d===d)l.n++;else parts.push({d,n:1});});
+  const n=Math.min(14,ch.length),H=n*CH+CE*3+16,W=90;
+  const r=stackSVG(W/2,H-CE*1.6,parts.length?parts:[{d:1,n:1}],false);
+  return `<svg viewBox="0 0 ${W} ${Math.max(H,60)}" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${svgDefs()}${r.svg}</svg>`;
+}
+function ticketHTML(q){
+  return `<div class="ticket"><div class="tk-art">${betArtSVG(q.amt)}</div><div class="tk-body">
+    <div class="tk-game">${esc(q.game)}</div><div class="tk-bet">${esc(q.bet)}</div><div class="tk-odds">${esc(q.odds)}</div>
+    <div class="tk-amt">${q.mult===null?'バンカーのベット':'ベット'}<b>${fmt$(q.amt)}</b></div>
+    ${q.notes.map(n=>`<div class="tk-note">${esc(n)}</div>`).join('')}</div></div>`;
+}
+/* ピクチャーベット：当たり番号の周り3×3のレイアウトと、線上・交点に置かれたチップ */
+function picSVG(q,reveal){
+  const cw=66,chh=48,x0=24,y0=26,W=x0*2+cw*3,H=y0+chh*3+40;
+  const colX=c=>x0+(c-(q.c-1))*cw,rowY=r=>y0+r*chh;
+  const RED=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${q.num}番の周りのベット">`;
+  for(let r=0;r<3;r++)for(let c=q.c-1;c<=q.c+1;c++){
+    const v=valAt(r,c),win=v===q.num;
+    s+=`<rect x="${colX(c)+1}" y="${rowY(r)+1}" width="${cw-2}" height="${chh-2}" rx="3" fill="${RED.has(v)?'#B3261E':'#1B1B1B'}" stroke="${win?'#F4DA94':'rgba(250,247,239,.4)'}" stroke-width="${win?3:1}"/>`;
+    s+=`<text x="${colX(c)+cw/2}" y="${rowY(r)+chh/2+6}" text-anchor="middle" font-size="18" font-weight="bold" fill="#F4EFE2" font-family="Georgia,serif" opacity="${win?1:.75}">${v}</text>`;
+  }
+  s+=`<rect x="${x0}" y="${y0+chh*3+2}" width="${cw*3}" height="20" fill="rgba(0,0,0,.18)" stroke="rgba(250,247,239,.3)"/><text x="${x0+cw*1.5}" y="${y0+chh*3+16}" text-anchor="middle" font-size="10" fill="rgba(250,247,239,.6)">（ダズン・アウトサイド側）</text>`;
+  const pos=at=>{
+    if(at.t==='cell')return[colX(at.c)+cw/2,rowY(at.r)+chh/2];
+    if(at.t==='v')return[colX(at.c)+cw,rowY(at.r)+chh/2];
+    if(at.t==='h')return[colX(at.c)+cw/2,rowY(at.r)+chh];
+    if(at.t==='x')return[colX(at.c)+cw,rowY(at.r)+chh];
+    if(at.t==='st')return[colX(at.c)+cw/2,rowY(2)+chh];
+    if(at.t==='sl')return[colX(at.c)+cw,rowY(2)+chh];
+  };
+  q.items.forEach(it=>{
+    const [x,y]=pos(it.at);
+    for(let k=it.k-1;k>=0;k--){
+      const yy=y-k*3.2;
+      s+=`<circle cx="${x}" cy="${yy}" r="12.5" fill="#6B3FA0" stroke="#F2D27A" stroke-width="3" stroke-dasharray="4 5.8"/><circle cx="${x}" cy="${yy}" r="8" fill="#6B3FA0" stroke="rgba(255,255,255,.5)" stroke-width=".8"/>`;
+    }
+    if(it.k>1)s+=`<text x="${x}" y="${y-(it.k-1)*3.2+4}" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff" font-family="Georgia,serif">${it.k}</text>`;
+    if(reveal)s+=`<text x="${x+14}" y="${y-12}" font-size="10" fill="#F4DA94" font-family="Georgia,serif">×${it.m}</text>`;
+  });
+  s+=`<text x="${W-6}" y="${H-6}" text-anchor="end" font-size="11" fill="#F4DA94">チップ1枚＝${fmt$(q.unit)}</text>`;
+  return s+'</svg>';
+}
+
+/* ===================== 状態と保存 ===================== */
+const STORE='dsim_chip_v1';
+function loadData(){
+  const d={opts:{mode:'count',level:1,session:'ten',sfx:true,auto:true},best:{},total:{q:0,ok:0},byMode:{count:{q:0,ok:0},pay:{q:0,ok:0},build:{q:0,ok:0}},sessions:0,lastAt:0};
+  try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v){Object.assign(d.opts,v.opts||{});Object.assign(d.best,v.best||{});Object.assign(d.total,v.total||{});
+    ['count','pay','build'].forEach(m=>{if(v.byMode&&v.byMode[m])d.byMode[m]=v.byMode[m];});d.sessions=v.sessions||0;d.lastAt=v.lastAt||0;}}catch(e){}
+  return d;
+}
+function saveData(){try{localStorage.setItem(STORE,JSON.stringify(DATA));}catch(e){}}
+let DATA=loadData();
+const S={screen:'home',q:null,input:'',chips:[],answered:false,res:[],score:0,streak:0,maxStreak:0,t0:0,qt0:0,deadline:0,last:null,timerRaf:0,autoT:0,newBest:false};
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const now=()=>performance.now();
+
+/* ---- 効果音（ゲーム側の共通キットと同じ鳴らし方） ---- */
+const SFX={
+  ctx:null,
+  ac(){if(!this.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;this.ctx=new A();}if(this.ctx.state==='suspended')this.ctx.resume();return this.ctx;},
+  tone(f,t,dur,type,vol){const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.05,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.02);},
+  click(t,f,vol){const c=this.ctx,n=Math.floor(c.sampleRate*.03),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,4);
+    const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();bp.type='bandpass';bp.frequency.value=f||3200;bp.Q.value=2.2;g.gain.value=vol||.35;
+    s.buffer=b;s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);},
+  play(kind){
+    if(DATA.opts.sfx===false)return;
+    try{
+      if(kind==='ng'&&navigator.vibrate)navigator.vibrate(45);
+      if((kind==='chip'||kind==='key')&&navigator.vibrate)navigator.vibrate(6);
+      const c=this.ac();if(!c)return;const t=c.currentTime+.005;
+      if(kind==='ok'){this.tone(988,t,.1,'sine',.045);this.tone(1480,t+.07,.16,'sine',.04);}
+      else if(kind==='ng'){this.tone(196,t,.16,'triangle',.07);this.tone(147,t+.09,.22,'triangle',.06);}
+      else if(kind==='chip'){this.click(t,3400,.32);this.click(t+.035,2600,.18);}
+      else if(kind==='key'){this.click(t,2200,.12);}
+      else if(kind==='end'){[784,988,1175,1568].forEach((f,i)=>this.tone(f,t+i*.08,.18,'sine',.04));}
+    }catch(e){}
+  }
+};
+
+/* ===================== 画面 ===================== */
+function modeIcon(m){
+  if(m==='count')return `<svg class="m-ico" viewBox="0 0 90 70" aria-hidden="true">${svgDefs()}${stackSVG(26,58,[{d:25,n:5}],false).svg}${stackSVG(64,58,[{d:100,n:3},{d:25,n:3}],false).svg}</svg>`;
+  if(m==='pay')return `<svg class="m-ico" viewBox="0 0 90 70" aria-hidden="true">${svgDefs()}${stackSVG(28,58,[{d:5,n:4}],false).svg}<text x="47" y="40" font-size="18" fill="#F4DA94" font-family="Georgia,serif">×35</text></svg>`;
+  return `<svg class="m-ico" viewBox="0 0 90 70" aria-hidden="true">${svgDefs()}<rect x="4" y="42" width="82" height="20" rx="5" fill="#2C1F16" stroke="rgba(217,178,95,.4)"/>${chipTop(22,46,100)}${chipTop(45,46,25)}${chipTop(68,46,5)}<path d="M45 8v22M37 22l8 8 8-8" stroke="#F4DA94" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function bestKey(m,lv,ss){return `${m}-${lv}-${ss}`;}
+function bestOfMode(m){
+  const order='SABC';let b=null;
+  Object.entries(DATA.best).forEach(([k,v])=>{if(k.startsWith(m+'-')&&(!b||order.indexOf(v.rank)<order.indexOf(b.rank)||(v.rank===b.rank&&+k.split('-')[1]>+b.lv)))b=Object.assign({lv:k.split('-')[1]},v);});
+  return b;
+}
+function renderHome(){
+  const o=DATA.opts;
+  const cards=Object.entries(MODES).map(([k,m])=>{
+    const b=bestOfMode(k);
+    return `<button class="mode${o.mode===k?' on':''}" data-a="mode" data-v="${k}" aria-pressed="${o.mode===k}">
+      ${modeIcon(k)}<span class="m-en">${m.en}</span><span class="m-name">${m.name}</span><span class="m-desc">${m.desc}</span>
+      <span class="m-best">${b?`最高 <b class="rank-${b.rank}">${b.rank}</b>（${LV_NAME[b.lv]}）`:'記録なし'}</span></button>`;
+  }).join('');
+  const lvs=[1,2,3,4].map(l=>`<button class="${o.level===l?'on':''}" data-a="level" data-v="${l}" aria-pressed="${o.level===l}">${LV_NAME[l]}<small>${['','入門','標準','上級','実戦'][l]}</small></button>`).join('');
+  const ses=[['ten','10問チャレンジ','正確さと平均タイム'],['sprint','60秒アタック','時間内の正解数']].map(x=>`<button class="${o.session===x[0]?'on':''}" data-a="session" data-v="${x[0]}" aria-pressed="${o.session===x[0]}">${x[1]}<small>${x[2]}</small></button>`).join('');
+  const recs=[1,2,3,4].map(l=>{const b=DATA.best[bestKey(o.mode,l,o.session)];
+    return `<div class="rec"><div class="r-lv">${LV_NAME[l]}</div><div class="r-rank ${b?'rank-'+b.rank:''}">${b?b.rank:'—'}</div><div class="r-sub">${b?(o.session==='ten'?`${Math.round(b.acc*100)}%・平均${b.avg.toFixed(1)}秒`:`正解${b.ok}問`)+`<br>${b.score}点`:'未挑戦'}</div></div>`;}).join('');
+  const T=DATA.total;
+  $('app').innerHTML=`<div class="wrap home">
+    <section class="hero"><div class="hero-art">${heroSVG()}</div><div>
+      <div class="en">CHIP COUNT DOJO</div><h1>チップカウント道場</h1>
+      <p>数える・払う・出す。ディーラーのチップ技術を1セット1〜2分で反復します。正確さが先、速さはその次。</p></div></section>
+    <h2 class="sec">モード</h2><div class="modes">${cards}</div>
+    <h2 class="sec">レベル</h2><div class="seg">${lvs}</div><p class="lvdesc">${LV_DESC[o.mode][o.level]}</p>
+    <h2 class="sec">形式</h2><div class="seg">${ses}</div>
+    <div class="startrow"><button class="btn primary big" data-a="start">スタート ▶</button></div>
+    <h2 class="sec">自己ベスト（${MODES[o.mode].name}・${o.session==='ten'?'10問':'60秒'}）</h2><div class="records">${recs}</div>
+    <div class="totals"><span>解いた問題<b>${T.q}</b></span><span>正答率<b>${T.q?Math.round(T.ok/T.q*100)+'%':'—'}</b></span><span>セット数<b>${DATA.sessions}</b></span></div>
+    ${guideHTML()}
+  </div>`;
+}
+function heroSVG(){
+  return `<svg viewBox="0 0 200 150" aria-hidden="true">${svgDefs()}${stackSVG(40,128,[{d:25,n:12}],true).svg}${stackSVG(100,128,[{d:500,n:4},{d:100,n:9}],false).svg}${stackSVG(160,128,[{d:5,n:7}],true).svg}</svg>`;
+}
+function guideHTML(){
+  const rows=[1,5,25,100,500,1000].map(d=>`<tr><td><span class="cdot" style="background:${CHIP[d].c}"></span>${CHIP[d].name}</td><td>${fmt$(d)}</td><td>${d<1000?fmt$(d*5):'—'}</td><td>${d<1000?fmt$(d*20):'—'}</td></tr>`).join('');
+  return `<details class="guide"><summary>チップの基本とカウントのコツ</summary>
+    <h4>色と額面（このアプリの配色）</h4>
+    <table class="ctable"><tr><th>色</th><th>1枚</th><th>5枚</th><th>20枚（1山）</th></tr>${rows}</table>
+    <p>実際の色はカジノにより異なります。白$1は青のスポット、金$1000は高額テーブル（バカラ）で使います。</p>
+    <h4>換算（1つ上の額面に替わる枚数）</h4>
+    <ul><li>白$1 ×5 ＝ 赤$5</li><li>赤$5 ×5 ＝ 緑$25（4枚で$20、20枚で$100）</li><li>緑$25 ×4 ＝ 黒$100</li><li>黒$100 ×5 ＝ 紫$500</li><li>紫$500 ×2 ＝ 金$1000</li></ul>
+    <h4>数えるコツ</h4>
+    <ul>
+      <li><b>5枚1組</b>：同じ額面は1枚ずつ数えず5枚ずつ区切る。7枚は「5＋2」。</li>
+      <li><b>高さで読む</b>：5枚の高さを目に焼き付け、隣の山と高さを比べる（サイジング）。20枚が1山。</li>
+      <li><b>色の境目で区切る</b>：混ざった山は色ごとに区切る。ベットは高額チップを下に積むのが基本。</li>
+      <li><b>額面ごとにまとめて足す</b>：黒の山同士、緑の山同士を先に足してから合計。</li>
+      <li><b>声に出して照合</b>：「黒4、緑3、合計475」。口に出すと数え間違いに気づける。</li>
+    </ul>
+    <h4>配当の暗算</h4>
+    <ul>
+      <li><b>35倍</b>＝36倍−1回分（36は6×6）　<b>17倍</b>＝20倍−3倍　<b>11倍</b>＝10倍＋1回分</li>
+      <li><b>8倍</b>＝倍々を3回　<b>5倍</b>＝10倍の半分　<b>9倍</b>＝10倍−1回分　<b>25倍</b>＝100倍÷4</li>
+      <li><b>3:2</b>＝元金＋その半分　<b>5%</b>＝10%の半分</li>
+      <li><b>ピクチャーベット</b>：枚数×倍率で「ユニット」を数え、最後に1ユニットの額を掛ける。ストレート＋スプリット2枚＝69、＋スプリット4枚＝103。</li>
+    </ul>
+    <p>練習の順序は「正確さ→最少枚数→速さ」。ここでの数え方は共通の基本で、スタックの単位や端数の扱いは所属するカジノの流儀に従ってください。</p>
+  </details>`;
+}
+
+function stageHTML(q,reveal){
+  if(q.mode==='count')return `<span class="tag">STACKS</span>${countStageSVG(q,reveal)}`;
+  if(q.mode==='pay')return q.kind==='pic'?`<span class="tag">PICTURE BET</span>${picSVG(q,reveal)}`:ticketHTML(q);
+  /* 出す：目標額の札 */
+  return `<div class="ticket"><div class="tk-body" style="align-items:center;text-align:center">
+    <div class="tk-game">CHIP OUT</div><div class="tk-note">${q.src?esc(q.src):'この金額をお客様へ'}</div>
+    <div class="tk-odds" style="font-size:44px">${fmt$(q.answer)}</div>
+    <div class="tk-note">最少枚数で出す${q.out?`　<b style="color:#FFB8AF">※${chipName(q.out)}チップ切れ</b>`:''}</div></div></div>`;
+}
+function legendHTML(q){
+  if(q.mode!=='count'||!CL[q.lv].legend)return '';
+  const ds=[...new Set(q.stacks.flatMap(s=>s.parts.map(p=>p.d)))].sort((a,b)=>a-b);
+  return `<span class="legend">${ds.map(d=>`<span><i style="background:${CHIP[d].c}"></i>${fmt$(d)}</span>`).join('')}</span>`;
+}
+function keypadHTML(q){
+  const k=(v,cls,label,aria)=>`<button class="key${cls?' '+cls:''}" data-a="key" data-v="${v}"${aria?` aria-label="${aria}"`:''}>${label||v}</button>`;
+  return `<div class="keypad">${k(7)}${k(8)}${k(9)}${k('bs','fn','⌫','1文字消す')}${k(4)}${k(5)}${k(6)}${k('c','fn','C','クリア')}${k(1)}${k(2)}${k(3)}${k('ok','ok','OK','答える')}${k(0)}${k('00')}${k('.','',q.decimal?'.':'.','小数点')}</div>`;
+}
+function buildPanelHTML(q){
+  const cnt=counts(S.chips),sum=S.chips.reduce((a,b)=>a+b,0);
+  const ds=q.all.filter(d=>cnt[d]);
+  const row=ds.length?ds.map(d=>{const n=cnt[d];return `<span class="sg"><span class="sg-chips">${Array.from({length:n},(_,i)=>`<span class="mini-chip ch-${d}${i%5===4&&i<n-1?' g5':''}">${d}</span>`).join('')}</span><span class="sg-n">×${n}</span></span>`;}).join(''):'<span style="color:var(--text3);font-size:13px">トレイのチップをタップして出す</span>';
+  const tray=q.all.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-a="chip" data-v="${d}"${q.out===d?' disabled aria-label="切れ"':` aria-label="$${d}を1枚出す"`}>$${d}</button>`).join('');
+  return `<div class="stackbox"><div class="row">${row}</div><div class="tot">${q.showTotal?`合計 <b>${fmt$(sum)}</b>／`:''}${S.chips.length}枚</div></div>
+    <div class="tray">${tray}</div>
+    <div class="acts"><button class="btn" data-a="undo">1枚戻す</button><button class="btn" data-a="clear">全部戻す</button><button class="btn primary" data-a="submit">確定する</button></div>`;
+}
+function feedbackHTML(){
+  const r=S.last,q=r.q;
+  const head=r.ok?'✓ 正解':r.half?'△ 金額は正解・枚数オーバー':'✕ ちがいます';
+  const cls=r.ok?'ok':r.half?'half':'ng';
+  const given=q.mode==='build'?`${fmt$(r.given)}（${r.used}枚）`:(r.given===null?'—':fmt$(r.given));
+  const ans=q.mode==='build'?`${fmt$(q.answer)}（最少${q.best.length}枚）`:fmt$(q.answer);
+  const diag=!r.ok&&q.mode!=='build'&&r.given!==null?diagText(r.given,q.answer):(!r.ok&&q.mode==='build'&&!r.half?diagText(r.given,q.answer):'');
+  return `<div class="fbk ${cls}" role="status" aria-live="polite"><div class="fbk-scroll">
+    <div class="fbk-head"><span class="fbk-mark">${head}</span><span class="fbk-time">${r.sec.toFixed(1)}秒${r.pts?`　<b>＋${r.pts}</b>`:''}</span></div>
+    <div class="fbk-ans">正解<b>${ans}</b>${r.ok?'':`あなた<b>${given}</b>`}</div>
+    ${diag?`<div class="fbk-ans">${esc(diag)}</div>`:''}
+    <ul class="fbk-steps">${q.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+    <div class="fbk-tip"><b>コツ</b>　${esc(q.tip).replace(/\n/g,'<br>')}</div></div>
+    <button class="btn primary" data-a="next">${isLast()?'結果を見る':'次へ'} ▶<small style="font-weight:normal;opacity:.7;margin-left:6px">Enter</small></button>
+  </div>`;
+}
+function diagText(given,ans){
+  const d=Math.round((given-ans)*100)/100,ad=Math.abs(d),more=d>0?'多い':'少ない';
+  if(ad===0)return '';
+  if([1,5,25,100,500,1000].includes(ad))return `差は${fmt$(ad)}（${chipName(ad)}1枚ぶん${more}）。枚数の数え間違いの可能性が高い。5枚ずつ区切って数え直す。`;
+  if(ad<ans*.25)return `差は${fmt$(ad)}${more}。額面の取り違えか、数枚の数え間違い。色で確かめる。`;
+  return `差は${fmt$(ad)}${more}と大きい。掛け算・分解の段階でずれている可能性。コツの分解を確認。`;
+}
+function isLast(){
+  if(DATA.opts.session==='ten')return S.res.length>=10;
+  return now()>=S.deadline;
+}
+function renderDrill(){
+  const q=S.q,o=DATA.opts,m=MODES[o.mode];
+  const prog=o.session==='ten'
+    ?`<span>${Math.min(S.res.length+(S.answered?0:1),10)} / 10</span><div class="bar"><i style="width:${S.res.length*10}%"></i></div>`
+    :`<span>残り <b id="tLeft">60</b>秒・正解 ${S.res.filter(r=>r.ok).length}</span><div class="bar time"><i id="tBar" style="width:100%"></i></div>`;
+  const qtext=q.mode==='pay'?q.qtext+'<small>元金は含めない</small>':q.mode==='build'?q.qtext+(q.showTotal?'':'<small>合計は自分で数える</small>'):q.qtext;
+  let body;
+  if(S.answered)body=feedbackHTML();
+  else if(q.mode==='build')body=buildPanelHTML(q);
+  else body=`<div class="answer" aria-live="polite"><span class="cur">＄</span><span class="val${S.input?'':' empty'}">${S.input?esc(fmtInput(S.input)):'0'}<span class="caret"></span></span></div>${keypadHTML(q)}`;
+  $('app').innerHTML=`<div class="drill mode-${q.mode}">
+    <div class="dbar"><button class="icon-x" data-a="quit" aria-label="やめてモード選択へ">×</button>
+      <div class="dtitle"><b>${m.name}</b><span>${LV_NAME[o.level]}</span></div>
+      <div class="dprog">${prog}</div>
+      <div class="dstat"><small>TIME</small><b id="tTime">${S.answered&&S.last?S.last.sec.toFixed(1):'0.0'}</b></div>
+      <div class="dstat"><small>${S.streak>=2?'連続':'SCORE'}</small><b class="${S.streak>=2?'streak':''}">${S.streak>=2?S.streak:S.score}</b></div></div>
+    <div class="stage">${stageHTML(q,S.answered)}</div>
+    <div class="panel"><div class="qline"><span class="q">${qtext}</span>${legendHTML(q)}</div>${body}</div>
+  </div>`;
+}
+function fmtInput(s){const [i,f]=s.split('.');return (i?(+i).toLocaleString('en-US'):'0')+(f!==undefined?'.'+f:'');}
+function renderResult(){
+  const o=DATA.opts,res=S.res,ok=res.filter(r=>r.ok).length,n=res.length;
+  const acc=n?ok/n:0,okTimes=res.filter(r=>r.ok).map(r=>r.sec),avg=okTimes.length?okTimes.reduce((a,b)=>a+b,0)/okTimes.length:0;
+  const target=MODES[o.mode].target[o.level];
+  const rank=o.session==='ten'?rankTen(acc,avg||999,target):rankSprint(ok,target);
+  const misses=res.filter(r=>!r.ok);
+  $('app').innerHTML=`<div class="result">
+    <div class="rhead"><div class="rt">${MODES[o.mode].name}・${LV_NAME[o.level]}・${o.session==='ten'?'10問チャレンジ':'60秒アタック'}</div>
+      <div class="rk rank-${rank}">${rank}</div>
+      <div class="rt">${o.session==='ten'?`目標：全問正解・平均${target}秒以内でS`:`目標：${Math.ceil(60/target)}問以上でS`}</div>
+      ${S.newBest?`<div class="newbest">${S.newBest==='first'?'初記録':'自己ベスト更新'}</div>`:''}</div>
+    <div class="rstats">
+      <div class="rstat"><small>正答率</small><b>${Math.round(acc*100)}%</b></div>
+      <div class="rstat"><small>正解</small><b>${ok}/${n}</b></div>
+      <div class="rstat"><small>平均タイム（正解）</small><b>${okTimes.length?avg.toFixed(1)+'s':'—'}</b></div>
+      <div class="rstat"><small>スコア</small><b>${S.score}</b></div></div>
+    <h2 class="sec">${misses.length?`ふり返り（ミス ${misses.length}問）`:'ふり返り'}</h2>
+    <div class="rlist">${(misses.length?misses:res.slice(-3)).map(r=>`<div class="ritem${r.ok?' ok':''}"><div class="rq">${esc(r.q.review)}</div>
+      <div class="ra">正解 <b>${fmt$(r.q.answer)}</b>${r.ok?'':`　あなた <b>${r.given===null?'—':fmt$(r.given)}</b>`}　${r.sec.toFixed(1)}秒</div>
+      <div class="rtip">${esc(r.q.steps[r.q.steps.length-1])}／${esc(r.q.tip.split('\n')[0])}</div></div>`).join('')||'<div class="ritem ok">時間内に解いた問題がありません。</div>'}</div>
+    <div class="ractions"><button class="btn" data-a="home">モード選択へ</button><button class="btn primary" data-a="start">もう一度 ▶</button></div>
+  </div>`;
+}
+function render(){
+  /* ドリル画面はヘッダーを除いた高さぴったりに収める（スクロールさせずにテンキーまで見せる） */
+  document.documentElement.style.setProperty('--hdr',document.querySelector('.topbar').offsetHeight+'px');
+  $('btnSfx').innerHTML=DATA.opts.sfx===false
+    ?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg><span class="lg">音OFF</span>'
+    :'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/></svg><span class="lg">音ON</span>';
+  $('btnSfx').setAttribute('aria-pressed',String(DATA.opts.sfx!==false));
+  if(S.screen==='home')renderHome();
+  else if(S.screen==='drill')renderDrill();
+  else renderResult();
+}
+
+/* ===================== 進行 ===================== */
+function startSession(){
+  S.screen='drill';S.res=[];S.score=0;S.streak=0;S.maxStreak=0;S.newBest=false;S.t0=now();
+  S.deadline=DATA.opts.session==='sprint'?S.t0+60000:0;
+  nextQ();loopTimer();
+}
+function nextQ(){
+  clearTimeout(S.autoT);
+  S.q=gen(DATA.opts.mode,DATA.opts.level);S.input='';S.chips=[];S.answered=false;S.last=null;S.qt0=now();
+  render();
+}
+function submit(){
+  if(S.answered)return;
+  const q=S.q,sec=(now()-S.qt0)/1000;
+  let ok=false,half=false,given=null,used=0;
+  if(q.mode==='build'){
+    given=S.chips.reduce((a,b)=>a+b,0);used=S.chips.length;
+    if(Math.abs(given-q.answer)<.001){ok=used<=q.best.length;half=!ok;}
+  }else{
+    if(!S.input)return;
+    given=parseFloat(S.input);ok=Math.abs(given-q.answer)<.001;
+  }
+  if(ok){S.streak++;S.maxStreak=Math.max(S.maxStreak,S.streak);}else S.streak=0;
+  const pts=points(ok,sec,MODES[q.mode].target[q.lv],S.streak-1);
+  S.score+=pts;
+  S.last={q,ok,half,given,used,sec,pts};S.res.push(S.last);S.answered=true;
+  DATA.total.q++;DATA.byMode[q.mode].q++;if(ok){DATA.total.ok++;DATA.byMode[q.mode].ok++;}
+  saveData();
+  SFX.play(ok?'ok':'ng');
+  render();
+  if(ok&&DATA.opts.auto!==false&&DATA.opts.session==='sprint')S.autoT=setTimeout(advance,650);
+}
+function advance(){
+  if(S.screen!=='drill')return;
+  if(isLast()){finish();return;}
+  nextQ();
+}
+function finish(){
+  cancelAnimationFrame(S.timerRaf);clearTimeout(S.autoT);
+  const o=DATA.opts,res=S.res,ok=res.filter(r=>r.ok).length,n=res.length;
+  if(n){
+    const acc=ok/n,okT=res.filter(r=>r.ok).map(r=>r.sec),avg=okT.length?okT.reduce((a,b)=>a+b,0)/okT.length:999;
+    const target=MODES[o.mode].target[o.level];
+    const rank=o.session==='ten'?rankTen(acc,avg,target):rankSprint(ok,target);
+    const key=bestKey(o.mode,o.level,o.session),prev=DATA.best[key];
+    if(!prev||S.score>prev.score){DATA.best[key]={rank,score:S.score,acc,avg:okT.length?avg:0,ok,at:Date.now()};S.newBest=prev?'update':'first';}
+    DATA.sessions++;DATA.lastAt=Date.now();saveData();
+  }
+  S.screen='result';SFX.play('end');render();window.scrollTo(0,0);
+}
+function loopTimer(){
+  cancelAnimationFrame(S.timerRaf);
+  const tick=()=>{
+    if(S.screen!=='drill')return;
+    const t=$('tTime');if(t&&!S.answered)t.textContent=((now()-S.qt0)/1000).toFixed(1);
+    if(DATA.opts.session==='sprint'){
+      const left=Math.max(0,S.deadline-now());
+      const l=$('tLeft');if(l)l.textContent=Math.ceil(left/1000);
+      const b=$('tBar');if(b)b.style.width=(left/600)+'%';
+      if(left<=0&&!S.answered){finish();return;}
+    }
+    S.timerRaf=requestAnimationFrame(tick);
+  };
+  S.timerRaf=requestAnimationFrame(tick);
+}
+function key(v){
+  if(S.answered){if(v==='ok')advance();return;}
+  if(v==='ok'){submit();return;}
+  if(v==='bs')S.input=S.input.slice(0,-1);
+  else if(v==='c')S.input='';
+  else if(v==='.'){if(!S.input.includes('.'))S.input=(S.input||'0')+'.';}
+  else{
+    const nx=S.input+v;const [i,f]=nx.split('.');
+    if((i||'').replace(/^0+/,'').length>6||(f&&f.length>2))return;
+    S.input=nx.replace(/^0+(?=\d)/,'');
+  }
+  SFX.play('key');
+  const el=document.querySelector('.answer');
+  if(el)el.outerHTML=`<div class="answer" aria-live="polite"><span class="cur">＄</span><span class="val${S.input?'':' empty'}">${S.input?esc(fmtInput(S.input)):'0'}<span class="caret"></span></span></div>`;
+}
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,v=el.dataset.v;
+  if(a==='mode'){DATA.opts.mode=v;saveData();render();return;}
+  if(a==='level'){DATA.opts.level=+v;saveData();render();return;}
+  if(a==='session'){DATA.opts.session=v;saveData();render();return;}
+  if(a==='start'){SFX.ac&&SFX.play('key');startSession();return;}
+  if(a==='home'||a==='quit'){cancelAnimationFrame(S.timerRaf);clearTimeout(S.autoT);S.screen='home';render();window.scrollTo(0,0);return;}
+  if(a==='sfx'){DATA.opts.sfx=DATA.opts.sfx===false;saveData();render();return;}
+  if(a==='key'){key(v);return;}
+  if(a==='next'){advance();return;}
+  if(a==='submit'){submit();return;}
+  if(a==='chip'&&!S.answered){if(S.chips.length<120){S.chips.push(+v);SFX.play('chip');render();}return;}
+  if(a==='undo'&&!S.answered){S.chips.pop();render();return;}
+  if(a==='clear'&&!S.answered){S.chips=[];render();return;}
+});
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(S.screen!=='drill'){if(e.key==='Enter'&&!e.target.closest('button,a')){e.preventDefault();startSession();}return;}
+  const k=e.key;
+  if(k==='Enter'){e.preventDefault();if(S.answered)advance();else if(S.q.mode==='build')submit();else key('ok');return;}
+  if(S.q.mode==='build'||S.answered)return;
+  if(/^[0-9]$/.test(k)){key(k);flash(k);}
+  else if(k==='.'||k===','){key('.');}
+  else if(k==='Backspace'){key('bs');flash('bs');}
+  else if(k==='Delete'||k==='Escape'){key('c');}
+});
+function flash(v){const b=document.querySelector(`.key[data-v="${v}"]`);if(b){b.classList.add('pressed');setTimeout(()=>b.classList.remove('pressed'),90);}}
+addEventListener('resize',()=>document.documentElement.style.setProperty('--hdr',document.querySelector('.topbar').offsetHeight+'px'));
+render();
+</script>
+</body>
+</html>

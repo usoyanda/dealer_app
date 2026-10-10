@@ -23,7 +23,11 @@ button{font:inherit}
 .back{text-decoration:none;white-space:nowrap;flex:none}
 .btn-ghost:focus-visible,.act:focus-visible,.seat:focus-visible,.hand:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 
-.settings{position:absolute;right:20px;top:100%;z-index:20;background:#fff;color:var(--ink);border-radius:10px;padding:16px 18px;width:320px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.settings{position:absolute;right:20px;top:100%;z-index:20;background:#fff;color:var(--ink);border-radius:10px;padding:16px 18px;width:340px;max-height:calc(100vh - 80px);overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.payout-guide{border-radius:8px;padding:8px 10px;margin:6px 0 12px}
+.payout-guide .phase{font-size:12px;margin-bottom:4px}
+.payout-guide ul{margin:0 0 6px;padding-left:18px;font-size:12.5px;line-height:1.5}
+.payout-guide li{margin-bottom:3px}
 .settings h3{margin:0 0 10px;font-size:15px}
 .settings .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #EEF0F2;font-size:14px}
 .settings select{font:inherit;padding:3px 6px}
@@ -218,6 +222,208 @@ button{font:inherit}
 /* 戻るボタンのぶん、狭い画面ではロゴを短縮してヘッダーを1行に収める */
 @media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}.topbar{gap:6px}}
 @media (max-width:340px){.brand-main{display:none}}
+/*THEME_START*/
+/* ===== 共通デザイン（4ゲーム共通。ホーム・チップ道場・ルールブック・イレギュラーとも同じ色の約束） =====
+   既存のレイアウト（1画面に収める寸法）を崩さないよう、ここでは色・背景・枠線の色・角丸・影だけを
+   上書きする。幅・高さ・余白・文字サイズ・枠線の太さは各ゲームの本体側の指定を生かす。 */
+:root{
+  --ds-bg:#0B1015;--ds-bg2:#121A22;--ds-surface:#17202A;--ds-surface2:#1E2934;--ds-surface3:#263341;
+  --ds-line:rgba(255,255,255,.08);--ds-line2:rgba(255,255,255,.15);
+  --ds-text:#E9EEF3;--ds-text2:#A7B4C1;--ds-text3:#7D8B99;
+  --ds-gold:#D9B25F;--ds-gold2:#F4DA94;--ds-goldd:#8E6C26;
+  --ds-ok:#43C98B;--ds-ng:#FF7062;--ds-warn:#F3BD4E;--ds-info:#82B4FF;
+}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:radial-gradient(1200px 520px at 50% -12%,#1B2734 0%,var(--ds-bg) 62%) fixed,var(--ds-bg);color:var(--ds-text)}
+button,a,.act,.tray-chip{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+::selection{background:rgba(217,178,95,.35)}
+
+/* ヘッダー */
+.topbar{background:linear-gradient(180deg,rgba(18,25,33,.97),rgba(11,16,21,.97));border-bottom:1px solid rgba(217,178,95,.22);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.brand-main{background:linear-gradient(180deg,#FBE7B0 0%,#D9B25F 55%,#A9812F 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+.brand-sub{color:var(--ds-text2)}
+.meta{color:var(--ds-text2)}
+.meta b{color:#fff}
+.btn-ghost{background:rgba(255,255,255,.04);border-color:var(--ds-line2);color:var(--ds-text);border-radius:999px;transition:border-color .15s,background .15s}
+.btn-ghost:hover{border-color:var(--ds-gold);background:rgba(217,178,95,.08)}
+.btn-ghost[aria-expanded="true"]{border-color:var(--ds-gold);color:var(--ds-gold2)}
+.hbtn{display:inline-flex;align-items:center;gap:5px}
+.hbtn svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* スマホではヘッダーのボタンをアイコンだけにし、通算正答率は設定パネルに任せて1行に収める */
+@media (max-width:600px){.meta .only-lg{display:none}}
+@media (max-width:520px){.hbtn .hl{display:none}.hbtn{padding-left:6px !important;padding-right:6px !important}.topbar .meta{gap:5px}}
+@media (max-width:340px){.brand-main{display:none}.hbtn{padding-left:5px !important;padding-right:5px !important}}
+.difficulty-pill{background:rgba(217,178,95,.08)}
+
+/* 設定パネル */
+.settings{background:var(--ds-surface);color:var(--ds-text);border:1px solid var(--ds-line2);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.settings h3,.settings h4{color:var(--ds-gold2)}
+.settings .row{border-bottom-color:var(--ds-line)}
+.settings select{background:var(--ds-surface3);color:var(--ds-text);border:1px solid var(--ds-line2);border-radius:6px}
+.settings input[type=checkbox]{accent-color:var(--ds-gold)}
+.settings .note{color:var(--ds-text2)}
+.settings .note b{color:var(--ds-text)}
+.settings .danger{background:transparent;border-color:var(--ds-ng);color:var(--ds-ng)}
+.payout-guide{background:var(--ds-surface2);border:1px solid var(--ds-line)}
+.payout-guide .phase{color:var(--ds-gold)}
+.rule-table th,.rule-table td{border-color:var(--ds-line2)}
+.rule-table th{background:var(--ds-surface3);color:var(--ds-text)}
+.rule-table td.hit{background:rgba(67,201,139,.16);color:#8FE7BE}
+.rule-table td.stand{background:rgba(255,112,98,.16);color:#FFB3AA}
+.rule-table td.lead{background:var(--ds-surface2);color:var(--ds-text)}
+
+/* テーブル外枠 */
+.felt{box-shadow:inset 0 0 50px rgba(0,0,0,.45),0 14px 34px rgba(0,0,0,.45)}
+
+/* 字幕 */
+.caption{background:linear-gradient(90deg,#0B1116,#111922);border-left-color:var(--ds-gold);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.caption .en{color:#FBF4E2}
+.caption .ja{color:var(--ds-text2)}
+.caption .who{color:var(--ds-gold)}
+.cap-voice{border-color:var(--ds-line2);color:var(--ds-text3);border-radius:999px;background:rgba(255,255,255,.03)}
+.cap-voice.on{border-color:var(--ds-gold);color:var(--ds-gold2)}
+
+/* コンソール（解説と選択肢） */
+.console{background:linear-gradient(180deg,#1B2530,#151D26);border-top-color:var(--ds-gold);color:var(--ds-text);box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}
+.phase{color:var(--ds-gold)}
+.prompt{color:var(--ds-text)}
+.hint{color:var(--ds-text2)}
+.fb{box-shadow:inset 3px 0 0 currentColor}
+.fb.ok{background:rgba(67,201,139,.13);color:#93E8C0}
+.fb.err{background:rgba(255,112,98,.14);color:#FFB8AF}
+.fb.info{background:rgba(130,180,255,.12);color:#C9DCFF}
+.fb.warn{background:rgba(243,189,78,.14);color:#F7D894}
+.act{background:linear-gradient(180deg,#2A3846,#22303C);border-color:rgba(255,255,255,.14);color:var(--ds-text);box-shadow:0 2px 0 rgba(0,0,0,.35);transition:border-color .12s,background .12s,transform .06s}
+.act:hover{border-color:var(--ds-gold);background:linear-gradient(180deg,#30404F,#273644)}
+.act:active{transform:translateY(1px);box-shadow:none}
+.act .sub{color:var(--ds-text2)}
+.act.primary{background:linear-gradient(180deg,#F1D58D 0%,#D9B25F 55%,#B88E3B 100%);border-color:#8E6C26;color:#1C1405;font-weight:bold;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.act.primary:hover{background:linear-gradient(180deg,#F7E0A4 0%,#E2BD6B 55%,#C39845 100%);border-color:#F4DA94}
+.act.primary .sub{color:rgba(28,20,5,.7)}
+.btn-ghost:focus-visible,.act:focus-visible,.chip:focus-visible,.tray-chip:focus-visible{outline:3px solid var(--ds-gold2);outline-offset:2px}
+
+/* チップトレイ（革張りのトレイ） */
+.tray{background:linear-gradient(180deg,#2C1F16,#1C130D);box-shadow:inset 0 2px 10px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05);border:1px solid rgba(217,178,95,.18)}
+.stack{background:rgba(0,0,0,.22);border-color:var(--ds-line2);color:var(--ds-text)}
+.stack-empty{color:var(--ds-text3)}
+.stack-total{color:var(--ds-text2)}
+.stack-total b{color:#fff;font-variant-numeric:tabular-nums}
+.sg-n{color:var(--ds-text2)}
+.coach{background:rgba(217,178,95,.09);border-color:rgba(217,178,95,.32);color:#F1E2B8}
+.coach summary{color:var(--ds-gold2)}
+.drawcard{background:var(--ds-surface2);border-color:var(--ds-line2);color:var(--ds-text)}
+.drawcard .dc-h{color:var(--ds-text2)}
+.summary h3{color:var(--ds-gold2)}
+.board-info,.hands-list{background:var(--ds-surface2);border-color:var(--ds-line2);color:var(--ds-text)}
+.hands-list .hl-board{border-bottom-color:var(--ds-line)}
+.hands-list em{color:var(--ds-text3)}
+.hands-list .rd{color:#FF8A80}
+.hands-list .bk{color:#F2F5F8}
+.stat-table th,.stat-table td{border-bottom-color:var(--ds-line2)}
+.stat-table th{color:var(--ds-text2);font-weight:normal}
+
+/* ===== カジノチップの質感 =====
+   点線の縁取りをやめ、実物と同じ「縁のエッジスポット＋中央の円盤＋細いインレイ」で描く。
+   色は --c（地色）と --spot（エッジスポット）で額面ごとに与える。枠線の太さは本体側の指定を残し、
+   色だけ透明にして地の模様を見せる（大きさが変わらないように）。 */
+.tray-chip,.mini-chip,.chip{
+  --c:#7A8794;--spot:#F4F0E6;
+  border-style:solid;border-color:transparent;
+  background:
+    radial-gradient(circle closest-side,transparent 0 60%,rgba(255,255,255,.55) 61% 65%,transparent 66%),
+    radial-gradient(circle closest-side,var(--c) 0 72%,transparent 73%),
+    repeating-conic-gradient(from 8deg,var(--spot) 0 16deg,transparent 16deg 60deg),
+    var(--c);
+  background-origin:border-box;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -2px 4px rgba(0,0,0,.38),0 2px 4px rgba(0,0,0,.55);
+  color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.55);
+}
+.tray-chip{transition:transform .08s}
+.tray-chip:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.tray-chip:active{transform:translateY(1px) scale(.96)}
+.ch-1{--c:#EFEBE1;--spot:#3E6A92}
+.ch-1,.tray-chip.ch-1,.mini-chip.ch-1{color:#1D232B !important;text-shadow:none}
+.ch-5{--c:#C23B2F;--spot:#F6F1E4}
+.ch-10{--c:#2C62C2;--spot:#F6F1E4}
+.ch-25{--c:#23885A;--spot:#F6F1E4}
+.ch-50{--c:#D7861C;--spot:#F6F1E4}
+.ch-100{--c:#1C1D22;--spot:#E9E2CF}
+.ch-500{--c:#6B3FA0;--spot:#F2D27A}
+.ch-1000{--c:#D7A93A;--spot:#7C1D1D}
+.ch-1000,.tray-chip.ch-1000,.mini-chip.ch-1000{color:#2A1D05 !important;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.c-s1{--c:#B83A3A}.c-s2{--c:#2F5FB3}.c-s3{--c:#2E7D4F}.c-s4{--c:#C7711E}.c-s5{--c:#6B3FA0}.c-s6{--c:#1C7C86}.c-s7{--c:#9A2E62}
+.c-red{--c:#B83A3A}.c-green{--c:#2E7D4F}.c-orange{--c:#C7711E}.c-dbl{--c:#3B4B8C}
+
+/* 出したチップの表示（額面ごと・5枚ごとに間をあける）とチップのコツ（KITの部品） */
+.fb,.entry .why{white-space:pre-line}
+.stack-row{display:flex;flex-wrap:wrap;gap:4px 14px;flex:1;min-width:0}
+.sg{display:inline-flex;align-items:center;gap:5px}
+.sg-chips{display:inline-flex;gap:3px;flex-wrap:wrap}
+.mini-chip.g5{margin-right:9px}
+.sg-n{font-size:12px;white-space:nowrap}
+.coach{border-width:1px;border-style:solid;border-radius:8px;padding:5px 10px;margin-bottom:8px;font-size:12.5px;line-height:1.5}
+.coach summary{cursor:pointer;font-weight:bold;font-size:12.5px;list-style-position:inside}
+.coach ul{margin:4px 0 2px;padding-left:18px}
+.coach li{margin-bottom:2px}
+/* スマホでは「チップのコツ」をコンソール右上の小さなボタンにして縦の高さを使わない。
+   開いたときは本文の上に重ねて表示する（選択肢まで1画面に収めるため） */
+@media (max-width:600px){
+  .console{position:relative}
+  .console .coach{position:absolute;right:6px;top:5px;z-index:6;margin:0;padding:1px 9px;border-radius:999px;background:#2A2416;max-width:calc(100% - 12px)}
+  .console .coach[open]{left:6px;border-radius:10px;padding:5px 10px;max-height:62%;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.65)}
+  .console:has(.coach) .prompt{padding-right:104px}
+  .coach .cc-sub{display:none}
+}
+/* スマホでは、まだ出していない枠は各額面1つだけ描いて幅を詰める（枚数は「0/4」の表記で伝わる） */
+@media (max-width:600px){.mini-chip.ghost+.mini-chip.ghost{display:none}.fb-more{display:none}.coach{font-size:11px;padding:3px 8px;margin-bottom:5px}.coach summary{font-size:11px}.sg-n{font-size:10px}.mini-chip.g5{margin-right:6px}}
+
+/* チップ内訳ガイド（目標の枚数を薄く描き、出したぶんだけ埋まる） */
+.mini-chip.ghost{background:transparent;box-shadow:none;border:2px dashed rgba(255,255,255,.28) !important;color:rgba(255,255,255,.35) !important;text-shadow:none}
+.mini-chip.over{box-shadow:0 0 0 2px var(--ds-ng),0 2px 4px rgba(0,0,0,.55)}
+.sg-n.done{color:var(--ds-ok)}
+.sg-n.over{color:var(--ds-ng)}
+
+/* 進行ログ */
+.log{background:linear-gradient(180deg,#151D26,#111820);border:1px solid var(--ds-line);color:#D3DBE3}
+.log h2{color:var(--ds-gold2)}
+.entry{border-bottom-color:var(--ds-line)}
+
+/* 質問チャット */
+.chat{background:var(--ds-surface);color:var(--ds-text);border:1px solid var(--ds-line2);border-top:3px solid var(--ds-gold)}
+.chat-head{background:var(--ds-surface2);border-bottom-color:var(--ds-line)}
+.chat-sub{color:var(--ds-text3)}
+.chat-x{color:var(--ds-text2)}
+.chat-x:hover{color:#fff}
+.chat-body{background:#0F151B}
+.cm.bot{background:var(--ds-surface2);border-color:var(--ds-line2);color:var(--ds-text)}
+.cm.me{background:linear-gradient(180deg,#1C6E52,#13553F);color:#fff}
+.cm.hint::before{color:var(--ds-warn)}
+.chat-sug,.chat-form{background:var(--ds-surface);border-top-color:var(--ds-line)}
+.chat-sug button{background:var(--ds-surface2);border-color:var(--ds-line2);color:var(--ds-text)}
+.chat-sug button:hover{border-color:var(--ds-gold)}
+.chat-form input{background:#0F151B;color:var(--ds-text);border-color:var(--ds-line2)}
+.chat-form input:focus{outline:none;border-color:var(--ds-gold)}
+
+/* ルールブックのシート（rules.html をゲームを離れずに開く） */
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(4,8,11,.66);display:flex;align-items:center;justify-content:center;padding:18px;animation:sheetin .2s ease-out}
+.sheet[hidden]{display:none}
+@keyframes sheetin{from{opacity:0}to{opacity:1}}
+.sheet-panel{width:min(760px,100%);height:min(88vh,900px);background:var(--ds-surface);border:1px solid var(--ds-line2);border-top:3px solid var(--ds-gold);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.7);animation:sheetup .28s cubic-bezier(.2,1,.3,1)}
+@keyframes sheetup{from{transform:translateY(24px)}to{transform:none}}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;background:var(--ds-surface2);border-bottom:1px solid var(--ds-line);color:var(--ds-text)}
+.sheet-head b{font-size:15px;color:var(--ds-gold2);flex:1}
+.sheet-open{font-size:12px;color:var(--ds-text2)}
+.sheet-x{background:transparent;border:0;color:var(--ds-text2);font-size:26px;line-height:1;cursor:pointer;padding:0 6px}
+.sheet-x:hover{color:#fff}
+.sheet-frame{flex:1;width:100%;border:0;background:var(--ds-bg)}
+@media (max-width:600px){.sheet{padding:0;align-items:flex-end}.sheet-panel{height:94vh;border-radius:14px 14px 0 0}}
+
+/* 結果の演出（正解・ミスのときにコンソールを一瞬光らせる） */
+.console.pulse-ok{animation:pulseok .5s ease-out}
+.console.pulse-ng{animation:pulseng .45s ease-out}
+@keyframes pulseok{0%{box-shadow:0 0 0 0 rgba(67,201,139,.6)}100%{box-shadow:0 0 0 14px rgba(67,201,139,0)}}
+@keyframes pulseng{0%,100%{transform:none}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+/*THEME_END*/
 </style>
 </head>
 <body>
@@ -225,7 +431,8 @@ button{font:inherit}
   <a class="btn-ghost back" href="index.html" aria-label="目次（テーブル選択）に戻る">◀<span class="lg"> 目次</span></a>
   <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">ブラックジャック</span></div>
   <div class="meta" id="meta"></div>
-  <button class="btn-ghost" data-act="toggleSettings" aria-expanded="false" id="btnSettings">設定<span class="lg">・成績</span></button>
+  <button class="btn-ghost hbtn" data-act="openRules" aria-expanded="false" id="btnRules" aria-label="ルールブックを開く"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v12H8.5A3.5 3.5 0 0 1 5 16.5z"/><path d="M5 16.5A3.5 3.5 0 0 1 8.5 13H19"/></svg><span class="hl">ルール</span></button>
+  <button class="btn-ghost hbtn" data-act="toggleSettings" aria-expanded="false" id="btnSettings" aria-label="設定・成績"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span class="hl">設定<span class="lg">・成績</span></span></button>
   <div class="settings" id="settings" hidden></div>
 </header>
 <main class="wrap">
@@ -359,7 +566,7 @@ function expected(G){
         const ev=G.seats.map((s,i)=>({s,i})).filter(x=>x.s.even);
         if(ev.length&&!F.evenPaid){
           const amt=ev.reduce((a,x)=>a+x.s.hands[0].bet,0),names=ev.map(x=>`${x.i+1}番席`).join('・');
-          return E('payEven','check',`${names}がイーブンマネーを選択しました。ピークの前にベットに対して1:1で支払い、そのハンドは終了です：${fmt$(amt)}。`,C('Even money.','イーブンマネーでお支払いします'),{amount:amt,hint:'イーブンマネーはブラックジャックのベットに対して1:1（複数席なら合計）',amountLabel:'支払う金額'});
+          return E('payEven','check',`${names}がイーブンマネーを選択しました。ピークの前にベットに対して1:1で支払い、そのハンドは終了です：${fmt$(amt)}。`,C('Even money.','イーブンマネーでお支払いします'),{amount:amt,hint:'イーブンマネーはブラックジャックのベットに対して1:1（複数席なら合計）',amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:1}});
         }
         if(!F.peeked)return E('peek','check','インシュアランス（イーブンマネー）の処理が終わったら、ホールカードを確認（ピーク）してブラックジャックの有無を判定します。');
       }else if(uv===10){
@@ -369,7 +576,7 @@ function expected(G){
       }
       if(F.dealerBJ){
         if(!G.dealer.holeUp)return E('reveal','check','ピークでディーラーのブラックジャックを確認しました。ホールカードを開いて見せてから精算します。',C('Dealer has blackjack.','ディーラー、ブラックジャックです'));
-        return E('payIns','check','ディーラーがブラックジャックのため、インシュアランスは2:1で支払います（保険額×2の合計）。',C('Insurance pays two to one.','インシュアランスを2:1でお支払いします'),{amount:insPayTotal(G),hint:'インシュアランスは2:1（保険額×2）。全席分の合計です',amountLabel:'支払う金額'});
+        return E('payIns','check','ディーラーがブラックジャックのため、インシュアランスは2:1で支払います（保険額×2の合計）。',C('Insurance pays two to one.','インシュアランスを2:1でお支払いします'),{amount:insPayTotal(G),hint:'インシュアランスは2:1（保険額×2）。全席分の合計です',amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:2}});
       }
       if(anyIns(G)&&!F.insResolved)return E('collectIns','check','ディーラーはブラックジャックではありません。インシュアランスは負けのため、回収してからゲームを進めます。',C('No blackjack. Insurance loses.','ブラックジャックはありません。インシュアランスは回収します'));
       return E('toPlayers','check','ディーラーはブラックジャックではありません。最初の席からプレイヤーのアクションに進みます。',C('No blackjack.','ブラックジャックはありません'));
@@ -377,7 +584,7 @@ function expected(G){
     case 'play':{
       const s=G.seats[G.turn.s],h=curHand(G),lbl=handName(G,G.turn.s,G.turn.h),v=handValue(h.cards);
       if(h.cards.length===1)return E('hit','play',`${lbl}はスプリット直後の手です。まず2枚目を1枚配ります。`,C('Card.','カードをお配りします'));
-      if(isBJ(h)){const amt=h.bet*1.5;return E('payBJ','play',`${lbl}は最初の2枚でブラックジャック（ディーラーのBJなしは確認済み）。3:2で即時支払います：${fmt$(h.bet)}×1.5＝${fmt$(amt)}。`,C('Blackjack. Pays three to two.','ブラックジャック、3:2でお支払いします'),{amount:amt,hint:'ブラックジャックは3:2（ベット×1.5）',amountLabel:'支払う金額'});}
+      if(isBJ(h)){const amt=h.bet*1.5;return E('payBJ','play',`${lbl}は最初の2枚でブラックジャック（ディーラーのBJなしは確認済み）。3:2で即時支払います：${fmt$(h.bet)}×1.5＝${fmt$(amt)}。`,C('Blackjack. Pays three to two.','ブラックジャック、3:2でお支払いします'),{amount:amt,hint:`ブラックジャックは3:2（ベット×1.5）。${fmt$(h.bet)}＋半分の${fmt$(h.bet/2)}＝${fmt$(amt)}`,amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:1.5}});}
       if(v.total>21)return E('bust','play',`${lbl}は合計${v.total}でバストです。ディーラーのターンを待たず、その場でチップとカードを回収します。`,C('Too many.','22以上、バストです'));
       if(!h.decision)h.decision=decide(G,s,h,up);
       const d=h.decision,base=`${lbl}の合図は「${SIG[d].text}」＝${SIG[d].name}です。`;
@@ -388,7 +595,7 @@ function expected(G){
         const re=h.fromSplit?`リスプリットです（最大${MAX_HANDS}手まで、Aのリスプリットは不可）。`:'';
         return E('split','play',base+re+'同額のベットで手を分け、左側の手から1枚ずつ配ります。',C(`Splitting ${RANK_EN[h.cards[0].r]}.`,'スプリットします'));
       }
-      return E('surrender','play',base+`レイトサレンダー（ピーク後・最初の2枚のみ）として、ベットの半分${fmt$(h.bet/2)}を回収し、残りを返却します。`,C('Surrender. Half your bet back.','サレンダーですね。半額をお返しします'),{amount:h.bet/2,hint:'サレンダーはベットの半分を回収し、半分を返却',amountLabel:'回収する金額'});
+      return E('surrender','play',base+`レイトサレンダー（ピーク後・最初の2枚のみ）として、ベットの半分${fmt$(h.bet/2)}を回収し、残りを返却します。`,C('Surrender. Half your bet back.','サレンダーですね。半額をお返しします'),{amount:h.bet/2,hint:'サレンダーはベットの半分を回収し、半分を返却',amountLabel:'回収する金額',chipInfo:{kind:'collect'}});
     }
     case 'dealer':{
       const dv=handValue(G.dealer.cards);
@@ -417,8 +624,8 @@ function settleOutcome(G,h,lbl){
     if(isBJ(h))return E('push','settle',`${lbl}：プレイヤーもブラックジャックのため、プッシュ（元金返還）です。`,PUSH);
     return E('collect','settle',`${lbl}：ディーラーがブラックジャックのため、ベットを回収します。`,LOSE);
   }
-  if(dv>21)return E('pay','settle',`${lbl}：ディーラーがバスト。残っているハンドは1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額'});
-  if(pv>dv)return E('pay','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}でプレイヤーの勝ち。1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額'});
+  if(dv>21)return E('pay','settle',`${lbl}：ディーラーがバスト。残っているハンドは1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:1}});
+  if(pv>dv)return E('pay','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}でプレイヤーの勝ち。1:1で${fmt$(h.bet)}を支払います${dbl}。`,WIN,{amount:h.bet,hint:payHint,amountLabel:'支払う金額',chipInfo:{kind:'pay',mult:1}});
   if(pv<dv)return E('collect','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}でディーラーの勝ち。ベットを回収します。`,LOSE);
   return E('push','settle',`${lbl}：プレイヤー${pv} 対 ディーラー${dv}で同点。プッシュ（ベットはそのまま）です。`,PUSH);
 }
@@ -547,7 +754,8 @@ function act(G,key,arg){
       }
       return{cat:'pay',ok:true};
     }
-    recordErr(G,'pay',p.ex.why,`金額が違います（出したチップ：${fmt$(sum)}）。${p.ex.hint}。`);
+    p.errs=(p.errs||0)+1;
+    recordErr(G,'pay',p.ex.why,`金額が違います（出したチップ ${fmt$(sum)}）。${chipDiagnosis(sum,p.ex.amount)}\n正しい出し方：${planText(p.ex.amount)}\n${p.ex.hint}。`);
     return{cat:'pay',ok:false};
   }
   const ex=expected(G);if(!ex)return null;
@@ -568,6 +776,174 @@ function act(G,key,arg){
 }
 /*ENGINE_END*/
 
+/*KIT_START*/
+/* ===== 共通キット（4ゲームで同じ内容。直すときは全ゲームをそろえる） =====
+   ・チップ・カウンティングのコツ（金額→額面×枚数への分解、検算、ミスの切り分け）
+   ・効果音と振動（正解・ミス・チップを置く音。外部ファイルを使わずその場で合成）
+   ・ルールブックのシート（rules.html をゲームの上に重ねて開く）
+   各ゲームの CHIPS（使えるチップの額面、高額順）・minChips・chipsText・fmt$ を前提にする。 */
+
+/* ---- チップ・カウンティング ---- */
+const CHIP_COLOR={1:'白',5:'赤',10:'青',25:'緑',50:'橙',100:'黒',500:'紫',1000:'金'};
+function chipCounts(arr){const m={};arr.forEach(d=>{m[d]=(m[d]||0)+1;});return m;}
+/* 最少枚数での内訳 [{d:額面,n:枚数}, …]（高額から） */
+function chipPlan(amount){const m=chipCounts(minChips(amount));return CHIPS.filter(d=>m[d]).map(x=>({d:x,n:m[x]}));}
+function planText(amount){
+  const pl=chipPlan(amount),n=pl.reduce((a,x)=>a+x.n,0);
+  return `${fmt$(amount)} ＝ ${pl.map(x=>`$${x.d}×${x.n}`).join(' ＋ ')}（${n}枚）`;
+}
+/* n枚を5枚単位に区切った数え方。7→「5＋2」、12→「5＋5＋2」、20→「5×4」 */
+function groupBy5(n){
+  if(n<=5)return String(n);
+  const full=Math.floor(n/5),rest=n%5;
+  const head=full<=3?Array(full).fill(5).join('＋'):`5×${full}`;
+  return rest?`${head}＋${rest}`:head;
+}
+/* 出した額と正解のズレから、枚数の数え間違いか金額の暗算ミスかを切り分ける */
+function chipDiagnosis(sum,amount){
+  const diff=Math.round((sum-amount)*100)/100,ad=Math.abs(diff),more=diff>0?'多い':'少ない';
+  if(ad===0)return '';
+  if(CHIPS.includes(ad))
+    return `差は${fmt$(ad)}（${CHIP_COLOR[ad]||''}$${ad}チップ1枚ぶん${more}）。枚数の数え間違いの可能性が高い。5枚ずつ区切って数え直す。`;
+  const m=minChips(ad);
+  if(m.length<=3&&Number.isInteger(ad))
+    return `差は${fmt$(ad)}（${chipsText(m)}）${more}。額面の取り違えか、2〜3枚の数え間違い。色で確かめて数え直す。`;
+  return `差は${fmt$(ad)}${more}と大きい。配当額の暗算がずれている可能性。分解からやり直す。`;
+}
+/* 1つ上の額面に何枚で替わるか（例：赤$5は5枚で緑$25）。このゲームで使う額面の中で探す */
+function chipUp(d){const ups=CHIPS.filter(u=>u>d&&u%d===0).sort((a,b)=>a-b);return ups.length?[ups[0]/d,ups[0]]:null;}
+function chipEquiv(d){const u=chipUp(d);return u?`${CHIP_COLOR[d]}$${d}は${u[0]}枚で${CHIP_COLOR[u[1]]}$${u[1]}`:null;}
+/* 20枚スタックの価値（暗記用） */
+function stack20Text(){return '20枚の山の価値：'+CHIPS.slice().sort((a,b)=>a-b).filter(d=>d<1000).map(d=>`${CHIP_COLOR[d]}${fmt$(d*20)}`).join('／');}
+/* その場面で使う「出し方のコツ」。withPlan が偽なら内訳そのものは伏せる。
+   info.kind：pay（配当）／commission（コミッション）／rake（レーキ）／pot（ポットの払い出し）／
+   return（返却）／collect（回収）。info.mult：配当倍率 */
+function chipCoach(amount,info,withPlan){
+  const lines=[],pl=chipPlan(amount),kind=info&&info.kind,mult=info&&info.mult;
+  if(withPlan)lines.push(`内訳：${planText(amount)}。高額の額面から順に取る。`);
+  else lines.push(`手を出す前に、金額を「額面×枚数」に分解する。高額の額面（${CHIPS.map(d=>'$'+d).join('→')}）から順に取る。`);
+  const eq=pl.filter(x=>x.d!==CHIPS[0]).map(x=>chipEquiv(x.d)).filter(Boolean).slice(0,2);
+  lines.push(withPlan&&eq.length?`換算：${eq.join('、')}。同じ額面が並んだら、1つ上の額面に替えて数える。`
+    :'換算：'+CHIPS.slice(1).reverse().map(chipEquiv).filter(Boolean).slice(0,3).join('、')+'。同じ額面が並んだら、1つ上の額面に替えて数える。');
+  if(kind==='commission')lines.push('コミッションは小額のチップが中心。$1・$5は5枚ずつの組にしてから出すと数え間違いが減る。');
+  else if(kind==='rake')lines.push('レーキはポットから取り分け、全員に見える位置で額を示してから入れる。小額チップは5枚1組で。');
+  else if(kind==='pot')lines.push('ポットは額面ごとに分け、20枚の山（5枚×4）にしてから数える。押し出す前に「黒何枚、緑何枚」と確認する。');
+  else if(kind==='return')lines.push('返す額は「最高額−次点の額」。ベットの山から上の差額だけを切り取って本人の前へ戻す。');
+  else if(kind==='collect')lines.push('回収は元金の山を割って取る。半分なら山を2つに切り分け、高さがそろっているかで検算する。');
+  else if(mult===1)lines.push('1:1は元金と同額。元金のチップの色と高さを見て、同じ並びを横にそろえる（ミラー）。高さが揃えば検算になる。');
+  else if(mult===1.5)lines.push('3:2は「元金＋その半分」。元金と同じ並びを作り、さらに半分の山を足す。半分にしにくい額面は先に崩しておく。');
+  else if(mult===0.5)lines.push('半額は元金のスタックを半分に分ける。割り切れない額面は、小さい額面に崩して作る。');
+  else if(mult===2)lines.push('2:1は元金の並びを2つ作る（ミラーを2回）。高さが元金と同じ山が2本になれば正解。');
+  else lines.push('倍率の大きい配当は、先に暗算で金額を確定してから分解する。チップを出しながら足し算し直さない。');
+  lines.push('出し終えたら額面ごとに「黒4、緑3」と声に出して照合し、最後に合計を言う。');
+  return lines;
+}
+const CHIP_GUIDE=[
+  ['手を出す前に分解する','「金額＝額面×枚数」を先に決める（例：$475＝$100×4＋$25×3）。チップを触りながら足し算しない。'],
+  ['高額の額面から取る','高い額面から順に取ると枚数が減り、数え間違いも減る。このアプリも最少枚数かどうかを見ている。'],
+  ['額面の換算を体で覚える','赤$5は5枚で緑$25、緑$25は4枚で黒$100、黒$100は5枚で紫$500。スタックの価値は、同じ額面を1つ上の額面に替えながら読むと速い。'],
+  ['20枚スタックの価値を暗記する','20枚で1山が基本の単位。白$20／赤$100／緑$500／黒$2,000／紫$10,000。山の数と端数（5枚単位）から価値を逆算できる。'],
+  ['5枚を1組で数える','同じ額面が並ぶときは1枚ずつ数えず、5枚ずつ区切る（5、10、15、20）。7枚なら「5＋2」。このアプリは出したチップを5枚ごとに間をあけて表示する。'],
+  ['高さで数える','5枚の山の高さを目に焼き付けておくと、隣の山と高さを比べるだけで枚数がわかる（サイジング）。1枚ずつ数えるのは最後の確認だけ。'],
+  ['色で額面を即断する','このアプリの配色は白$1／赤$5／緑$25／黒$100／紫$500（ブラックジャックは青$10・橙$50、バカラは金$1000も使う）。実際の色はカジノにより異なる。'],
+  ['1:1はミラーで検算','元金と同じ色の並び・同じ高さを横に作る。数えなくても見比べるだけで検算できる。'],
+  ['半額・3:2は「半分の山」','元金のスタックを半分に分ける。割り切れない額面は小さい額面に崩す（例：$175＝$100＋$25×3）。3:2は元金のミラー＋その半分。'],
+  ['声に出して照合する','出し終えたら額面ごとに「黒4、緑3」と読み、最後に合計を言う。口に出すと数え間違いに気づきやすい。'],
+  ['練習の順序','①正確さ→②最少枚数→③速さ。ミスしたら「枚数の数え間違い」か「金額の暗算ミス」かを切り分ける（このアプリは差額から判定して表示する）。'],
+  ['所属先の流儀に従う','スタックの単位・切り方・端数の扱いはカジノやスクールで違う。ここに書いたのは共通して使える基本。']
+];
+/* 出したチップの表示。額面ごとにまとめ、5枚ごとに間をあける（5枚1組で数える練習）。
+   withPlan のときは最少枚数の内訳を薄い枠で先に描いておき、出したぶんだけ埋まっていく。 */
+function chipStackHTML(chips,amount,withPlan){
+  const cnt=chipCounts(chips),plan={};
+  if(withPlan&&amount>0)chipPlan(amount).forEach(x=>{plan[x.d]=x.n;});
+  const ds=CHIPS.filter(d=>cnt[d]||plan[d]);
+  if(!ds.length)return '<span class="stack-empty">まだチップがありません</span>';
+  return ds.map(d=>{
+    const have=cnt[d]||0,need=plan[d]||0,slots=Math.max(have,need);
+    const chipsH=Array.from({length:slots},(_,i)=>{
+      const cls=i<have?(need&&i>=need?' over':''):' ghost';
+      return `<span class="mini-chip ch-${d}${cls}${i%5===4&&i<slots-1?' g5':''}">${d}</span>`;
+    }).join('');
+    const state=withPlan&&need?(have===need?' done':have>need?' over':''):'';
+    const label=withPlan&&need?`${have}/${need}`:`×${have}${have>5?`（${groupBy5(have)}）`:''}`;
+    return `<span class="sg" aria-label="$${d}が${have}枚"><span class="sg-chips">${chipsH}</span><span class="sg-n${state}">${label}</span></span>`;
+  }).join('');
+}
+
+/* ---- 効果音と振動 ----
+   音声ファイルは持たず Web Audio でその場で鳴らす（単一HTMLのまま、通信なしで動かすため）。
+   設定の「効果音・振動」で切れる。振動は対応する端末（主にAndroid）だけ。 */
+const SFX={
+  ctx:null,
+  enabled(){try{return !(G&&G.opts&&G.opts.sfx===false);}catch(e){return true;}},
+  ac(){
+    if(!this.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return null;this.ctx=new A();}
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    return this.ctx;
+  },
+  tone(f,t,dur,type,vol){
+    const c=this.ctx,o=c.createOscillator(),g=c.createGain();
+    o.type=type||'sine';o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||0.05,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+0.02);
+  },
+  click(t,f,vol){
+    const c=this.ctx,n=Math.floor(c.sampleRate*0.03),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,4);
+    const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();
+    bp.type='bandpass';bp.frequency.value=f||3200;bp.Q.value=2.2;g.gain.value=vol||0.35;
+    s.buffer=b;s.connect(bp);bp.connect(g);g.connect(c.destination);s.start(t);
+  },
+  play(kind){
+    if(!this.enabled())return;
+    try{
+      if(kind==='ng'&&navigator.vibrate)navigator.vibrate(45);
+      if(kind==='chip'&&navigator.vibrate)navigator.vibrate(6);
+      const c=this.ac();if(!c)return;const t=c.currentTime+0.005;
+      if(kind==='ok'){this.tone(988,t,0.10,'sine',0.045);this.tone(1480,t+0.07,0.16,'sine',0.04);}
+      else if(kind==='ng'){this.tone(196,t,0.16,'triangle',0.07);this.tone(147,t+0.09,0.22,'triangle',0.06);}
+      else if(kind==='chip'){this.click(t,3400,0.32);this.click(t+0.035,2600,0.18);}
+      else if(kind==='pay'){[0,0.045,0.09,0.13].forEach((d,i)=>this.click(t+d,3000+i*200,0.26));this.tone(1319,t+0.16,0.14,'sine',0.035);}
+      else if(kind==='round'){[784,988,1175,1568].forEach((f,i)=>this.tone(f,t+i*0.08,0.18,'sine',0.04));}
+    }catch(e){}
+  }
+};
+
+/* ---- ルールブックのシート ----
+   rules.html を iframe でゲームの上に重ねる。ゲームの進行状態を失わずにルールを確認できる。
+   （ファイル単体で開いた場合など rules.html が無いときは、シートの中が空になるだけでゲームは動く） */
+function openRules(id){
+  let el=document.getElementById('rulesSheet');
+  if(!el){
+    el=document.createElement('div');el.id='rulesSheet';el.className='sheet';
+    el.innerHTML=`<div class="sheet-panel" role="dialog" aria-modal="true" aria-label="ルールブック">
+      <div class="sheet-head"><b>ルールブック</b><a class="sheet-open" href="rules.html#${id}" target="_blank" rel="noopener">別タブで開く</a><button type="button" class="sheet-x" data-act="closeRules" aria-label="閉じる">×</button></div>
+      <iframe class="sheet-frame" title="ルールブック" src="rules.html?embed=1#${id}"></iframe></div>`;
+    el.addEventListener('click',e=>{if(e.target===el)closeRules();});
+    document.body.appendChild(el);
+  }
+  el.hidden=false;
+  const btn=document.getElementById('btnRules');if(btn)btn.setAttribute('aria-expanded','true');
+}
+function closeRules(){
+  const el=document.getElementById('rulesSheet');if(el)el.hidden=true;
+  const btn=document.getElementById('btnRules');if(btn)btn.setAttribute('aria-expanded','false');
+}
+function rulesOpen(){const el=document.getElementById('rulesSheet');return !!(el&&!el.hidden);}
+/* フィードバック。先頭2行（結論と正しい出し方）は常に出し、3行目以降（暗算の長い解説）は
+   スマホでは畳む（1画面に収めるため）。全文は進行ログに残る。 */
+function fbHTML(f){
+  const ls=String(f.text).split('\n');
+  return `<div class="fb ${f.t}">${esc(ls.slice(0,2).join('\n'))}${ls.length>2?`<span class="fb-more">\n${esc(ls.slice(2).join('\n'))}</span>`:''}</div>`;
+}
+/* 正解・ミスのときにコンソールを一瞬光らせる（結果が目の端でもわかるように） */
+function pulseConsole(ok){
+  const el=document.getElementById('console');if(!el)return;
+  el.classList.remove('pulse-ok','pulse-ng');void el.offsetWidth;el.classList.add(ok?'pulse-ok':'pulse-ng');
+}
+/*KIT_END*/
 /* ===== UI ===== */
 const STORE_OPTS='dsim_bj_opts',STORE_STATS='dsim_bj_stats';
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d;}catch(e){return d;}}
@@ -598,7 +974,7 @@ function chipClass(x){return x>=50?'c-orange':x>=25?'c-green':'c-red';}
 function renderMeta(){
   const t=Object.values(STATS.cats).reduce((a,c)=>({ok:a.ok+c.ok,ng:a.ng+c.ng}),{ok:0,ng:0});
   const pct=t.ok+t.ng?Math.round(t.ok/(t.ok+t.ng)*100)+'%':'—';
-  $('meta').innerHTML=`<span><i class="lg">ラウンド</i><i class="sm">R</i><b>${G.roundNo}</b></span><span><i class="lg">今回の</i>ミス<b>${G.round?G.round.err:0}</b></span><span><i class="lg">通算</i>正答率<b>${pct}</b></span>`;
+  $('meta').innerHTML=`<span><i class="lg">ラウンド</i><i class="sm">R</i><b>${G.roundNo}</b></span><span><i class="lg">今回の</i>ミス<b>${G.round?G.round.err:0}</b></span><span class="only-lg"><i class="lg">通算</i>正答率<b>${pct}</b></span>`;
 }
 
 function renderTable(){
@@ -695,13 +1071,20 @@ function btn(key,label,cls){return `<button class="act${cls?' '+cls:''}" data-ac
 function renderConsole(){
   const P={idle:'待機中',bet:'ベット受付',deal:'カード配布',check:'アップカードの確認',play:'プレイヤーのアクション',dealer:'ディーラーのターン',settle:'精算',done:'ラウンド終了'};
   let prompt='',actions='';
-  const fb=G.lastFb?`<div class="fb ${G.lastFb.t}">${esc(G.lastFb.text)}</div>`:'';
+  const fb=G.lastFb?fbHTML(G.lastFb):'';
   if(G.pending){
     const p=G.pending,sum=p.chips.reduce((a,b)=>a+b,0),verb=p.ex.amountLabel==='回収する金額'?'回収':'支払い';
-    prompt=`チップトレイから${verb}のチップを出してください`;
-    const stack=p.chips.length?p.chips.map(d=>`<span class="mini-chip ch-${d}">${d}</span>`).join(''):'<span class="stack-empty">まだチップがありません</span>';
+    prompt=`${verb}のチップを出してください`;
+    /* 出したチップは額面ごと・5枚区切りで表示。「内訳を先に表示」がオンなら最少枚数の内訳を薄く描く */
+    const withPlan=G.opts.showChipPlan!==false||(p.errs||0)>0;
+    const stack=chipStackHTML(p.chips,p.ex.amount,withPlan);
+    let coach='';
+    if(G.opts.showChipCoach!==false){
+      const narrow=window.matchMedia('(max-width:600px)').matches;
+      coach=`<details class="coach"${withPlan&&!narrow&&!(p.errs>0)?' open':''}><summary>チップのコツ${withPlan?'':'<span class="cc-sub">（内訳は伏せています）</span>'}</summary><ul>${chipCoach(p.ex.amount,p.ex.chipInfo,withPlan).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></details>`;
+    }
     const total=G.opts.showTotals?`<div class="stack-total">合計 <b>${fmt$(sum)}</b>／${p.chips.length}枚</div>`:`<div class="stack-total">${p.chips.length}枚</div>`;
-    actions=`<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
+    actions=`${coach}<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
       <div class="stack"><div class="stack-row">${stack}</div>${total}</div>
       <div class="actions chip-acts">${btn('chipUndo','1枚戻す')}${btn('chipClear','すべて戻す')}${btn('chipPay',`${verb}を確定する`,'primary')}</div>`;
   }else switch(G.phase){
@@ -753,9 +1136,28 @@ function renderSettings(){
     <div class="row"><label for="optRule">ディーラールール</label><select id="optRule"><option value="S17"${o.rule==='S17'?' selected':''}>S17（ソフト17でスタンド）</option><option value="H17"${o.rule==='H17'?' selected':''}>H17（ソフト17でヒット）</option></select></div>
     <div class="row"><label for="optTotals">合計点を表示</label><input type="checkbox" id="optTotals"${o.showTotals?' checked':''}></div>
     <div class="row"><label for="optSig">合図の名称を表示</label><input type="checkbox" id="optSig"${o.showSignalNames?' checked':''}></div>
+    <div class="row"><label for="optChipPlan">チップの内訳（最少枚数）を先に表示</label><input type="checkbox" id="optChipPlan"${o.showChipPlan!==false?' checked':''}></div>
+    <div class="row"><label for="optChipCoach">チップを出す画面に「チップのコツ」を表示</label><input type="checkbox" id="optChipCoach"${o.showChipCoach!==false?' checked':''}></div>
+    <div class="row"><label for="optSfx">効果音・振動</label><input type="checkbox" id="optSfx"${o.sfx!==false?' checked':''}></div>
     <div class="row"><label for="optSpeech">発声を読み上げる${hasTTS?'':'（このブラウザは非対応）'}</label><input type="checkbox" id="optSpeech"${o.voice?' checked':''}${hasTTS?'':' disabled'}></div>
     <p class="note">人数とルールは次のラウンドから反映されます。慣れてきたら「合計点」「合図の名称」をオフにしてください。</p>
     <p class="note">テーブルルール：6デッキ、シュー開始時にバーン1枚、レイトサレンダー、ダブルダウンは最初の2枚（スプリット後も可）、リスプリットは最大${MAX_HANDS}手（Aは不可）、スプリットしたAは1枚のみ。</p>
+    <p class="note">慣れてきたら「チップの内訳を先に表示」もオフにして、自分で分解してください（間違えたときは内訳を表示します）。</p>
+    <div class="payout-guide">
+      <div class="phase">配当と暗算のコツ</div>
+      <ul>
+        <li><b>ブラックジャック 3:2</b>：元金＋その半分（$30なら$30＋$15＝$45）。</li>
+        <li><b>通常の勝ち 1:1</b>：元金と同じ並び・同じ高さを横に作る（ミラー）。</li>
+        <li><b>インシュアランス 2:1</b>：保険額の2倍。保険額は元のベットの半分まで。</li>
+        <li><b>イーブンマネー</b>：ブラックジャックの客がディーラーのAに対して選ぶ。1:1をその場で払って終了。</li>
+        <li><b>サレンダー</b>：ベットの半分を回収し、半分を返す。</li>
+      </ul>
+    </div>
+    <div class="payout-guide">
+      <div class="phase">チップ・カウンティングのコツ</div>
+      <ul>${CHIP_GUIDE.map(g=>`<li><b>${esc(g[0])}</b>：${esc(g[1])}</li>`).join('')}</ul>
+    </div>
+    <p class="note"><button type="button" class="act" data-act="openRules">ルールブック（手順・合図・イレギュラー）を開く</button></p>
     <button class="danger" data-act="resetStats">通算成績をリセット</button>`;
 }
 
@@ -768,6 +1170,9 @@ function doAct(key,arg){
   if(G.phase==='done'&&!G._counted){STATS.rounds++;G._counted=true;}
   if(G.phase!=='done')G._counted=false;
   save(STORE_STATS,STATS);render();
+  /* 効果音・振動：チップを置く音／正解／ミス／ラウンド終了。結果はコンソールの光り方でも返す */
+  if(key==='chip'||key==='chipUndo'||key==='chipClear')SFX.play('chip');
+  else if(r){SFX.play(!r.ok?'ng':(G.phase==='done'&&prevPhase!=='done')?'round':key==='chipPay'?'pay':'ok');pulseConsole(r.ok);}
   if((G.phase==='done'&&prevPhase!=='done')||(G.pending&&!prevPending)){
     const el=G.pending?document.querySelector('.tray'):$('console');
     if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -783,6 +1188,8 @@ document.addEventListener('click',e=>{
     if('speechSynthesis' in window){if(G.opts.voice){capShown=null;speak([G.caption].filter(c=>c.en).length?[G.caption]:[C('Voice on.','音声をオンにしました')]);}else speechSynthesis.cancel();}
     renderCaption();return;
   }
+  if(a==='openRules'){$('settings').hidden=true;$('btnSettings').setAttribute('aria-expanded','false');openRules('blackjack');return;}
+  if(a==='closeRules'){closeRules();return;}
   if(a==='resetStats'){if(confirm('通算成績をリセットします。よろしいですか？')){STATS=emptyStats();save(STORE_STATS,STATS);render();}return;}
   if(a.startsWith('deal:')){doAct('deal',a.slice(5));return;}
   doAct(a,el.dataset.arg);
@@ -796,10 +1203,14 @@ document.addEventListener('change',e=>{
   else if(id==='optRule')G.opts.rule=e.target.value;
   else if(id==='optTotals')G.opts.showTotals=e.target.checked;
   else if(id==='optSig')G.opts.showSignalNames=e.target.checked;
+  else if(id==='optChipPlan')G.opts.showChipPlan=e.target.checked;
+  else if(id==='optChipCoach')G.opts.showChipCoach=e.target.checked;
+  else if(id==='optSfx')G.opts.sfx=e.target.checked;
   else if(id==='optSpeech'){G.opts.voice=e.target.checked;if(!G.opts.voice&&'speechSynthesis' in window)speechSynthesis.cancel();}
   else return;
   save(STORE_OPTS,G.opts);render();
 });
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&rulesOpen())closeRules();});
 render();
 
 </script>
