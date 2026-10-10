@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23B83A3A'/%3E%3Ccircle cx='32' cy='32' r='30' fill='none' stroke='%23F6F1E4' stroke-width='8' stroke-dasharray='10 21.4'/%3E%3Ccircle cx='32' cy='32' r='17' fill='%23B83A3A' stroke='%23F4DA94' stroke-width='3'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0B1015">
 <title>Dealer Simulator | ルーレット</title>
 <style>
 :root{
@@ -99,6 +101,12 @@ button{font:inherit}
 .hub{fill:#3A2A20;stroke:var(--brass);stroke-width:1.5}
 .ball{fill:#FAF7EF;stroke:#9A9384;stroke-width:.6}
 .wheel-note{color:rgba(250,247,239,.6);font-size:11px;text-align:center;line-height:1.4}
+.ns-plate{border-color:#E0645A}
+.ns-plate .rp-cap{color:#FF9B91}
+.rp-ns{font-size:13px;line-height:1.35;color:#FFD9D3;margin:2px 0}
+.wheel-wrap.ball-out #ballGroup{display:none}
+.stray-ball{position:absolute;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 30%,#fff,#E9E2CF 55%,#9A9384);box-shadow:0 2px 4px rgba(0,0,0,.6);z-index:6;animation:strayin .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes strayin{from{transform:translate(-50%,-260%) scale(.6);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
 .dolly-badge{background:#11171C;border:1.5px solid var(--brass);color:var(--brass);border-radius:8px;padding:3px 10px;font-size:12px;font-family:Georgia,serif}
 
 /* ---- layout ---- */
@@ -260,6 +268,8 @@ button{font:inherit}
   .rp-cap{font-size:8px}
   .rp-num{font-size:26px;line-height:1}
   .rp-meta,.rp-wait{font-size:8.5px;line-height:1.2}
+  .rp-ns{font-size:9px}
+  .stray-ball{width:9px;height:9px}
   .dolly-badge{font-size:9px;padding:1px 5px}
   .zone-tag{display:none}
   .lay-scroll{overflow:visible;padding:0}
@@ -596,6 +606,7 @@ const LABEL={
   start:'ラウンド開始（ベットを募る）',
   spin:'ボールを投入する',
   noMoreBets:'ノー・モア・ベットを宣言',
+  callNoSpin:'ノースピンを宣言',
   rejectLateBet:'後賭けを差し戻す',
   callNumber:'当選番号をコール',
   placeDolly:'ドリーを置く',
@@ -642,10 +653,10 @@ function payoutTip(pay,amount){
    段階を上げる。人数・後賭け頻度・コールの選択肢数も一緒に難しくする。 */
 function difficultyFor(roundNo){
   const r=Math.max(1,roundNo||1);
-  if(r<=2)return{level:1,label:'BASIC',inside:[5,10,25],outside:[25,50,100],betsMin:1,betsMax:2,lateChance:.3,extraCallOption:false};
-  if(r<=5)return{level:2,label:'STANDARD',inside:[5,15,20,25,30,35],outside:[25,35,50,75,100,125],betsMin:1,betsMax:2,lateChance:.35,extraCallOption:false};
-  if(r<=9)return{level:3,label:'ADVANCED',inside:[7,11,13,17,19,23,29,31],outside:[30,45,55,70,85,110,135,175],betsMin:2,betsMax:3,lateChance:.42,extraCallOption:true};
-  return{level:4,label:'EXPERT',inside:[6,9,14,18,22,27,33,37,41,47],outside:[35,55,65,95,115,145,185,225],betsMin:2,betsMax:3,lateChance:.5,extraCallOption:true};
+  if(r<=2)return{level:1,label:'BASIC',inside:[5,10,25],outside:[25,50,100],betsMin:1,betsMax:2,lateChance:.3,noSpinChance:.1,extraCallOption:false};
+  if(r<=5)return{level:2,label:'STANDARD',inside:[5,15,20,25,30,35],outside:[25,35,50,75,100,125],betsMin:1,betsMax:2,lateChance:.35,noSpinChance:.14,extraCallOption:false};
+  if(r<=9)return{level:3,label:'ADVANCED',inside:[7,11,13,17,19,23,29,31],outside:[30,45,55,70,85,110,135,175],betsMin:2,betsMax:3,lateChance:.42,noSpinChance:.18,extraCallOption:true};
+  return{level:4,label:'EXPERT',inside:[6,9,14,18,22,27,33,37,41,47],outside:[35,55,65,95,115,145,185,225],betsMin:2,betsMax:3,lateChance:.5,noSpinChance:.2,extraCallOption:true};
 }
 function currentDifficulty(G){return G.opts.adaptiveDifficulty===false?difficultyFor(1):difficultyFor(G.roundNo);}
 
@@ -725,9 +736,11 @@ function callOptions(G){
   const wrongCol=n===0?`${n}, red`:`${n}, ${colEn(n)==='red'?'black':'red'}${n%2===0?', even':', odd'}`;
   const wrongPar=n===0?`${n}, black`:`${n}, ${colEn(n)}${n%2===0?', odd':', even'}`;
   opts.push(wrongCol,wrongPar);
-  if(currentDifficulty(G).extraCallOption&&n!==0){
-    const wrongBoth=`${n}, ${colEn(n)==='red'?'black':'red'}, ${n%2===0?'odd':'even'}`;
-    if(!opts.includes(wrongBoth))opts.push(wrongBoth);
+  if(currentDifficulty(G).extraCallOption){
+    /* 上級では、正常に落ちたのに「ノースピン」と言ってしまう誤りも選択肢に混ぜる */
+    const wrongBoth=n===0?null:`${n}, ${colEn(n)==='red'?'black':'red'}, ${n%2===0?'odd':'even'}`;
+    const extra=Math.random()<.4||!wrongBoth?'No spin.':wrongBoth;
+    if(!opts.includes(extra))opts.push(extra);
   }
   for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
   return{right,opts};
@@ -742,6 +755,13 @@ function expected(G){
       if(!F.closed)return E('noMoreBets','close','ボールの勢いが落ち、ポケットに落ちる約3周前に「ノー・モア・ベット」と通る声で宣言します。同時に手のひらを下に向けてレイアウトの上を左右に大きく振り、チップの追加・変更を物理的にも視覚的にも遮断します。',C('No more bets.','ノー・モア・ベット、締切です'));
       return null;
     case 'ball':
+      if(F.noSpin){
+        const ns=F.noSpin;
+        const why=ns.reason==='out'
+          ?'ボールがウィールの外へ飛び出しました。出目はポケットで決まるため、このスピンは無効です。「ノースピン」を宣言してボールを回収し、投げ直します。ベットはそのまま次のスピンへ持ち越し、もう一度ノー・モア・ベットを宣言します。'
+          :`ボールが1周ほどで${ns.pocket}のポケットに落ちました。規定の周回に届かないスピンは、出目を狙えた疑いが残るため無効です。落ちた番号はコールせず、「ノースピン」を宣言して投げ直します。`;
+        return E('callNoSpin','security',why,C('No spin.','ノースピンです'),{reason:ns.reason});
+      }
       if(F.lateBet&&!F.lateDone){
         const lb=F.lateBet;
         return E('rejectLateBet','security',`締切後に${lb.seat}番席が${betLabel(lb)}へチップを置こうとしました。締切宣言以降のベットは無効です。チップを本人に戻し、受け付けないことを明確に伝えます。`,C('No more bets. This one is too late.','締切後ですので、こちらはお返しします'));
@@ -803,8 +823,23 @@ function apply(G,ex,amount){
   switch(ex.key){
     case 'start':startRound(G);return;
     case 'spin':F.spun=true;break;
-    case 'noMoreBets':F.closed=true;done();landBall(G);
+    case 'noMoreBets':{
+      F.closed=true;done();
+      const df=currentDifficulty(G);
+      if(!F.noSpinDone&&G.opts.noSpin!==false&&Math.random()<(df.noSpinChance||0)){
+        const reason=Math.random()<.55?'out':'short';
+        F.noSpin={reason,pocket:WHEEL_ORDER[Math.floor(Math.random()*37)],pos:{x:12+Math.random()*70,y:18+Math.random()*64}};
+        G.phase='ball';
+        addLog(G,{t:'info',el:reason==='out'?'ボールがウィールの外へ飛び出しました':`ボールが1周ほどで${F.noSpin.pocket}に落ちました（周回不足）`});
+        return;
+      }
+      landBall(G);
       addLog(G,{t:'info',el:`ボールが${G.result}（${colJa(G.result)}）に落ちました`});return;
+    }
+    case 'callNoSpin':
+      /* スピンを無効にしてベット受付の状態へ戻す（ベットはそのまま）。投げ直し→締切をやり直す */
+      F.noSpin=null;F.noSpinDone=true;F.spun=false;F.closed=false;G.phase='bet';
+      done();addLog(G,{t:'info',el:'ボールを回収。ベットはそのまま、投げ直します'});return;
     case 'rejectLateBet':F.lateDone=true;break;
     case 'callNumber':F.called=true;cap=C(ex.callSet.right+'.',`${G.result}、${colJa(G.result)}${G.result===0?'':`、${G.result%2===0?'イーブン':'オッド'}`}`);break;
     case 'placeDolly':F.dolly=true;break;
@@ -868,6 +903,10 @@ function act(G,key,arg){
 
   if(ex.key==='callNumber'){
     if(arg!==ex.callSet.right){
+      if(arg==='No spin.'){
+        recordErr(G,'call',ex.why,`ボールは規定どおり回ってポケットに落ちています。ノースピンは、飛び出し・周回不足・異物などで無効なスピンのときだけ。正しくは「${ex.callSet.right}」です。`);
+        return{cat:'call',ok:false};
+      }
       recordErr(G,'call',ex.why,`コールが違います。正しくは「${ex.callSet.right}」です。${ex.why}`);
       return{cat:'call',ok:false};
     }
@@ -1363,6 +1402,15 @@ function buildMotion(key,arg,pre){
     }
     case 'callNumber':
       return[{t:0,nod:0},{t:240,nod:1},{t:560,nod:0},{t:760,nod:0}];
+    case 'callNoSpin':{
+      /* 宣言してうなずき、ボールのある場所（レイアウト上／ポケット）へ手を運んで拾い、ラックへ持ち帰る */
+      const w=elRect('#wheelWrap');if(!w)return null;
+      const c=P(w.x+w.w/2,w.y+w.h/2),rad=w.w*0.4;
+      const from=pre.stray||P(c.x+rad*0.55,c.y-rad*0.6);
+      return[{t:0,nod:0},{t:220,nod:1},{t:420,nod:0,r:P(from.x,from.y-14)},{t:620,r:P(from.x,from.y)},
+        {t:760,r:P(from.x,from.y),prop:'ball'},{t:1100,r:P((from.x+rk.x)/2,Math.min(from.y,rk.y)-10),prop:'ball'},
+        {t:1350,r:P(rk.x,rk.y),prop:'ball'},{t:1480,r:P(rk.x,rk.y),prop:''},{t:1750,r:P(R.rx,R.ry)}];
+    }
     case 'placeDolly':{
       const c=ptOf('.dolly');if(!c)return null;
       return[{t:0,prop:'dolly'},{t:160,r:P(rk.x,rk.y),prop:'dolly'},
@@ -1467,7 +1515,7 @@ function layoutHTML(){
   return `<div class="lay-scroll"><div class="lay">
     <div class="grid-wrap${zc('inside')}">
       <div class="grid-main">${cells}</div>
-      <div class="chip-layer">${chipLayer}</div>
+      <div class="chip-layer">${chipLayer}${G.flags.noSpin&&G.flags.noSpin.reason==='out'?`<span class="stray-ball" style="left:${G.flags.noSpin.pos.x}%;top:${G.flags.noSpin.pos.y}%"></span>`:''}</div>
     </div>
     <div class="row-dozens${zc('nearOutside')}">${dz}</div>
     <div class="row-outside${zc('farOutside')}">${ou}</div>
@@ -1491,9 +1539,13 @@ function renderTable(){
     const tag=s===1?'手前':s===(G.seats||G.opts.players)?'奥':'';
     seats.push(`<span><i class="dot ${seatClass(s)}"></i>${s}番席${tag?`（${tag}）`:''}</span>`);
   }
-  const r=G.result;
+  const r=G.result,ns=F.noSpin;
   let plate='';
-  if(r!==null){
+  if(ns){
+    plate=ns.reason==='out'
+      ?`<div class="result-plate ns-plate"><div class="rp-cap">BALL OUT</div><div class="rp-ns">ボールが<br>ウィールの外へ</div></div>`
+      :`<div class="result-plate ns-plate"><div class="rp-cap">1周で落下</div><div class="rp-num">${ns.pocket}</div><div class="rp-wait">周回が足りない</div></div>`;
+  }else if(r!==null){
     const told=F.called;
     const meta=r===0?'ゼロ（赤でも黒でもない）':`${colJa(r)} / ${r%2===0?'イーブン':'オッド'} / ${r<=18?'1-18':'19-36'}`;
     plate=`<div class="result-plate">
@@ -1505,13 +1557,13 @@ function renderTable(){
   $('table').innerHTML=`
     ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
     <div class="wheel-col">
-      <div class="wheel-wrap${spinning?' spinning':''}" id="wheelWrap">
+      <div class="wheel-wrap${spinning?' spinning':''}${ns&&ns.reason==='out'?' ball-out':''}" id="wheelWrap">
         <svg class="wheel" viewBox="0 0 300 300" aria-hidden="true">
           <g id="wheelGroup">${wheelBuilt}</g>
           <g id="ballGroup"><circle class="ball" cx="150" cy="22" r="6"/></g>
         </svg>
       </div>
-      <div class="wheel-note">${spinning?'ボール回転中':r!==null?'ボール確定':'投入前'}</div>
+      <div class="wheel-note">${spinning?'ボール回転中':ns?'スピンに異常あり':r!==null?'ボール確定':'投入前'}</div>
       ${plate}
       ${late?'<div class="dolly-badge" style="border-color:#E0B65C;color:#E0B65C">締切後のチップあり</div>':''}
     </div>
@@ -1521,9 +1573,9 @@ function renderTable(){
       <div class="seatkey">${seats.join('')}</div>
     </div>`;
   const wrap=$('wheelWrap');
-  if(!spinning&&G.result!==null&&wrap){
+  if(!spinning&&(G.result!==null||(ns&&ns.reason==='short'))&&wrap){
     const bg=document.getElementById('ballGroup');
-    if(bg)bg.style.transform=`rotate(${ballAngleFor(G.result)}deg)`;
+    if(bg)bg.style.transform=`rotate(${ballAngleFor(ns?ns.pocket:G.result)}deg)`;
   }
   const show=G.opts.showDealer!==false;
   $('table').classList.toggle('has-dealer',show);
@@ -1578,13 +1630,13 @@ function btn(key,label,cls,arg){
 
 const PHASE_ACTS={
   bet:['spin','noMoreBets'],
-  ball:['rejectLateBet','placeDolly'],
+  ball:['callNoSpin','rejectLateBet','placeDolly'],
   take:['takeFar','takeNear','takeInside','mucking'],
   pay:['cleanHands','removeDolly']
 };
 const PHASE_HINT={
   bet:'投入 → 締切宣言。',
-  ball:'締切後に置かれたチップがあれば、先に差し戻す。',
+  ball:'まずボールが正常に落ちたかを確認。締切後のチップは先に差し戻す。',
   take:'回収は外側から内側へ。ハズレが無いエリアは飛ばす。',
   pay:'支払いが全部済んでから、クリーンハンド → ドリー解除。'
 };
@@ -1644,6 +1696,7 @@ function renderSettings(){
   $('settings').innerHTML=`<h3>設定</h3>
     <div class="row"><label for="optPlayers">プレイヤー人数</label><select id="optPlayers">${[2,3,4].map(n=>`<option value="${n}"${o.players===n?' selected':''}>${n}人</option>`).join('')}</select></div>
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
+    <div class="row"><label for="optNoSpin">ノースピン（ボールの飛び出し・周回不足）を発生させる</label><input type="checkbox" id="optNoSpin"${o.noSpin!==false?' checked':''}></div>
     <div class="row"><label for="optLate">後賭けを発生させる</label><input type="checkbox" id="optLate"${o.lateBets?' checked':''}></div>
     <div class="row"><label for="optZone">回収エリアを強調表示</label><input type="checkbox" id="optZone"${o.showZoneHints?' checked':''}></div>
     <div class="row"><label for="optDealer">ディーラーを表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
@@ -1685,6 +1738,7 @@ function doAct(key,arg){
     betId:G.pending&&G.pending.ex?G.pending.ex.betId:null,
     zone:exNow&&exNow.zone?exNow.zone:null,
     late:ptOf('.chip.late'),
+    stray:ptOf('.stray-ball'),
     dolly:ptOf('.dolly')
   };
   const r=act(G,key,arg);
@@ -1725,6 +1779,7 @@ document.addEventListener('change',e=>{
   if(id==='optPlayers')G.opts.players=+e.target.value;
   else if(id==='optAdaptive')G.opts.adaptiveDifficulty=e.target.checked;
   else if(id==='optLate')G.opts.lateBets=e.target.checked;
+  else if(id==='optNoSpin')G.opts.noSpin=e.target.checked;
   else if(id==='optZone')G.opts.showZoneHints=e.target.checked;
   else if(id==='optDealer'){G.opts.showDealer=e.target.checked;Dealer.stop();}
   else if(id==='optSpeed')G.opts.dealerSpeed=+e.target.value;
