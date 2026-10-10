@@ -48,32 +48,7 @@ button{font:inherit}
 .felt{position:relative;background:radial-gradient(ellipse at 50% 20%,var(--felt2),var(--felt) 72%);border:12px solid var(--rail);border-radius:14px;padding:14px 16px 18px;box-shadow:inset 0 0 50px rgba(0,0,0,.35);display:grid;grid-template-columns:210px minmax(0,1fr);gap:14px;align-items:start}
 
 /* ---- dealer figure（骨格アニメーション） ---- */
-.felt.has-dealer{padding-top:134px}
-.dealer-layer{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden;border-radius:4px}
-.dlayer{position:absolute;left:0;top:0;width:100%;height:100%}
-.dl-skin{fill:#F0D2B0}
-.dl-hair{fill:#191A26}
-.dl-brow{fill:none;stroke:#191A26;stroke-width:1.4;stroke-linecap:round}
-.dl-eye{fill:#3F8F6E}
-.dl-eye-hi{fill:#fff}
-.dl-blouse{fill:#F7F1E3}
-.dl-collar{fill:#20222E}
-.dl-collar-trim{fill:none;stroke:#fff;stroke-width:1.6}
-.dl-ribbon{fill:#20222E}
-.dl-edge{fill:none;stroke:rgba(0,0,0,.16);stroke-width:1.1}
-.dl-sleeve-out{fill:none;stroke:rgba(0,0,0,.32);stroke-width:19;stroke-linecap:round;stroke-linejoin:round}
-.dl-sleeve{fill:none;stroke:#F7F1E3;stroke-width:15;stroke-linecap:round;stroke-linejoin:round}
-.dl-sleeve-hi{fill:none;stroke:#20222E;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.dl-arm-skin{fill:none;stroke:#F0D2B0;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
-.dl-fingers{display:none}
-.dl-cuff{fill:#F0D2B0}
-.dl-shadow{fill:rgba(0,0,0,.22)}
-.dl-rackbox{fill:#3A2A20;stroke:rgba(201,162,75,.5);stroke-width:1}
-.carry{display:none}
-.dl-replay{position:absolute;left:14px;top:12px;pointer-events:auto;background:#11171C;border:1px solid var(--brass);color:var(--brass);border-radius:16px;padding:4px 12px;font-size:12px;cursor:pointer;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dl-replay:hover{background:#1A232B}
-.dl-replay[hidden]{display:none}
-.dl-replay b{font-weight:bold}
+.felt.has-dealer{padding-bottom:84px}
 
 /* ---- result plate ---- */
 .result-plate{margin-top:2px;width:100%;background:#11171C;border:2px solid var(--brass);border-radius:10px;padding:6px 10px 8px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.45);animation:plate .45s cubic-bezier(.2,1.3,.4,1)}
@@ -86,7 +61,7 @@ button{font:inherit}
 .table-next{position:absolute;right:14px;top:12px;z-index:6;font-size:15px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 
 /* ---- wheel ---- */
-.wheel-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wheel-col{display:flex;flex-direction:column;align-items:center;gap:6px;align-self:end}
 .wheel-wrap{position:relative;width:100%;max-width:200px;aspect-ratio:1/1;transition:opacity .4s,filter .4s}
 .wheel{width:100%;height:100%;display:block}
 #wheelGroup{transform-origin:150px 150px}
@@ -128,7 +103,7 @@ button{font:inherit}
 .cell-num.is-black{background:var(--rblk)}
 .cell-201{grid-column:14/15;background:transparent;font-family:inherit;font-size:11px;gap:2px}
 .cell-201 .label{position:absolute;top:1px;left:4px;font-size:9px;opacity:.6;pointer-events:none}
-.row-dozens,.row-outside{display:grid;gap:2px;margin-top:2px}
+.row-dozens,.row-outside{display:grid;gap:2px;margin-bottom:2px}
 .row-dozens,.row-outside{margin-left:calc((100% - 26px)/14 + 2px);width:calc((100% - 26px)/14*12 + 22px)}
 .row-dozens{grid-template-columns:1fr 1fr 1fr}
 .row-outside{grid-template-columns:repeat(6,1fr)}
@@ -216,7 +191,7 @@ button{font:inherit}
 @media (max-width:1040px){.wrap{grid-template-columns:1fr}.log{position:static;max-height:320px}}
 @media (max-width:760px){
   .felt{grid-template-columns:1fr;padding:10px 8px 12px;border-width:8px}
-  .felt.has-dealer{padding-top:104px}
+  .felt.has-dealer{padding-bottom:70px}
   .wheel-wrap{max-width:150px}
   .table-next{position:absolute;right:10px;top:10px;width:auto;font-size:13px;padding:6px 10px}
 }
@@ -259,8 +234,7 @@ button{font:inherit}
    横並びに変えて高さを半分以下にする。 */
 @media (max-width:600px){
   .felt{grid-template-columns:96px minmax(0,1fr);gap:6px;padding:6px 6px 8px;border-width:7px;border-radius:10px}
-  .felt.has-dealer{padding-top:66px}
-  .dl-replay{font-size:10px;padding:2px 8px;left:7px;top:6px}
+  .felt.has-dealer{padding-bottom:46px}
   .wheel-col{gap:3px}
   .wheel-wrap{max-width:92px}
   .wheel-note{font-size:9px;line-height:1.2}
@@ -1142,62 +1116,6 @@ function buildWheel(){
 /* このアプリの目的は所作を映像として見て覚えること。OS側の「アニメーション削減」設定に
    関わらず、ディーラーの動きは常に再生する。 */
 const REDUCED=false;
-const HAND_MARKUP=`
-  <g class="dl-hand">
-    <g class="hand-shape">
-      <ellipse class="dl-skin dl-palm" rx="9" ry="6.6"></ellipse>
-      <ellipse class="dl-skin" cx="3" cy="-6.6" rx="3.6" ry="2.7"></ellipse>
-      <g class="dl-fingers">
-        <ellipse class="dl-skin" cx="11" cy="-4.4" rx="4.4" ry="1.7"></ellipse>
-        <ellipse class="dl-skin" cx="12" cy="-1.5" rx="4.8" ry="1.7"></ellipse>
-        <ellipse class="dl-skin" cx="11.6" cy="1.5" rx="4.6" ry="1.7"></ellipse>
-        <ellipse class="dl-skin" cx="10.4" cy="4.4" rx="4" ry="1.7"></ellipse>
-      </g>
-    </g>
-    <g class="carry carry-ball"><circle r="4.2" fill="#FAF7EF" stroke="#9A9384" stroke-width=".6"></circle></g>
-    <g class="carry carry-dolly"><circle r="7" fill="#C9A24B" stroke="#4A380F" stroke-width="1"></circle><circle r="2.8" fill="#F6E6B8"></circle></g>
-    <g class="carry carry-chips">
-      <ellipse cy="4" rx="9" ry="3.4" fill="#B83A3A" stroke="rgba(255,255,255,.85)" stroke-width=".8"></ellipse>
-      <ellipse cy="0" rx="9" ry="3.4" fill="#2E7D4F" stroke="rgba(255,255,255,.85)" stroke-width=".8"></ellipse>
-      <ellipse cy="-4" rx="9" ry="3.4" fill="#F2F2EE" stroke="rgba(0,0,0,.45)" stroke-width=".8"></ellipse>
-    </g>
-    <g class="carry carry-rake">
-      <line x1="6" y1="0" x2="38" y2="0" stroke="#C9A24B" stroke-width="3" stroke-linecap="round"></line>
-      <line x1="38" y1="-14" x2="38" y2="14" stroke="#C9A24B" stroke-width="5" stroke-linecap="round"></line>
-    </g>
-  </g>`;
-const DEALER_MARKUP=`<div class="dealer-layer">
-  <svg class="dlayer" aria-hidden="true">
-    <g class="dl-bust">
-      <path class="dl-blouse" d="M-58 112 q1 -29 20 -39 l18 -8 h40 l18 8 q19 10 20 39 z"></path>
-      <path class="dl-edge" d="M-58 112 q1 -29 20 -39 M58 112 q-1 -29 -20 -39"></path>
-      <path class="dl-collar" d="M-20 64 l20 48 l20 -48 l-9 -4 h-22 z"></path>
-      <path class="dl-collar-trim" d="M-20 64 l20 48 l20 -48"></path>
-      <path class="dl-ribbon" d="M-9 65 l9 8 l9 -8 l-4 -5 h-10 z"></path>
-      <rect class="dl-skin" x="-9" y="50" width="18" height="17" rx="6"></rect>
-      <g class="dl-headg">
-        <path class="dl-hair" d="M-19 14 q-13 7 -14 28 q-1 24 3 52 q1 9 -3 17 l9 -1 q4 -9 3 -18 q-3 -25 -2 -46 q1 -16 9 -21 z"></path>
-        <path class="dl-hair" d="M19 14 q13 7 14 28 q1 24 -3 52 q-1 9 3 17 l-9 -1 q-4 -9 -3 -18 q3 -25 2 -46 q-1 -16 -9 -21 z"></path>
-        <ellipse class="dl-skin" cy="33" rx="18" ry="21"></ellipse>
-        <path class="dl-hair" d="M-18 22 q4 -16 18 -16 q14 0 18 16 q-8 -9 -18 -9 q-10 0 -18 9 z"></path>
-        <path class="dl-brow" d="M-13 26 q4 -2.4 8 0"></path>
-        <path class="dl-brow" d="M5 26 q4 -2.4 8 0"></path>
-        <ellipse class="dl-eye" cx="-7" cy="33.5" rx="3.3" ry="4.1"></ellipse>
-        <ellipse class="dl-eye" cx="7" cy="33.5" rx="3.3" ry="4.1"></ellipse>
-        <circle class="dl-eye-hi" cx="-6" cy="31.8" r="1.1"></circle>
-        <circle class="dl-eye-hi" cx="8" cy="31.8" r="1.1"></circle>
-        <path d="M-4 43 q4 3 8 0" fill="none" stroke="#B4536A" stroke-width="1.2" stroke-linecap="round"></path>
-      </g>
-    </g>
-    <g class="dl-rack"><rect class="dl-rackbox" rx="4"></rect><g class="dl-rackchips"></g></g>
-    <ellipse class="dl-shadow dl-shadow-l" rx="11" ry="4"></ellipse>
-    <ellipse class="dl-shadow dl-shadow-r" rx="11" ry="4"></ellipse>
-    <g class="dl-arm dl-arm-l"><path class="dl-sleeve-out"></path><path class="dl-arm-skin"></path><path class="dl-sleeve"></path><path class="dl-sleeve-hi"></path><circle class="dl-cuff" r="5.5"></circle>${HAND_MARKUP}</g>
-    <g class="dl-arm dl-arm-r"><path class="dl-sleeve-out"></path><path class="dl-arm-skin"></path><path class="dl-sleeve"></path><path class="dl-sleeve-hi"></path><circle class="dl-cuff" r="5.5"></circle>${HAND_MARKUP}</g>
-  </svg>
-  <button class="dl-replay" data-act="replay" hidden>▶ もう一度見る</button>
-</div>`;
-
 function elRect(sel){
   const host=$('table'),el=typeof sel==='string'?host&&host.querySelector(sel):sel;
   if(!host||!el)return null;
@@ -1211,253 +1129,816 @@ function ptOf(sel,ax,ay){
 function lerp(a,b,t){return a+(b-a)*t;}
 function ease(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
 
-const Dealer={
-  root:null,svg:null,W:0,H:0,cx:0,band:0,s:1,
-  shL:{x:0,y:0},shR:{x:0,y:0},rackL:{x:0,y:0},rackR:{x:0,y:0},
-  raf:0,frames:null,t0:0,dur:0,last:null,busy:false,
+/*DEALER_START*/
+/* ===== ディーラー（共通・4ゲームで同一。直すときは scratchpad の kit/dealer.js を直して同期する） =====
+   画面はディーラー目線（一人称）。画面の下がディーラー側（卓の手前の縁とチップラック）、上がプレイヤー側。
+   felt（#table）の padding-bottom がディーラーの手元の帯。ゲーム側は Dealer.cfg（center/speed/rackW）を与え、
+   所作ごとにキーフレーム {t, r:{x,y,z?}, l, prop, hold, open, rp/lp} の列を Dealer.play() に渡す。
+   座標は felt 内のピクセル。z（高さ）を付けた点は、その高さで画面上のその点に手が来る。 */
+const DEALER_CSS=`.dealer-layer{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden;border-radius:inherit}
+.dealer-layer *{pointer-events:none}
+.dealer-layer .dlayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden}
+.dealer-layer .dl-replay{position:absolute;right:12px;bottom:8px;pointer-events:auto;background:rgba(17,23,28,.88);border:1px solid #C9A24B;color:#C9A24B;border-radius:16px;padding:4px 12px;font-size:12px;line-height:1.4;cursor:pointer;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:2}
+.dealer-layer .dl-replay:hover{background:#1A232B}
+.dealer-layer .dl-replay[hidden]{display:none}
+.dealer-layer .dl-replay b{font-weight:bold}
+.dealer-layer .dl-sk{fill:#F2D3B3}
+.dealer-layer .dl-palm{fill:#F8E0CB}
+.dealer-layer .dl-o{stroke:#9A6650;stroke-width:.8;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.dealer-layer .dl-ln{fill:none;stroke:#B98166;stroke-width:.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.dealer-layer .dl-knk{fill:none;stroke:#D9A887;stroke-width:.7;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.8}
+.dealer-layer .dl-nail{fill:#FBE6DA;opacity:.9}
+.dealer-layer .dl-sleeve{stroke:#8E887D;stroke-linejoin:round}
+.dealer-layer .dl-fold{fill:none;stroke:#B9B2A6;stroke-linecap:round}
+.dealer-layer .dl-garter{fill:#17171C;stroke:#C9A24B}
+.dealer-layer .dl-cuff{fill:#FFFFFF;stroke:#8E887D}
+.dealer-layer .dl-link{fill:#D6B35E}
+.dealer-layer .dl-ashadow{fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round}
+.dealer-layer .dl-hshadow{fill:#000}
+.dealer-layer .dl-rackbox{fill:#2C1F17;stroke:rgba(214,179,94,.75);stroke-linejoin:round}
+.dealer-layer .dl-rackin{fill:#120D09}
+.dealer-layer .dl-cardf{fill:#FBF8F0;stroke:#7C7466;stroke-width:.6;vector-effect:non-scaling-stroke}
+.dealer-layer .dl-cardb{fill:#9A2234}
+.dealer-layer .dl-cardx{fill:none;stroke:rgba(255,220,170,.55);stroke-width:.5;vector-effect:non-scaling-stroke}
+.dealer-layer .dl-chip{stroke:#FFFFFF;stroke-width:1.6;stroke-dasharray:2.2 2.9}
+.dealer-layer .dl-chipin{fill:none;stroke:rgba(255,255,255,.75);stroke-width:.5;vector-effect:non-scaling-stroke}
+.dealer-layer .dl-rake{fill:none;stroke-linecap:round}
+.dealer-layer .dl-shape{display:none}
+@media (max-width:600px){.dealer-layer .dl-replay{font-size:10px;padding:2px 8px;right:6px;bottom:4px;max-width:40%}}`;
 
-  build(){
-    if(this.root)return this.root;
-    const tmp=document.createElement('div');tmp.innerHTML=DEALER_MARKUP;
-    this.root=tmp.firstElementChild;this.svg=this.root.querySelector('.dlayer');
-    this.q={
-      bust:this.svg.querySelector('.dl-bust'),head:this.svg.querySelector('.dl-headg'),
-      rack:this.svg.querySelector('.dl-rack'),rackBox:this.svg.querySelector('.dl-rackbox'),
-      rackChips:this.svg.querySelector('.dl-rackchips'),
-      arm:{l:this.svg.querySelector('.dl-arm-l'),r:this.svg.querySelector('.dl-arm-r')},
-      shadow:{l:this.svg.querySelector('.dl-shadow-l'),r:this.svg.querySelector('.dl-shadow-r')}
-    };
-    ['l','r'].forEach(k=>{
-      const g=this.q.arm[k];
-      this.q.arm[k]={g,sleeve:g.querySelector('.dl-sleeve'),hi:g.querySelector('.dl-sleeve-hi'),
-        out:g.querySelector('.dl-sleeve-out'),skin:g.querySelector('.dl-arm-skin'),fingers:g.querySelector('.dl-fingers'),
-        cuff:g.querySelector('.dl-cuff'),hand:g.querySelector('.dl-hand'),
-        shape:g.querySelector('.hand-shape'),
-        carry:{ball:g.querySelector('.carry-ball'),dolly:g.querySelector('.carry-dolly'),
-          chips:g.querySelector('.carry-chips'),rake:g.querySelector('.carry-rake')}};
-    });
-    return this.root;
-  },
+const Dealer=(()=>{
+  'use strict';
+  /* ---------- ベクトル演算 ---------- */
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const sstep=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+  const V=(x,v,z)=>({x,v,z});
+  const add=(a,b)=>V(a.x+b.x,a.v+b.v,a.z+b.z);
+  const sub=(a,b)=>V(a.x-b.x,a.v-b.v,a.z-b.z);
+  const mul=(a,k)=>V(a.x*k,a.v*k,a.z*k);
+  const dot=(a,b)=>a.x*b.x+a.v*b.v+a.z*b.z;
+  const len=a=>Math.sqrt(dot(a,a));
+  const nrm=a=>{const l=len(a);return l>1e-9?mul(a,1/l):V(0,1,0);};
+  const cross=(a,b)=>V(a.v*b.z-a.z*b.v,a.z*b.x-a.x*b.z,a.x*b.v-a.v*b.x);
+  const F=n=>Math.round(n*10)/10;
+  const P2=p=>F(p.x)+' '+F(p.y);
 
-  layout(){
-    const host=$('table');if(!host||!this.svg)return;
-    this.W=host.clientWidth;this.H=host.clientHeight;
-    this.band=parseFloat(getComputedStyle(host).paddingTop)||110;
-    this.svg.setAttribute('viewBox',`0 0 ${this.W} ${this.H}`);
-    this.s=Math.max(0.5,Math.min(1,(this.band-16)/112));
-    /* 実物と同じく、ホイールとレイアウトの境目に立たせる（中央に置くと両端まで
-       腕が伸びきってしまうため）。ただし縦積みレイアウト（狭幅）では中央に戻す */
-    const stacked=window.matchMedia('(max-width:760px)').matches;
-    const wc=!stacked&&elRect('.wheel-col');
-    this.cx=wc?(wc.x+wc.w):this.W*0.5;
-    const s=this.s;
-    this.armA=Math.max(52,this.H*0.3);
-    this.armB=Math.max(56,this.H*0.32);
-    this.shL={x:this.cx-46*s,y:78*s+4};
-    this.shR={x:this.cx+46*s,y:78*s+4};
-    const rw=126*s,rh=18*s;
-    this.q.rackBox.setAttribute('x',this.cx-rw/2);this.q.rackBox.setAttribute('y',this.band-rh-4);
-    this.q.rackBox.setAttribute('width',rw);this.q.rackBox.setAttribute('height',rh);
-    const cols=['#F2F2EE','#B83A3A','#2E7D4F','#1C1C1C','#6B3FA0'];
-    this.q.rackChips.innerHTML=cols.map((c,i)=>{
-      const x=this.cx-rw/2+rw*(i+0.5)/cols.length;
-      return `<ellipse cx="${x}" cy="${this.band-rh/2-4}" rx="${8*s}" ry="${4.6*s}" fill="${c}" stroke="rgba(255,255,255,.7)" stroke-width=".8"></ellipse>`;
-    }).join('');
-    this.rackL={x:this.cx-rw*0.3,y:this.band-rh};
-    this.rackR={x:this.cx+rw*0.3,y:this.band-rh};
-  },
+  /* ---------- 投影と体の寸法（単位 fu。s px/fu） ---------- */
+  const HC=130,VC=-35;  // カメラ（目）の高さと奥行き位置（卓の縁より少し後ろ）
+  const GAMMA=.8;       // 手・持ち物の大きさは μ^GAMMA（持ち上げた手が大きくなりすぎないように少し抑える）
+  const HSC=1;          // 手の大きさの係数
+  const HAND_FU=34;     // 手の長さ（手首〜中指の先）。画面に対する手の大きさから s を決める
+  const SHX=38,SHV=-40,SHZ=58;        // 肩（画面の下の外）
+  const ARM_A=54,ARM_B=48;            // 上腕・前腕
+  const UP_SHARE=.4;                  // 届かない分を伸ばすとき、上腕が受け持つ割合（残りは前腕）
+  const RU0=8.6,RU1=7,RF0=6.6,RF1=4.7; // 袖の半径（肩・肘・手首）
+  const RACK_W=86;                    // チップラックの幅
+  const RET=360;                      // 最後のキーフレームの後、休めの姿勢へ戻る時間(ms)
 
-  rest(){
-    const s=this.s,y=this.band-4;
-    return{lx:this.cx-88*s,ly:y,rx:this.cx+88*s,ry:y,open:0,nod:0,prop:'',lift:0};
-  },
+  /* ---------- 手の形（左手として設計：指先が +x。甲側は親指 +y、手のひら側は親指 -y） ---------- */
+  function capD(x1,y1,x2,y2,r1,r2){
+    const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy)||1e-3,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+    const sa=clamp((r1-r2)/L,-.99,.99),ca=Math.sqrt(1-sa*sa);
+    const ax=nx*ca+ux*sa,ay=ny*ca+uy*sa,bx=-nx*ca+ux*sa,by=-ny*ca+uy*sa;
+    const big0=r1>r2?1:0,big1=r2>r1?1:0;
+    return `M${F(x1+ax*r1)},${F(y1+ay*r1)}L${F(x2+ax*r2)},${F(y2+ay*r2)}A${F(r2)},${F(r2)} 0 ${big1} 0 ${F(x2+bx*r2)},${F(y2+by*r2)}L${F(x1+bx*r1)},${F(y1+by*r1)}A${F(r1)},${F(r1)} 0 ${big0} 0 ${F(x1+ax*r1)},${F(y1+ay*r1)}Z`;
+  }
+  /* 甲側：指先を1本ずつ丸め、指の境目を付け根から引く（ミトンに見えないように） */
+  const FLAT_D='M0,-6.3 C5.5,-7.4 11,-8.6 15.8,-8.4 L25,-7.7 Q27.9,-7.4 27.7,-5.4 Q27.5,-4.1 26,-4.1 L29.6,-4.4 Q32.1,-4.3 32,-2.3 Q31.9,-.6 30.2,-.4 L32,-.3 Q34,-.1 33.9,1.8 Q33.7,3.6 31.8,3.7 L29.6,3.8 Q31.5,4.1 31.4,5.7 Q31.2,7.3 29.1,7.3 L17,7.8 C11.6,8.5 5.6,7.9 0,6.4 Z';
+  const GAPS='M17.4,-4.3 L26,-4.1 M18,-.4 L30.2,-.4 M18,3.7 L29.6,3.8';
+  const KNUCK='M15.6,-5.6 q1.2,-.9 2.4,0 M16.4,-1.9 q1.2,-.9 2.4,0 M16.4,1.9 q1.2,-.9 2.4,0 M15.4,5.4 q1.1,-.8 2.2,0';
+  const HANDS={
+    flat:{view:'d',c:[31.5,0],html:
+      `<path class="dl-sk dl-o" d="M3.4,5.6 C8,8.8 14,10.7 19.6,10.4 C21.7,10.3 22.1,8.5 20.5,7.8 C16.2,7.1 12,6.3 8.6,4.6 Z"/>`+
+      `<path class="dl-sk dl-o" d="${FLAT_D}"/>`+
+      `<path class="dl-ln" d="${GAPS}"/><path class="dl-knk" d="${KNUCK}"/>`+
+      `<path class="dl-nail" d="M25.1,-6.6h1.9v1.6h-1.9z M29.3,-3.5h2v1.7h-2z M31.2,.5h2v1.7h-2z M28.6,4.5h1.9v1.6h-1.9z"/>`},
+    relax:{view:'d',c:[14,0],html:
+      `<path class="dl-sk dl-o" d="M3.6,5.6 C8,9.4 13.6,11.4 18.4,11.2 C20.4,11.1 20.8,9.4 19.4,8.6 C15.6,7.6 12,6.4 8.8,4.6 Z"/>`+
+      `<path class="dl-sk dl-o" d="M0,-6.3 C5.5,-7.4 11,-8.8 15.8,-8.6 L22.4,-8 Q25,-7.6 24.8,-5.8 Q24.6,-4.5 23.4,-4.3 L26,-4.5 Q28.4,-4.2 28.2,-2.3 Q28,-.8 26.6,-.5 L28,-.4 Q30.2,-.1 30,1.8 Q29.8,3.5 27.9,3.6 L26.4,3.8 Q28.2,4.3 27.9,5.9 Q27.5,7.5 25.4,7.5 L17,7.9 C11.6,8.6 5.6,7.9 0,6.4 Z"/>`+
+      `<path class="dl-ln" d="M17.4,-4.4 L23.4,-4.3 M18,-.5 L26.6,-.5 M18,3.7 L26.4,3.8"/><path class="dl-knk" d="${KNUCK}"/>`},
+    point:{view:'d',c:[35.6,4.5],html:
+      `<path class="dl-sk dl-o" d="M0,-6.3 C5.5,-7.4 11.5,-8.8 16.8,-8.5 C20.6,-8.2 22.8,-6 23,-3.2 C23.2,-.6 22.6,1.2 21.4,2 L33.6,2.4 C35.6,2.5 36.4,3.6 36.4,4.6 C36.4,5.7 35.5,6.6 33.6,6.6 L17.4,7.8 C11.8,8.6 5.6,7.9 0,6.4 Z"/>`+
+      `<path class="dl-ln" d="M16.6,-5.2 C19.6,-5.2 21.4,-4.6 22.4,-3.6 M17.2,-1.8 C19.8,-1.8 21.4,-1.2 22.4,-.2 M25,2.4 L25,6.4"/>`+
+      `<path class="dl-nail" d="M32.6,3.3h2.4v2h-2.4z"/>`+
+      `<path class="dl-sk dl-o" d="M3.6,5.6 C8.4,9 14.4,10.2 18.6,8.8 C19.8,8.4 19.6,7 18.2,6.8 C14.4,6.6 11.4,6 8.8,4.6 Z"/>`},
+    grip:{view:'d',c:[26,0],html:
+      `<path class="dl-sk dl-o" d="M0,-6.3 C5.5,-7.6 11.5,-9 16.8,-8.7 C21.8,-8.4 24.4,-5.2 24.4,-1.2 C24.4,2.8 22.4,6.6 17.6,7.6 C12,8.8 5.8,8 0,6.4 Z"/>`+
+      `<path class="dl-ln" d="M17.4,-6.6 C20.6,-6.2 22.6,-5 23.6,-3.6 M18,-3.2 C21,-3 23,-2 24,-.6 M18,.4 C21,.6 22.8,1.6 23.6,2.8"/>`+
+      `<path class="dl-sk dl-o" d="M4,5.8 C9,9.6 15.6,10.8 20.4,9 C21.8,8.4 21.6,6.8 20,6.6 C15.6,6.8 11.6,6.2 9,4.8 Z"/>`},
+    pinch:{view:'d',c:[39,0],html:
+      `<path class="dl-sk dl-o" d="M0,-6.3 C5.5,-7.4 11,-8.6 15.8,-8.4 L22.6,-7.8 Q25.2,-7.4 25,-5.6 Q24.8,-4.3 23.6,-4.1 L26.6,-4.3 Q29,-4 28.8,-2.1 Q28.6,-.6 27.2,-.4 L28.6,-.3 Q30.7,0 30.5,1.9 Q30.3,3.5 28.6,3.6 L17,7.8 C11.6,8.5 5.6,7.9 0,6.4 Z"/>`+
+      `<path class="dl-ln" d="M17.4,-4.3 L23.6,-4.1 M18,-.4 L27.2,-.4 M18,3.4 L27,3.6"/>`+
+      `<path class="dl-sk dl-o" d="M3.4,5.6 C8.4,9.2 15.6,10.8 24.6,8.4 C27.6,7.6 29.6,5.6 28.8,4.2 C27.8,3.4 26.2,4.6 23.4,5.6 C18.4,7 13,6.2 8.6,4.6 Z"/>`},
+    palm:{view:'p',c:[10,0],html:
+      `<path class="dl-palm dl-o" d="${capD(3.6,-5.4,12.6,-13.6,3.3,2.3)}"/>`+
+      `<path class="dl-palm dl-o" d="${capD(15.2,-5.6,28.8,-8.8,2.25,1.85)}"/>`+
+      `<path class="dl-palm dl-o" d="${capD(16,-1.9,31.8,-2.5,2.3,1.9)}"/>`+
+      `<path class="dl-palm dl-o" d="${capD(15.8,1.9,30.2,3.9,2.2,1.8)}"/>`+
+      `<path class="dl-palm dl-o" d="${capD(14.6,5.3,25.8,8.7,2,1.6)}"/>`+
+      `<path class="dl-palm dl-o" d="M0,-6.6 C4.6,-8.2 10.4,-9.4 15.6,-8.4 C17.6,-6.4 18.2,-2.4 18,1.2 C17.8,4.4 17,6.8 15.6,8.2 C10.4,8.8 4.6,8 0,6.6 Z"/>`+
+      `<path class="dl-ln" d="M3.2,-2.6 C7,-4.4 11,-5.2 15,-5.2 M2.6,2 C6.6,.8 10.6,.2 15.6,.8 M6.4,6.6 C4.8,3 5,-1 7.6,-5"/>`},
+    /* 挙手（フロアを呼ぶ）：手のひらを前へ向けて上げるので、ディーラーからは手の甲が見える */
+    raise:{view:'d',c:[18,0],html:
+      `<path class="dl-sk dl-o" d="${capD(4,5.2,13.4,12.4,3.2,2.3)}"/>`+
+      `<path class="dl-sk dl-o" d="${FLAT_D}"/>`+
+      `<path class="dl-ln" d="${GAPS}"/><path class="dl-knk" d="${KNUCK}"/>`+
+      `<path class="dl-nail" d="M25.1,-6.6h1.9v1.6h-1.9z M29.3,-3.5h2v1.7h-2z M31.2,.5h2v1.7h-2z M28.6,4.5h1.9v1.6h-1.9z"/>`}
+  };
+  const SHAPES=Object.keys(HANDS);
+  /* 持ち物（画面に対してほぼ正立。接点が中心） */
+  const chipCol=['#B8322E','#1F7A4A','#2D6CB5','#ECE9E1'];
+  const PROPS={
+    card:`<g><rect class="dl-cardf" x="-9" y="-13" width="18" height="26" rx="2.2"/><rect class="dl-cardb" x="-6.9" y="-10.9" width="13.8" height="21.8" rx="1.2"/><path class="dl-cardx" d="M-6.9,-10.9 L6.9,10.9 M6.9,-10.9 L-6.9,10.9 M0,-10.9 L0,10.9"/></g>`,
+    cards:`<g><rect class="dl-cardf" x="-12" y="-14" width="18" height="26" rx="2.2" transform="rotate(-10)"/><rect class="dl-cardf" x="-9" y="-13" width="18" height="26" rx="2.2"/><rect class="dl-cardf" x="-6" y="-12" width="18" height="26" rx="2.2" transform="rotate(9)"/><rect class="dl-cardb" x="-3.9" y="-9.9" width="13.8" height="21.8" rx="1.2" transform="rotate(9)"/></g>`,
+    chips:chipCol.map((c,i)=>`<ellipse class="dl-chip" cy="${F(4.2-i*2.6)}" rx="8.4" ry="7" fill="${c}"/>`).join('')+`<ellipse class="dl-chipin" cy="${F(4.2-3*2.6)}" rx="5" ry="4.1"/>`,
+    ball:`<circle r="3.6" fill="#FFFFFF" stroke="#8C8C8C" stroke-width=".5" vector-effect="non-scaling-stroke"/><circle cx="-1.2" cy="-1.3" r="1.1" fill="#fff" opacity=".9"/>`,
+    dolly:`<ellipse cy="5" rx="6" ry="2.8" fill="#C9C4B8"/><path d="M-4.6,5 C-4.6,1.6 -2.6,-.2 -1.8,-2 C-3.4,-3.2 -3.2,-6.2 0,-6.6 C3.2,-6.2 3.4,-3.2 1.8,-2 C2.6,-.2 4.6,1.6 4.6,5 Z" fill="#F6F3EC" stroke="#8A857A" stroke-width=".6" vector-effect="non-scaling-stroke"/>`,
+    puck:`<ellipse cy="1.6" rx="9.6" ry="8" fill="#0E0E10"/><ellipse rx="9.6" ry="8" fill="#F4F2EC" stroke="#333" stroke-width=".6" vector-effect="non-scaling-stroke"/><path d="M-9.6,0 A9.6,8 0 0 1 9.6,0 Z" fill="#141416"/>`
+  };
+  const PROP_NAMES=Object.keys(PROPS);
+  const PINCH_PROPS={card:1,cards:1,ball:1,dolly:1};
+  const PROP_C={card:[39,0],cards:[39,0],ball:[31.5,0],dolly:[32,0],chips:[27,0],puck:[27,0],rake:[14,0]};
 
-  ik(S,Hd,a,b,sign){
-    let dx=Hd.x-S.x,dy=Hd.y-S.y,d=Math.hypot(dx,dy)||0.001;
-    /* 近距離では腕を縮めて描く（肘が体の外へ大きく張り出すのを防ぐ） */
-    if(a+b>d*1.5){const k=d*1.5/(a+b);a*=k;b*=k;}
-    const max=(a+b)*0.99;
-    if(d>max){const k=d/max;a*=k;b*=k;}
-    const dd=Math.max(d,Math.abs(a-b)+1);
-    const cosA=Math.max(-1,Math.min(1,(a*a+dd*dd-b*b)/(2*a*dd)));
-    const ang=Math.acos(cosA),base=Math.atan2(dy,dx),e=base+sign*ang;
-    return{x:S.x+Math.cos(e)*a,y:S.y+Math.sin(e)*a};
-  },
+  function armMarkup(side){
+    return `<g class="dl-arm dl-arm-${side}">`+
+      `<path class="dl-sleeve dl-up" fill="url(#dlr-g-${side}u)"/>`+
+      `<path class="dl-fold dl-fold-u"/><path class="dl-garter"/>`+
+      `<path class="dl-sleeve dl-fo" fill="url(#dlr-g-${side}f)"/>`+
+      `<path class="dl-fold dl-fold-f"/>`+
+      `<g class="dl-rakeg" style="display:none"><path class="dl-rake dl-rake-stick" stroke="#B88B4A"/><path class="dl-rake dl-rake-hi" stroke="#E8C98E"/><path class="dl-rake dl-rake-head" stroke="#5A3B22"/><path class="dl-rake dl-rake-headhi" stroke="#D9B074"/></g>`+
+      `<g class="dl-props">`+PROP_NAMES.filter(n=>n!=='ball'&&n!=='dolly').map(n=>`<g class="dl-prop dl-prop-${n}" style="display:none">${PROPS[n]}</g>`).join('')+`</g>`+
+      `<g class="dl-hand">`+SHAPES.map(n=>`<g class="dl-shape dl-shape-${n}">${HANDS[n].html}</g>`).join('')+`</g>`+
+      `<g class="dl-props2">`+['ball','dolly'].map(n=>`<g class="dl-prop dl-prop-${n}" style="display:none">${PROPS[n]}</g>`).join('')+`</g>`+
+      `<path class="dl-cuff dl-cuffp"/><circle class="dl-link"/>`+
+      `</g>`;
+  }
+  function gradDef(id){return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#F4F1EA"/><stop offset=".85" stop-color="#D2CABD"/><stop offset="1" stop-color="#BDB4A6"/></linearGradient>`;}
 
-  setPose(p){
-    if(!this.svg)return;
-    const reach=(this.armA+this.armB)*0.98;
-    const dL=Math.hypot(p.lx-this.shL.x,p.ly-this.shL.y),dR=Math.hypot(p.rx-this.shR.x,p.ry-this.shR.y);
-    const need=Math.max(dL-reach,dR-reach,0);
-    const leanY=Math.min(34,need*0.5);
-    const midX=(p.lx+p.rx)/2,leanX=Math.max(-88,Math.min(88,(midX-this.cx)*0.4));
-    const s=this.s;
-    this.q.bust.setAttribute('transform',`translate(${this.cx+leanX} ${leanY}) scale(${s})`);
-    this.q.head.setAttribute('transform',`rotate(${p.nod*7} 0 54) translate(0 ${p.nod*3})`);
-    const SL={x:this.shL.x+leanX,y:this.shL.y+leanY},SR={x:this.shR.x+leanX,y:this.shR.y+leanY};
-    /* 肘は体の外側へ張らせる（画面左の腕＝時計回り、右の腕＝反時計回り） */
-    this.drawArm('l',SL,{x:p.lx,y:p.ly},1,p);
-    this.drawArm('r',SR,{x:p.rx,y:p.ry},-1,p);
-  },
+  const MARKUP=`<div class="dealer-layer">
+<svg class="dlayer" aria-hidden="true">
+<defs>${gradDef('dlr-g-lu')}${gradDef('dlr-g-lf')}${gradDef('dlr-g-ru')}${gradDef('dlr-g-rf')}</defs>
+<g class="dl-shadows"><path class="dl-ashadow dl-ash-l"/><path class="dl-ashadow dl-ash-r"/><ellipse class="dl-hshadow dl-hsh-l"/><ellipse class="dl-hshadow dl-hsh-r"/></g>
+<g class="dl-rack"></g>
+<g class="dl-arms">${armMarkup('l')}${armMarkup('r')}</g>
+</svg>
+<button class="dl-replay" data-act="replay" hidden>▶ もう一度見る</button>
+</div>`;
 
-  drawArm(side,S,Hd,sign,p){
-    const A=this.q.arm[side];
-    /* 手先は肩からの実際の可動範囲より外へは出さない（届かない距離に置くと
-       腕だけが伸びきる「ゴムゴムの実」状態になるため、届く位置で止める） */
-    const reach=(this.armA+this.armB)*0.97;
-    const hdx=Hd.x-S.x,hdy=Hd.y-S.y,hdd=Math.hypot(hdx,hdy);
-    if(hdd>reach){const k=reach/hdd;Hd={x:S.x+hdx*k,y:S.y+hdy*k};}
-    const E=this.ik(S,Hd,this.armA,this.armB,sign);
-    const d=`M ${S.x} ${S.y} L ${E.x} ${E.y} L ${Hd.x} ${Hd.y}`;
-    /* 半袖ブラウスなので、上腕（肩→肘）だけ袖の色、肘から先は肌色にする */
-    const dUpper=`M ${S.x} ${S.y} L ${E.x} ${E.y}`,dLower=`M ${E.x} ${E.y} L ${Hd.x} ${Hd.y}`;
-    A.out.setAttribute('d',d);A.sleeve.setAttribute('d',dUpper);A.hi.setAttribute('d',dUpper);A.skin.setAttribute('d',dLower);
-    A.fingers.style.display=p.open>0.45?'block':'none';
-    const ang=Math.atan2(Hd.y-E.y,Hd.x-E.x);
-    A.cuff.setAttribute('cx',Hd.x-Math.cos(ang)*9);A.cuff.setAttribute('cy',Hd.y-Math.sin(ang)*9);
-    A.cuff.setAttribute('r',5.5);
-    const sc=1+p.open*0.5;
-    A.hand.setAttribute('transform',`translate(${Hd.x} ${Hd.y}) rotate(${ang*180/Math.PI}) scale(${sc} ${1+p.open*0.2})`);
-    const carried=(side==='r')||p.prop==='clean';
-    Object.keys(A.carry).forEach(k=>{A.carry[k].style.display=(carried&&p.prop===k)?'block':'none';});
-    const sh=this.q.shadow[side];
-    sh.setAttribute('cx',Hd.x+4);sh.setAttribute('cy',Hd.y+13);
-    sh.setAttribute('opacity',Hd.y>this.band?0.2:0);
-  },
+  const D={
+    root:null,svg:null,W:0,H:0,cx:0,band:0,feltB:0,s:1,
+    rackL:{x:0,y:0},rackR:{x:0,y:0},
+    raf:0,last:null,busy:false,cfg:{},
+    _held:null,_idleRaf:0,_contact:{l:{x:0,y:0},r:{x:0,y:0}},_sim:null,_top:'',
 
-  reset(){this.stop();this.layout();this.setPose(this.rest());},
-  stop(){if(this.raf)cancelAnimationFrame(this.raf);this.raf=0;this.busy=false;},
+    /* ---------- 構築 ---------- */
+    build(){
+      if(this.root)return this.root;
+      const tmp=document.createElement('div');tmp.innerHTML=MARKUP;
+      this.root=tmp.firstElementChild;this.svg=this.root.querySelector('.dlayer');
+      const q=s=>this.svg.querySelector(s);
+      this.q={rack:q('.dl-rack'),arms:q('.dl-arms'),sh:{l:q('.dl-ash-l'),r:q('.dl-ash-r')},hsh:{l:q('.dl-hsh-l'),r:q('.dl-hsh-r')},arm:{}};
+      ['l','r'].forEach(k=>{
+        const g=q('.dl-arm-'+k),qq=s=>g.querySelector(s);
+        const shapes={},props={};
+        SHAPES.forEach(n=>shapes[n]=qq('.dl-shape-'+n));
+        PROP_NAMES.forEach(n=>props[n]=qq('.dl-prop-'+n));
+        this.q.arm[k]={g,up:qq('.dl-up'),fo:qq('.dl-fo'),foldU:qq('.dl-fold-u'),foldF:qq('.dl-fold-f'),garter:qq('.dl-garter'),
+          cuff:qq('.dl-cuffp'),link:qq('.dl-link'),hand:qq('.dl-hand'),shapes,props,
+          rake:qq('.dl-rakeg'),rakeStick:qq('.dl-rake-stick'),rakeHi:qq('.dl-rake-hi'),rakeHead:qq('.dl-rake-head'),rakeHeadHi:qq('.dl-rake-headhi'),
+          gu:this.svg.querySelector('#dlr-g-'+k+'u'),gf:this.svg.querySelector('#dlr-g-'+k+'f')};
+      });
+      return this.root;
+    },
 
-  /* frames: [{t, r:{x,y}, l:{x,y}, open, nod, prop}] 未指定は直前を引き継ぐ */
-  play(frames,label){
-    if(!this.svg||!frames||frames.length<2)return;
-    this.stop();this.layout();
-    const base=this.rest();let cur=Object.assign({},base);
-    const seq=frames.map(f=>{
-      cur=Object.assign({},cur,{
-        lx:f.l?f.l.x:cur.lx,ly:f.l?f.l.y:cur.ly,
-        rx:f.r?f.r.x:cur.rx,ry:f.r?f.r.y:cur.ry,
-        open:f.open!==undefined?f.open:cur.open,
-        nod:f.nod!==undefined?f.nod:cur.nod,
-        prop:f.prop!==undefined?f.prop:cur.prop});
-      return Object.assign({t:f.t},cur);
-    });
-    this.last={frames,label};
-    const btn=this.root&&this.root.querySelector('.dl-replay');
-    if(btn){btn.hidden=false;btn.innerHTML='▶ もう一度：<b>'+esc(label||'')+'</b>';}
-    if(REDUCED){this.setPose(seq[seq.length-1]);this.setPose(base);return;}
-    const speed=G.opts.dealerSpeed||1;
-    const total=seq[seq.length-1].t/speed;
-    const t0=performance.now();this.busy=true;
-    const step=now=>{
-      const el=(now-t0);
-      if(el>=total){this.setPose(base);this.busy=false;this.raf=0;return;}
-      const tm=el*speed;
-      let i=0;while(i<seq.length-2&&seq[i+1].t<=tm)i++;
-      const a=seq[i],b=seq[i+1],span=Math.max(1,b.t-a.t),k=ease(Math.min(1,(tm-a.t)/span));
-      this.setPose({lx:lerp(a.lx,b.lx,k),ly:lerp(a.ly,b.ly,k),rx:lerp(a.rx,b.rx,k),ry:lerp(a.ry,b.ry,k),
-        open:lerp(a.open,b.open,k),nod:lerp(a.nod,b.nod,k),prop:a.prop});
+    /* ---------- 寸法 ---------- */
+    _host(){const c=this.cfg||{};return (c.host&&c.host())||(this.root&&this.root.parentElement)||document.getElementById('table');},
+    layout(){
+      const host=this._host();if(!host||!this.svg)return;
+      this.W=host.clientWidth;this.H=host.clientHeight;
+      const cs=getComputedStyle(host);
+      this.band=parseFloat(cs.paddingBottom)||Math.round(this.H*.1);
+      this.feltB=this.H-this.band;
+      this.svg.setAttribute('viewBox',`0 0 ${this.W} ${this.H}`);
+      const c=this.cfg||{};
+      const s=this.s=clamp(Math.min(this.H*.15,this.W*.085)/HAND_FU*clamp(+(c.handScale||1),.5,2),.35,5);
+      this.cx=c.center?+c.center():this.W/2;
+      if(!isFinite(this.cx))this.cx=this.W/2;
+      this.X0=this.cx;this.Yb=this.H;this.Ypp=this.H-s*VC;
+      this.reachK=clamp(+(c.reach||1),.5,3);
+      /* 線の太さ（画面座標で描くパーツ） */
+      const sw=Math.max(.6,.5*s);
+      this.svg.querySelectorAll('.dl-sleeve,.dl-cuff').forEach(e=>e.setAttribute('stroke-width',F(sw)));
+      ['l','r'].forEach(k=>{const A=this.q.arm[k];A.foldU.setAttribute('stroke-width',F(Math.max(.5,.55*s)));A.foldF.setAttribute('stroke-width',F(Math.max(.5,.55*s)));});
+      this._drawRack();
+      this._sig=[this.W,this.H,this.band,this.cx,s].join(',');
+    },
+    /* チップラック：卓の手前の縁、ディーラーの正面。上から見下ろすので奥ほど細い台形 */
+    _drawRack(){
+      const s=this.s,c=this.cfg||{},hw=(+c.rackW||RACK_W)/2;
+      if(c.rack===false){this.q.rack.innerHTML='';this.rackL=this.rackR={x:this.cx,y:this.H-this.band*.5};return;}
+      const yT=this.H-this.band*.8,yB=this.H-this.band*.14;
+      const vT=this.unproj(this.cx,yT,0).v,vB=this.unproj(this.cx,yB,0).v;
+      const P=(x,v)=>this.proj(V(x,v,0));
+      const box=[P(-hw,vT),P(hw,vT),P(hw,vB),P(-hw,vB)];
+      const path=pts=>'M'+pts.map(P2).join('L')+'Z';
+      let h=`<path class="dl-rackbox" stroke-width="${F(Math.max(.8,.45*s))}" d="${path(box)}"/>`;
+      const pd=1.6,iv0=vT+(vB-vT)*.0+pd*.6,iv1=vB-pd*.8;
+      h+=`<path class="dl-rackin" d="${path([P(-hw+pd,iv0),P(hw-pd,iv0),P(hw-pd,iv1),P(-hw+pd,iv1)])}"/>`;
+      const cols=['#ECE9E1','#B8322E','#1F7A4A','#1C1C22','#6B3FA0','#E0A21C','#2D6CB5'];
+      const n=cols.length,tw=(hw*2-pd*2)/n,lw=F(Math.max(.5,.32*s));
+      cols.forEach((col,i)=>{
+        /* 溝に立てて並んだチップ：上から見ると縁が横縞に並ぶ。溝の両端は丸い */
+        const x0=-hw+pd+i*tw+tw*.12,x1=x0+tw*.76,v0=iv0+.8,v1=iv1-.6;
+        const A=P(x0,v1),B=P(x1,v0),r=F((B.x-A.x)/2);
+        h+=`<rect x="${F(A.x)}" y="${F(B.y)}" width="${F(B.x-A.x)}" height="${F(A.y-B.y)}" rx="${r}" fill="${col}"/>`;
+        let d='';for(let v=v1-1.4;v>v0+1;v-=1.45){const a=P(x0+.3,v),b=P(x1-.3,v);d+=`M${P2(a)}L${P2(b)}`;}
+        h+=`<path d="${d}" stroke="rgba(0,0,0,.42)" stroke-width="${lw}" fill="none"/>`;
+        h+=`<rect x="${F(A.x)}" y="${F(B.y)}" width="${F((B.x-A.x)*.24)}" height="${F(A.y-B.y)}" rx="${F((B.x-A.x)*.12)}" fill="rgba(0,0,0,.28)"/>`;
+        h+=`<rect x="${F(A.x+(B.x-A.x)*.56)}" y="${F(B.y+(A.y-B.y)*.06)}" width="${F((B.x-A.x)*.16)}" height="${F((A.y-B.y)*.88)}" rx="${F((B.x-A.x)*.08)}" fill="rgba(255,255,255,.3)"/>`;
+      });
+      this.q.rack.innerHTML=h;
+      const vm=(vT+vB)/2;
+      const L=P(-hw*.55,vm),R=P(hw*.55,vm);
+      this.rackL={x:L.x,y:L.y};this.rackR={x:R.x,y:R.y};
+      this.rackBox={x0:box[3].x,x1:box[2].x,y0:box[0].y,y1:box[3].y};
+    },
+
+    rest(){
+      const s=this.s,c=this.cfg||{},hw=(+c.rackW||RACK_W)/2;
+      const y=this.H-this.band*.5;
+      const dx=Math.min((hw+22)*s,this.W*.42);
+      return{lx:this.cx-dx,ly:y,rx:this.cx+dx,ry:y,lz:2,rz:2,open:0,nod:0,prop:'',hold:'r',lift:0};
+    },
+    /* ゲーム側で使う基準点 */
+    chest(){return{x:this.cx,y:this.H-this.band*.3};},
+    /* クリーンハンズ：両手を体の前へ出して手の甲を見せ、手のひらを上へ返して見せる（監視カメラと客に何も持っていないことを示す） */
+    cleanFrames(){
+      const s=this.s,cx=this.cx,y=this.feltB-Math.min(70,24*s),w=Math.min(this.W*.22,44*s),R=this.rest();
+      return[{t:0,rp:'flat',lp:'flat'},
+        {t:340,r:{x:cx+w,y,z:10},l:{x:cx-w,y,z:10}},
+        {t:620,r:{x:cx+w,y,z:12},l:{x:cx-w,y,z:12},open:1,rp:'',lp:''},
+        {t:1060,r:{x:cx+w+5*s,y:y-4*s,z:12},l:{x:cx-w-5*s,y:y-4*s,z:12},open:1},
+        {t:1420,r:{x:R.rx,y:R.ry},l:{x:R.lx,y:R.ly},open:0}];
+    },
+    /* 手を止めてフロアを呼ぶ：もう片方の手は卓に置いたまま、片手を立てて上げる */
+    floorFrames(side){
+      const k=side==='l'?'l':'r',R=this.rest(),f=[{t:0},{t:320},{t:700},{t:1500}];
+      f[1][k]=this.raisePt(k);f[1][k+'p']='raise';f[2][k]=this.raisePt(k);f[2][k+'p']='raise';
+      f[3][k]=k==='l'?{x:R.lx,y:R.ly}:{x:R.rx,y:R.ry};f[3][k+'p']='';
+      return f;
+    },
+    raisePt(side){const sg=side==='l'?-1:1;return{x:this.cx+sg*Math.min(this.W*.3,110*this.s),y:this.feltB*.72,z:26};},
+
+    /* ---------- 投影 ---------- */
+    _mu(z){return HC/(HC-clamp(z,-HC,HC*.72));},
+    proj(p){
+      const m=this._mu(p.z),s=this.s;
+      return{x:this.X0+s*m*p.x,y:this.Ypp-s*m*(p.v-VC),m};
+    },
+    /* 画面上の点 → 世界座標（高さ z で画面の点にちょうど重なる位置） */
+    unproj(X,Y,z){
+      z=+z||0;const s=this.s,m=this._mu(z);
+      return V((X-this.X0)/(s*m),VC+(this.Ypp-Y)/(s*m),z);
+    },
+    /* 3Dの小さなベクトルを画面のベクトルへ（ヤコビアン） */
+    _jac(p,d){
+      const m=this._mu(p.z),s=this.s,dm=m*m/HC;
+      return{x:s*(m*d.x+p.x*dm*d.z),y:-s*(m*d.v+(p.v-VC)*dm*d.z)};
+    },
+
+    /* ---------- 体（見えない）：肩の位置だけを動かす ---------- */
+    _handWorld(pose,side){
+      const H=pose[side],p=this.unproj(H.x,H.y,H.z||0);
+      p.z+=H.lift||0;return p;
+    },
+    _restPt(side){const r=this.rest();return side==='l'?{x:r.lx,y:r.ly}:{x:r.rx,y:r.ry};},
+    _active(pose,side){const H=pose[side],R=this._restPt(side);return Math.hypot(H.x-R.x,H.y-R.y)/this.s>10||(H.z||0)>30;},
+    /* 手の配置から、体の横移動・前傾・ひねり・肩の突き出しの目標値を決める */
+    _bodyTarget(pose){
+      const aL=this._active(pose,'l'),aR=this._active(pose,'r');
+      const TL=this._handWorld(pose,'l'),TR=this._handWorld(pose,'r');
+      const want=(T,sg)=>{const ex=T.x-sg*SHX,a=Math.abs(ex);return Math.sign(ex)*Math.max(0,a-30)*.42;};
+      let bx=0;
+      if(aL&&aR)bx=(want(TL,-1)+want(TR,1))*.5*.8;
+      else if(aL)bx=want(TL,-1)*.8;
+      else if(aR)bx=want(TR,1)*.8;
+      bx=clamp(bx,-30,30);
+      const reach=(ARM_A+ARM_B)*this.reachK;
+      const nd=(T,sg)=>Math.max(0,len(sub(T,V(sg*SHX+bx,SHV,SHZ)))-reach*.7);
+      const needL=aL?nd(TL,-1):0,needR=aR?nd(TR,1):0,need=Math.max(needL,needR);
+      const dep=(a,T)=>a?Math.max(0,T.v):0;
+      const yaw=clamp((dep(aR,TR)-dep(aL,TL))/320,-1,1)*.3;
+      return{bx,lean:sstep(0,220,need),yaw,pl:sstep(20,160,needL),pr:sstep(20,160,needR)};
+    },
+    /* 肩：体のひねり・前傾・突き出しを反映し、画面の下の外に留める */
+    _shoulder(k,B,T){
+      const sg=k==='r'?1:-1,cy=Math.cos(B.yaw),sy=Math.sin(B.yaw),br=B.breath||0;
+      let S=V(B.bx+sg*SHX*cy,SHV+sg*SHX*sy+B.lean*30+br*.5,SHZ-B.lean*12+br*.9);
+      const pr=k==='r'?B.pr:B.pl,dx=T.x-S.x,dv=T.v-S.v,l=Math.hypot(dx,dv)||1;
+      S=add(S,V(dx/l*12*pr,dv/l*12*pr,-3*pr));
+      /* 肩の丸みが画面に入らない位置まで（画面の下端より袖の半径ぶん下） */
+      const m=this._mu(S.z),vmax=VC-VC/m-RU0*1.15;
+      if(S.v>vmax)S.v=vmax;
+      return S;
+    },
+
+    /* ---------- タイムライン ---------- */
+    _resolve(frames){
+      const R=this.rest();
+      let cur={l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,nod:0,prop:'',hold:'r',look:null,lp:'',rp:''};
+      const seq=[];let tPrev=0;
+      const ok=q=>q&&isFinite(+q.x)&&isFinite(+q.y);
+      const pt=q=>({x:+q.x,y:+q.y,z:+q.z||0});
+      for(const f of frames||[]){
+        if(!f)continue;
+        const t=Math.max(tPrev,+f.t||0);tPrev=t;
+        cur={l:ok(f.l)?pt(f.l):cur.l,r:ok(f.r)?pt(f.r):cur.r,
+          open:f.open!==undefined?+f.open||0:cur.open,nod:f.nod!==undefined?+f.nod||0:cur.nod,
+          prop:f.prop!==undefined?(f.prop||''):cur.prop,hold:f.hold!==undefined?(f.hold||'r'):cur.hold,
+          look:f.look!==undefined?f.look:cur.look,lp:f.lp!==undefined?f.lp:cur.lp,rp:f.rp!==undefined?f.rp:cur.rp};
+        seq.push(Object.assign({t},cur));
+      }
+      if(!seq.length)seq.push(Object.assign({t:0},cur));
+      const last=seq[seq.length-1];
+      const far=Math.max(Math.hypot(last.l.x-R.lx,last.l.y-R.ly),Math.hypot(last.r.x-R.rx,last.r.y-R.ry))/this.s;
+      seq.push({t:last.t+RET+clamp(far*.9,0,340),l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,nod:0,prop:'',hold:last.hold,look:null,lp:'',rp:''});
+      /* 手ごとの移動区間：区間ごとに持ち上げの弧と横へのふくらみを付ける（キーフレームの点は必ず通る） */
+      const s=this.s,fb=this.feltB-4*s;
+      seq.runs={};
+      ['l','r'].forEach(k=>{
+        const runs=[];
+        for(let i=0;i<seq.length-1;i++){
+          const a=seq[i][k],b=seq[i+1][k],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
+          if(d<=.5)continue;
+          const carried=seq[i].prop==='rake'&&(seq[i].hold==='both'||seq[i].hold===k);
+          const slide=carried&&a.y<fb&&b.y<fb;
+          const r={i,t0:seq[i].t,t1:seq[i+1].t,L:d,slide};
+          r.A=slide?0:clamp(.14*d/s,0,22);
+          let nx=-dy/d,ny=dx/d;const mx=(a.x+b.x)/2-this.cx;
+          if(nx*mx<0||(Math.abs(mx)<4&&nx*(k==='r'?1:-1)<0)){nx=-nx;ny=-ny;}
+          const bw=slide?0:Math.min(d*.05,12*s);r.bx=nx*bw;r.by=ny*bw;
+          r.ex=dx/d;r.ey=dy/d;r.As=Math.min(3*s,.03*d);
+          r.hold=i+2<seq.length&&Math.hypot(seq[i+2][k].x-b.x,seq[i+2][k].y-b.y)<.5;
+          runs.push(r);
+        }
+        seq.runs[k]=runs;
+      });
+      return seq;
+    },
+    _shapeKey(kf,side,ignoreProp){
+      const ex=kf[side+'p'];if(ex&&HANDS[ex])return ex;
+      const carried=kf.prop&&(kf.hold==='both'||(kf.hold||'r')===side);
+      if(carried&&!ignoreProp)return PINCH_PROPS[kf.prop]?'pinch':'grip';
+      if(kf.open>.5)return'palm';
+      const R=this._restPt(side),H=kf[side];
+      return Math.hypot(H.x-R.x,H.y-R.y)/this.s>10?'flat':'relax';
+    },
+    /* 時刻 t のポーズ（手の目標・持ち物・形） */
+    _pose(seq,t){
+      const n=seq.length;let i=0;
+      while(i<n-1&&seq[i+1].t<=t)i++;
+      const a=seq[i],b=seq[Math.min(i+1,n-1)];
+      const span=Math.max(1,b.t-a.t),u=clamp((t-a.t)/span,0,1),e=u*u*(3-2*u);
+      const pose={open:lerp(a.open,b.open,e),nod:lerp(a.nod,b.nod,e),prop:a.prop,hold:a.hold,t};
+      if(a.look&&b.look)pose.look={x:lerp(a.look.x,b.look.x,e),y:lerp(a.look.y,b.look.y,e)};
+      else pose.look=b.look&&u>0?b.look:a.look;
+      const tan=(k,j)=>{
+        if(j<=0||j>=n-1)return{x:0,y:0};
+        const p0=seq[j-1][k],p1=seq[j][k],p2=seq[j+1][k];
+        if(Math.hypot(p1.x-p0.x,p1.y-p0.y)<.5||Math.hypot(p2.x-p1.x,p2.y-p1.y)<.5)return{x:0,y:0};
+        const dt=Math.max(1,seq[j+1].t-seq[j-1].t);
+        return{x:(p2.x-p0.x)/dt*.85,y:(p2.y-p0.y)/dt*.85};
+      };
+      ['l','r'].forEach(k=>{
+        const p0=a[k],p1=b[k];let x,y;
+        if(i>=n-1||t>=b.t&&i===n-1){x=p0.x;y=p0.y;}
+        else{
+          const m0=tan(k,i),m1=tan(k,i+1),dt=span;
+          const u2=u*u,u3=u2*u,h00=2*u3-3*u2+1,h10=u3-2*u2+u,h01=-2*u3+3*u2,h11=u3-u2;
+          x=h00*p0.x+h10*dt*m0.x+h01*p1.x+h11*dt*m1.x;
+          y=h00*p0.y+h10*dt*m0.y+h01*p1.y+h11*dt*m1.y;
+        }
+        const z=i>=n-1?(p0.z||0):lerp(p0.z||0,p1.z||0,e);
+        let lift=0;
+        for(const r of seq.runs[k]){
+          if(t>r.t0&&t<r.t1){const w=(t-r.t0)/(r.t1-r.t0),sn=Math.sin(Math.PI*w),s2=sn*sn;lift=r.A*(.35*sn+.65*s2);x+=r.bx*s2;y+=r.by*s2;break;}
+          /* 着地後のわずかな行き過ぎと戻り（静止する場合のみ） */
+          if(r.hold&&t>=r.t1&&t<r.t1+220){const tt=t-r.t1,o=r.As*Math.sin(Math.PI*tt/220)*Math.exp(-tt/110);x+=r.ex*o;y+=r.ey*o;}
+        }
+        /* 形：移動中は行き先の形へ移り、キーフレームで持ち物が変わったら素早く切り替える */
+        const carriedNow=a.prop&&(a.hold==='both'||(a.hold||'r')===k);
+        let sA=this._shapeKey(a,k),sB=sA,w=1;
+        const moving=Math.hypot(p1.x-p0.x,p1.y-p0.y)>.5&&i<n-1;
+        if(moving&&!carriedNow){sB=sA;sA=this._shapeKey(b,k,true);w=sstep(.15,.6,u);}
+        else if(i>0){const prev=this._shapeKey(seq[i-1],k);if(prev!==sA){sB=prev;w=sstep(0,90,t-a.t);}}
+        const changed=i>0&&seq[i-1].prop!==a.prop;
+        pose[k]={x,y,z,lift,shape:sA,shapeB:sB,mix:w,prop:carriedNow?a.prop:'',propA:changed?sstep(0,80,t-a.t):1};
+      });
+      return pose;
+    },
+
+    /* ---------- バネ（体は手より先に動く） ---------- */
+    _simStep(st,seq,tau,dt){
+      const tb=this._bodyTarget(this._pose(seq,tau+210));
+      const w1=2*Math.PI*1.9,z1=.74;
+      const sp=(k,tg)=>{const a=w1*w1*(tg-st.x[k])-2*z1*w1*st.v[k];st.v[k]+=a*dt;st.x[k]+=st.v[k]*dt;};
+      ['bx','lean','yaw','pl','pr'].forEach(k=>sp(k,tb[k]));
+    },
+    _simulate(frames,seq,t){
+      const DT=1000/120;
+      let c=this._sim;
+      if(!c||c.frames!==frames||c.sig!==this._sig||c.t>t+1e-6){
+        const x=this._bodyTarget(this._pose(seq,0)),v={};Object.keys(x).forEach(k=>v[k]=0);
+        c=this._sim={frames,sig:this._sig,t:0,x,v};
+      }
+      const st={x:c.x,v:c.v};
+      while(c.t+DT<=t+1e-6){this._simStep(st,seq,c.t,DT/1000);c.t+=DT;}
+      const rem=t-c.t;
+      if(rem>.01){const tmp={x:Object.assign({},c.x),v:Object.assign({},c.v)};this._simStep(tmp,seq,c.t,rem/1000);return tmp.x;}
+      return Object.assign({},c.x);
+    },
+
+    /* ---------- 腕の解決（3D） ---------- */
+    _arm(side,S,T,pose){
+      const sg=side==='r'?1:-1,H=pose[side];
+      let shape=H.shape;const prop=H.prop;
+      let handT=T,rake=null,cl;
+      const hor=(a,b)=>{const x=b.x-a.x,v=b.v-a.v,l=Math.hypot(x,v);return l>1e-6?{x:x/l,v:v/l,l}:{x:0,v:1,l:0};};
+      if(prop==='rake'){
+        const hd=hor(T,S),gl=clamp(hd.l-90,22,150);
+        const grip=V(T.x+hd.x*gl,T.v+hd.v*gl,T.z+6+gl*.05);
+        rake={head:T,grip,back:V(grip.x+hd.x*24,grip.v+hd.v*24,grip.z+2)};
+        handT=grip;shape='grip';cl=[14,0];
+      }else if(prop&&PROP_C[prop])cl=PROP_C[prop];
+      else cl=HANDS[shape].c;
+      const u0=hor(S,handT),wf=sstep(20,120,u0.l),u0x=lerp(sg*.08,u0.x,wf),u0v=lerp(1,u0.v,wf),ul=Math.hypot(u0x,u0v)||1,u={x:u0x/ul,v:u0v/ul,l:u0.l};
+      /* 手の向き：f=指先の方向、n=手のひらの法線。親指は右手で cross(f,n)、左手はその逆 */
+      let f,n;
+      const palmar=HANDS[shape].view==='p';
+      if(shape==='palm'){f=nrm(V(sg*.14,1,.22));n=nrm(V(0,-.22,1));}
+      else if(shape==='raise'){/* 手のひらを前へ向けて立てる（「待って」の手）。上から見るので指先は前上がり */f=nrm(V(sg*.16,.78,.62));n=nrm(V(0,.62,-.78));}
+      else{
+        const AL={flat:.18,relax:.36,point:.28,grip:.5,pinch:.5}[shape]||.3;
+        let ux=u.x,uv=u.v;
+        if(shape==='relax'){/* 休めの手は指先を少し内側へ */const a=sg*.42,c=Math.cos(a),s2=Math.sin(a);const x=ux*c-uv*s2,v=ux*s2+uv*c;ux=x;uv=v;}
+        f=V(ux*Math.cos(AL),uv*Math.cos(AL),-Math.sin(AL));
+        n=V(-ux*Math.sin(AL),-uv*Math.sin(AL),-Math.cos(AL));
+      }
+      let th=nrm(cross(f,n));if(side==='l')th=mul(th,-1);
+      const ty=palmar?mul(th,-1):th;
+      const mT=this._mu(handT.z),ws=Math.pow(mT,GAMMA-1)*HSC;
+      const off=add(mul(f,cl[0]*ws),mul(ty,cl[1]*ws));
+      const W=sub(handT,off);
+      /* 2関節IK。届かない分はまず体が寄り（_bodyTarget）、残りは上腕と前腕を伸ばして補う */
+      let a=ARM_A*this.reachK,b=ARM_B*this.reachK;
+      const d=sub(W,S),dl=Math.max(1e-3,len(d)),maxR=(a+b)*.95;
+      const Lf=clamp(dl*1.3/(a+b),.62,1);a*=Lf;b*=Lf;
+      let k=1;if(dl>maxR){k=dl/maxR;const tot=(a+b)*k,a2=a+(tot-a-b)*UP_SHARE;a=Math.min(a2,tot*.6);b=tot-a;}
+      const x=(a*a-b*b+dl*dl)/(2*dl),y=Math.sqrt(Math.max(0,a*a-x*x));
+      const dn=mul(d,1/dl);
+      const upv=sstep(10,70,W.z-S.z);
+      /* 肘は外側・下へ（上から見ると腕の外側に少し張り出す） */
+      let pole=nrm(V(sg*.82,-.18,-.55));
+      pole=nrm(V(lerp(pole.x,sg*.75,upv),lerp(pole.v,.1,upv),lerp(pole.z,-.65,upv)));
+      let pp=sub(pole,mul(dn,dot(pole,dn)));
+      if(len(pp)<.35){const o=V(sg,0,-.3);pp=sub(o,mul(dn,dot(o,dn)));}
+      const E=add(add(S,mul(dn,x)),mul(nrm(pp),y));
+      return{S,E,W,T,handT,f,ty,ws,cl,shape,rake,stretch:k,palmar};
+    },
+
+    /* ---------- 描画 ---------- */
+    _taper(p0,r0,p1,r1,bulge){
+      const dx=p1.x-p0.x,dy=p1.y-p0.y,L=Math.hypot(dx,dy);
+      if(L<.3)return`M${F(p0.x-r0)} ${F(p0.y)}a${F(r0)} ${F(r0)} 0 1 0 ${F(2*r0)} 0a${F(r0)} ${F(r0)} 0 1 0 ${F(-2*r0)} 0Z`;
+      const ux=dx/L,uy=dy/L,nx=-uy,ny=ux,sa=clamp((r0-r1)/L,-.95,.95),ca=Math.sqrt(1-sa*sa);
+      const ax=nx*ca+ux*sa,ay=ny*ca+uy*sa,bx=-nx*ca+ux*sa,by=-ny*ca+uy*sa;
+      const A0={x:p0.x+ax*r0,y:p0.y+ay*r0},A1={x:p1.x+ax*r1,y:p1.y+ay*r1},B1={x:p1.x+bx*r1,y:p1.y+by*r1},B0={x:p0.x+bx*r0,y:p0.y+by*r0};
+      const bg=bulge||0,mA={x:(A0.x+A1.x)/2+nx*bg*(r0+r1)*.5,y:(A0.y+A1.y)/2+ny*bg*(r0+r1)*.5},mB={x:(B0.x+B1.x)/2-nx*bg*(r0+r1)*.3,y:(B0.y+B1.y)/2-ny*bg*(r0+r1)*.3};
+      return`M${P2(A0)}Q${P2(mA)} ${P2(A1)}A${F(r1)} ${F(r1)} 0 ${r1>r0?1:0} 0 ${P2(B1)}Q${P2(mB)} ${P2(B0)}A${F(r0)} ${F(r0)} 0 ${r0>r1?1:0} 0 ${P2(A0)}Z`;
+    },
+    /* 付け根側がふくらむ先細りの外形（前腕の筋肉のふくらみ） */
+    _taperC(p0,r0,p1,r1,sw){
+      const dx=p1.x-p0.x,dy=p1.y-p0.y,L=Math.hypot(dx,dy);
+      if(L<r0*1.2)return this._taper(p0,r0,p1,r1,0);
+      const ux=dx/L,uy=dy/L,nx=-uy,ny=ux,sa=clamp((r0-r1)/L,-.95,.95),ca=Math.sqrt(1-sa*sa);
+      const ax=nx*ca+ux*sa,ay=ny*ca+uy*sa,bx=-nx*ca+ux*sa,by=-ny*ca+uy*sa;
+      const A0={x:p0.x+ax*r0,y:p0.y+ay*r0},A1={x:p1.x+ax*r1,y:p1.y+ay*r1},B1={x:p1.x+bx*r1,y:p1.y+by*r1},B0={x:p0.x+bx*r0,y:p0.y+by*r0};
+      const k=Math.min(L*.28,r0*3.2),w=r0*sw;
+      const a1={x:A0.x+ux*k+nx*w,y:A0.y+uy*k+ny*w},a2={x:A1.x-ux*L*.35,y:A1.y-uy*L*.35};
+      const b1={x:B1.x-ux*L*.35,y:B1.y-uy*L*.35},b2={x:B0.x+ux*k-nx*w*.6,y:B0.y+uy*k-ny*w*.6};
+      return`M${P2(A0)}C${P2(a1)} ${P2(a2)} ${P2(A1)}A${F(r1)} ${F(r1)} 0 ${r1>r0?1:0} 0 ${P2(B1)}C${P2(b1)} ${P2(b2)} ${P2(B0)}A${F(r0)} ${F(r0)} 0 ${r0>r1?1:0} 0 ${P2(A0)}Z`;
+    },
+    _grad(g,p0,p1,r){
+      const dx=p1.x-p0.x,dy=p1.y-p0.y,L=Math.hypot(dx,dy)||1;let nx=-dy/L,ny=dx/L;
+      if(nx*.6+ny*.8<0){nx=-nx;ny=-ny;}
+      const mx=(p0.x+p1.x)/2,my=(p0.y+p1.y)/2;
+      g.setAttribute('x1',F(mx-nx*r));g.setAttribute('y1',F(my-ny*r));g.setAttribute('x2',F(mx+nx*r));g.setAttribute('y2',F(my+ny*r));
+    },
+
+    _render(pose,B,fx){
+      if(!this.svg)return;
+      fx=fx||{};
+      B=Object.assign({bx:0,lean:0,yaw:0,pl:0,pr:0},B);
+      B.breath=fx.breath||0;
+      const TW={l:this._handWorld(pose,'l'),r:this._handWorld(pose,'r')};
+      /* 両手で1つの束を持つとき（手が近い）は、束を両手の間に1つだけ描く */
+      let shared=null;
+      if(pose.hold==='both'&&pose.r.prop&&pose.r.prop===pose.l.prop&&Math.hypot(pose.r.x-pose.l.x,pose.r.y-pose.l.y)<70*this.s){
+        shared=this.proj(mul(add(TW.l,TW.r),.5));
+      }
+      this._shared=shared;
+      const R={l:this._arm('l',this._shoulder('l',B,TW.l),TW.l,pose),r:this._arm('r',this._shoulder('r',B,TW.r),TW.r,pose)};
+      /* 重なり順：動いている（持ち上がっている）腕を上に */
+      const act=k=>{const H=pose[k],P=this._restPt(k);return Math.hypot(H.x-P.x,H.y-P.y)+((H.lift||0)+(H.z||0))*this.s*2;};
+      const al=act('l'),ar=act('r');
+      const top=al>ar+3?'l':ar>al+3?'r':(this._top||'r');
+      if(top!==this._top){this._top=top;this.q.arms.appendChild(this.q.arm[top].g);}
+      this._drawArm('l',R.l,pose);this._drawArm('r',R.r,pose);
+    },
+
+    _drawArm(k,R,pose){
+      const A=this.q.arm[k],s=this.s,H=pose[k];
+      const Ss=this.proj(R.S),Es=this.proj(R.E);
+      /* 手の平面を画面へ写すアフィン（接点が目標点に一致するように接点を基準にする） */
+      const Ts=this.proj(R.handT);
+      const jf=this._jac(R.handT,mul(R.f,R.ws)),jt=this._jac(R.handT,mul(R.ty,R.ws));
+      const e=Ts.x-(jf.x*R.cl[0]+jt.x*R.cl[1]),f=Ts.y-(jf.y*R.cl[0]+jt.y*R.cl[1]);
+      const Ws={x:e,y:f};
+      A.hand.setAttribute('transform',`matrix(${F(jf.x*1000)/1000} ${F(jf.y*1000)/1000} ${F(jt.x*1000)/1000} ${F(jt.y*1000)/1000} ${F(e)} ${F(f)})`);
+      /* 形の切り替え（クロスフェード） */
+      let want={};want[H.shape]=H.mix;if(H.shapeB!==H.shape)want[H.shapeB]=1-H.mix;
+      if(R.rake){want={};want.grip=1;}
+      SHAPES.forEach(n=>{
+        const o=want[n]||0,el=A.shapes[n];
+        if(o>.01){el.style.display='inline';el.setAttribute('opacity',F(Math.min(1,o*1.4)*100)/100);}
+        else el.style.display='none';
+      });
+      /* 袖：肩→肘→手首。太さは各点の透視の拡大率に比例（伸ばした分だけわずかに太らせる） */
+      const st=R.stretch,gw=u=>1+(st-1)*.18*u;
+      const mW=this._mu(R.W.z);
+      const r0=RU0*s*Ss.m,r1=RU1*s*Es.m*gw(.5),r2=RF0*s*Es.m*gw(.5),r3=RF1*s*mW*gw(1);
+      A.up.setAttribute('d',this._taper(Ss,r0,Es,r1,.18));
+      {const fl0=Math.hypot(Ws.x-Es.x,Ws.y-Es.y)||1,cut=Math.min(fl0*.4,6*s*mW*gw(1));A.fo.setAttribute('d',this._taperC(Es,r2,{x:Ws.x-(Ws.x-Es.x)/fl0*cut,y:Ws.y-(Ws.y-Es.y)/fl0*cut},r3,.32));}
+      this._grad(A.gu,Ss,Es,(r0+r1)/2);this._grad(A.gf,Es,Ws,(r2+r3)/2);
+      /* アームバンド（袖留め）：上腕の肘寄り */
+      {const gu=.66,gx=Ss.x+(Es.x-Ss.x)*gu,gy=Ss.y+(Es.y-Ss.y)*gu,L=Math.hypot(Es.x-Ss.x,Es.y-Ss.y)||1,ex=(Es.x-Ss.x)/L,ey=(Es.y-Ss.y)/L,px=-ey,py=ex,
+        rg=lerp(r0,r1,gu)*1.04,hw=Math.max(1.1,2.3*s*lerp(Ss.m,Es.m,gu)),cv=rg*.32;
+        A.garter.setAttribute('d',`M${F(gx-ex*hw+px*rg)} ${F(gy-ey*hw+py*rg)}Q${F(gx-ex*hw+ex*cv)} ${F(gy-ey*hw+ey*cv)} ${F(gx-ex*hw-px*rg)} ${F(gy-ey*hw-py*rg)}L${F(gx+ex*hw-px*rg)} ${F(gy+ey*hw-py*rg)}Q${F(gx+ex*hw+ex*cv)} ${F(gy+ey*hw+ey*cv)} ${F(gx+ex*hw+px*rg)} ${F(gy+ey*hw+py*rg)}Z`);
+        A.garter.setAttribute('stroke-width',F(Math.max(.4,.4*s)));}
+      /* 肘のしわ */
+      const ux=Ws.x-Es.x,uy=Ws.y-Es.y,ul=Math.hypot(ux,uy)||1,dxu=ux/ul,dyu=uy/ul;
+      const vx=Es.x-Ss.x,vy=Es.y-Ss.y,vl=Math.hypot(vx,vy)||1;
+      const bend=(vx*uy-vy*ux)/(vl*ul),side=bend>0?1:-1;
+      const nx=-dyu*side,ny=dxu*side;
+      const fo=`M${F(Es.x+dxu*r2*.6+nx*r2*.15)} ${F(Es.y+dyu*r2*.6+ny*r2*.15)}q${F(dxu*r2*.5+nx*r2*.5)} ${F(dyu*r2*.5+ny*r2*.5)} ${F(dxu*r2*1.3+nx*r2*.75)} ${F(dyu*r2*1.3+ny*r2*.75)}`+
+        `M${F(Es.x+dxu*r2*1.8+nx*r2*.05)} ${F(Es.y+dyu*r2*1.8+ny*r2*.05)}q${F(dxu*r2*.4+nx*r2*.4)} ${F(dyu*r2*.4+ny*r2*.4)} ${F(dxu*r2*.9+nx*r2*.7)} ${F(dyu*r2*.9+ny*r2*.7)}`;
+      const fl=Math.hypot(Ws.x-Es.x,Ws.y-Es.y);
+      let fo2='';
+      if(fl>r2*5){/* 前腕が長い（奥へ伸ばした）ときは袖口側にも布のたるみ */
+        [.72,.83].forEach((t,j)=>{const cx=Es.x+ux*t,cy=Es.y+uy*t,rr=lerp(r2,r3,t);
+          fo2+=`M${F(cx+nx*rr*.75)} ${F(cy+ny*rr*.75)}q${F(-nx*rr*.6+dxu*rr*.35)} ${F(-ny*rr*.6+dyu*rr*.35)} ${F(-nx*rr*1.2-dxu*rr*.15*(j?1:-1))} ${F(-ny*rr*1.2-dyu*rr*.15*(j?1:-1))}`;});
+      }
+      A.foldF.setAttribute('d',fo+fo2);
+      const wx=Ss.x+vx*.62,wy=Ss.y+vy*.62,vnx=-vy/vl*side,vny=vx/vl*side;
+      A.foldU.setAttribute('d',`M${F(wx+vnx*r1*.2)} ${F(wy+vny*r1*.2)}q${F(vx/vl*r1*.6+vnx*r1*.4)} ${F(vy/vl*r1*.6+vny*r1*.4)} ${F(vx/vl*r1*1.2+vnx*r1*.8)} ${F(vy/vl*r1*1.2+vny*r1*.8)}`);
+      /* 袖口 */
+      const cr=r3*1.1,cl=9.5*s*mW*gw(1);
+      const c0={x:Ws.x-dxu*cl,y:Ws.y-dyu*cl},c1={x:Ws.x-dxu*cl*.05,y:Ws.y-dyu*cl*.05};
+      {const px=-dyu,py=dxu,b=cr*.32,sm=cr*.18;
+        A.cuff.setAttribute('d',`M${F(c0.x+px*cr)} ${F(c0.y+py*cr)}L${F(c1.x+px*cr)} ${F(c1.y+py*cr)}Q${F(c1.x+dxu*b*2)} ${F(c1.y+dyu*b*2)} ${F(c1.x-px*cr)} ${F(c1.y-py*cr)}L${F(c0.x-px*cr)} ${F(c0.y-py*cr)}Q${F(c0.x+dxu*sm*2)} ${F(c0.y+dyu*sm*2)} ${F(c0.x+px*cr)} ${F(c0.y+py*cr)}Z`);}
+      A.link.setAttribute('cx',F(Ws.x-dxu*cl*.5-nx*cr*.5));A.link.setAttribute('cy',F(Ws.y-dyu*cl*.5-ny*cr*.5));A.link.setAttribute('r',F(Math.max(.7,1.05*s*mW)));
+      /* 持ち物 */
+      const ps=s*Math.pow(this._mu(R.handT.z),GAMMA)*HSC;
+      PROP_NAMES.forEach(nm=>{
+        const el=A.props[nm];if(!el)return;
+        const sh=this._shared,on=H.prop===nm&&nm!=='rake'&&!(sh&&k==='l');
+        if(on){
+          el.style.display='inline';
+          const c=sh||this.proj(R.T),a=H.propA,sc=ps*(.75+.25*a)*(sh?1.08:1);
+          let rot=0;if(nm==='card'||nm==='cards'){let ang=Math.atan2(jf.y,jf.x)*180/Math.PI+90;if(ang>180)ang-=360;rot=clamp(ang*.45,-30,30);}
+          el.setAttribute('transform',`translate(${F(c.x)} ${F(c.y)}) rotate(${F(rot)}) scale(${F(sc*100)/100})`);
+          el.setAttribute('opacity',F(a));
+        }else el.style.display='none';
+      });
+      if(R.rake){
+        A.rake.style.display='inline';
+        const h=this.proj(R.rake.head),b=this.proj(R.rake.back),g=this.proj(R.rake.grip);
+        const dx=h.x-b.x,dy=h.y-b.y,dl=Math.hypot(dx,dy)||1,px=-dy/dl,py=dx/dl,hw=12*s*h.m;
+        A.rakeStick.setAttribute('d',`M${P2(b)}L${P2(h)}`);A.rakeStick.setAttribute('stroke-width',F(Math.max(1.4,2.8*s*g.m)));
+        A.rakeHi.setAttribute('d',`M${P2(b)}L${F(h.x-dx/dl*3*s)} ${F(h.y-dy/dl*3*s)}`);A.rakeHi.setAttribute('stroke-width',F(Math.max(.5,.9*s*g.m)));
+        A.rakeHead.setAttribute('d',`M${F(h.x-px*hw)} ${F(h.y-py*hw)}L${F(h.x+px*hw)} ${F(h.y+py*hw)}`);A.rakeHead.setAttribute('stroke-width',F(Math.max(2,4.2*s*h.m)));
+        A.rakeHeadHi.setAttribute('d',`M${F(h.x-px*hw*.9-dx/dl*1.2*s)} ${F(h.y-py*hw*.9-dy/dl*1.2*s)}L${F(h.x+px*hw*.9-dx/dl*1.2*s)} ${F(h.y+py*hw*.9-dy/dl*1.2*s)}`);A.rakeHeadHi.setAttribute('stroke-width',F(Math.max(.7,1.4*s*h.m)));
+        A.rakeHead.setAttribute('opacity',F(H.propA));A.rakeStick.setAttribute('opacity',F(H.propA));
+      }else A.rake.style.display='none';
+      /* 接点（精度測定用） */
+      const cpt=this.proj(R.T);
+      this._contact[k]={x:cpt.x,y:cpt.y};
+      /* 影：腕の卓面への投影（照明は真上やや手前） */
+      const g=p=>this.proj(V(p.x+.1*p.z,p.v+.22*p.z,0));
+      const tip=add(R.handT,mul(R.f,R.ws*24));
+      const gs=[g(R.S),g(R.E),g(R.W),g(tip)];
+      const shd=this.q.sh[k];
+      shd.setAttribute('d',`M${P2(gs[0])}L${P2(gs[1])}L${P2(gs[2])}L${P2(gs[3])}`);
+      shd.setAttribute('stroke-width',F(1.6*r2));
+      const zH=Math.max(0,R.handT.z);
+      shd.setAttribute('opacity',F(clamp(.12-zH*.001,.04,.12)));
+      const hsd=this.q.hsh[k],hc=g(add(R.handT,mul(R.f,R.ws*-6)));
+      hsd.setAttribute('cx',F(hc.x));hsd.setAttribute('cy',F(hc.y));
+      hsd.setAttribute('rx',F(13*ps));hsd.setAttribute('ry',F(10*ps));
+      hsd.setAttribute('opacity',F(clamp(.18-zH*.003,.04,.18)));
+    },
+
+    /* ---------- 公開API ---------- */
+    _speed(){try{const f=this.cfg&&this.cfg.speed;const v=f?+f():((window.G&&G.opts&&G.opts.dealerSpeed)||1);return isFinite(v)&&v>0?v:1;}catch(e){return 1;}},
+    _poseFromFlat(p){
+      const R=this.rest();p=p||{};
+      const kf={l:{x:p.lx!==undefined?+p.lx:R.lx,y:p.ly!==undefined?+p.ly:R.ly,z:p.lz!==undefined?+p.lz:R.lz},r:{x:p.rx!==undefined?+p.rx:R.rx,y:p.ry!==undefined?+p.ry:R.ry,z:p.rz!==undefined?+p.rz:R.rz},
+        open:+p.open||0,nod:+p.nod||0,prop:p.prop||'',hold:p.hold||'r',look:p.look||null,lp:p.lp||'',rp:p.rp||''};
+      return this._kfPose(kf);
+    },
+    _kfPose(kf){
+      const pose={open:kf.open,nod:kf.nod,prop:kf.prop,hold:kf.hold,look:kf.look};
+      ['l','r'].forEach(k=>{
+        const carried=kf.prop&&(kf.hold==='both'||(kf.hold||'r')===k),sh=this._shapeKey(kf,k);
+        pose[k]={x:kf[k].x,y:kf[k].y,z:kf[k].z||0,lift:0,shape:sh,shapeB:sh,mix:1,prop:carried?kf.prop:'',propA:1};
+      });
+      return pose;
+    },
+    _settled(pose){return this._bodyTarget(pose);},
+    setPose(p){
+      if(!this.svg)return;
+      if(!this.W)this.layout();
+      const pose=this._poseFromFlat(p),B=this._settled(pose);
+      this._held={pose,B};this._render(pose,B);
+    },
+    preview(f){
+      if(!this.svg)return;
+      this._stopIdle();
+      const seq=this._resolve([{t:0},Object.assign({},f||{},{t:1})]);
+      const kf=seq[1],pose=this._kfPose(kf),B=this._settled(pose);
+      this._held={pose,B};this._render(pose,B);
+    },
+    sample(frames,tm){
+      if(!this.svg||!frames)return;
+      const seq=this._resolve(frames);
+      const t=Math.max(0,+tm||0);
+      const pose=this._pose(seq,t),B=this._simulate(frames,seq,t);
+      this._held={pose,B};this._render(pose,B);
+      return pose;
+    },
+    play(frames,label){
+      if(!this.svg||!frames||!frames.length)return;
+      this.stop();this.layout();
+      this.last={frames,label};
+      const btn=this.root&&this.root.querySelector('.dl-replay');
+      if(btn){btn.hidden=false;btn.textContent='▶ もう一度：';const b=document.createElement('b');b.textContent=String(label||'');btn.appendChild(b);}
+      const seq=this._resolve(frames),end=seq[seq.length-1].t,R0=this._settled(this._poseFromFlat(this.rest()));
+      this.busy=true;this._sim=null;
+      let prev=null,tm=0;
+      const step=now=>{
+        if(prev===null)prev=now;
+        tm+=Math.max(0,Math.min(100,now-prev))*this._speed();prev=now;
+        if(tm>=end){
+          /* 体のバネが落ち着くまで待ってから静止ポーズへ（最後にカクッと戻らないように） */
+          const c=this._sim;let dev=0;
+          if(c)Object.keys(R0).forEach(k=>{dev=Math.max(dev,Math.abs((c.x[k]||0)-R0[k])*(k==='bx'?.02:1),Math.abs(c.v[k]||0)*(k==='bx'?.02:1)*.1);});
+          if(dev<.012||tm>=end+160){this.raf=0;this.busy=false;this.setPose(this.rest());this._startIdle();return;}
+        }
+        this.sample(frames,tm);
+        this.raf=requestAnimationFrame(step);
+      };
       this.raf=requestAnimationFrame(step);
-    };
-    this.raf=requestAnimationFrame(step);
-  },
-  replay(){if(this.last)this.play(this.last.frames,this.last.label);}
+    },
+    replay(){if(this.last)this.play(this.last.frames,this.last.label);},
+    stop(){if(this.raf)cancelAnimationFrame(this.raf);this.raf=0;this.busy=false;this._stopIdle();},
+    reset(){this.stop();this.layout();this.setPose(this.rest());this._startIdle();},
+    contact(side){const c=this._contact[side==='l'?'l':'r'];return{x:c.x,y:c.y};},
+
+    /* ---------- 待機（呼吸）：表示中かつ再生していない間だけ ---------- */
+    _startIdle(){
+      if(this._idleRaf||!this.root)return;
+      const t0=performance.now();let lastDraw=0;
+      const tick=now=>{
+        if(!this.root||!this.root.isConnected||this.busy||!this._held){this._idleRaf=0;return;}
+        if(now-lastDraw>=80){
+          lastDraw=now;
+          this._render(this._held.pose,this._held.B,{breath:Math.sin((now-t0)/4200*2*Math.PI)});
+        }
+        this._idleRaf=requestAnimationFrame(tick);
+      };
+      this._idleRaf=requestAnimationFrame(tick);
+    },
+    _stopIdle(){if(this._idleRaf)cancelAnimationFrame(this._idleRaf);this._idleRaf=0;}
+  };
+  return D;
+})();
+(()=>{if(document.getElementById('dealer-css'))return;const st=document.createElement('style');st.id='dealer-css';st.textContent=DEALER_CSS;document.head.appendChild(st);})();
+/*DEALER_END*/
+/* 実物と同じく、ホイールとレイアウトの境目に立たせる（中央に置くと両端まで腕が伸びきるため）。
+   ただし縦積みレイアウト（狭幅）では中央に戻す */
+Dealer.cfg={
+  center:()=>{const wc=!matchMedia('(max-width:760px)').matches&&elRect('.wheel-col');return wc?(wc.x+wc.w):$('table').clientWidth/2;},
+  speed:()=>G.opts.dealerSpeed||1
 };
 
 /* 手先を肩側へ d だけ戻した点（レーキの先端を目標に当てるため） */
 function pullBack(p,d){
-  const S={x:Dealer.cx,y:Dealer.band*0.6};
+  const S=Dealer.chest();
   const dx=p.x-S.x,dy=p.y-S.y,L=Math.hypot(dx,dy)||1;
   return{x:p.x-dx/L*d,y:p.y-dy/L*d};
 }
 const ZONE_SEL={inside:'.grid-wrap',nearOutside:'.row-dozens',farOutside:'.row-outside'};
 
-/* 所作 → 手先の移動シナリオ。pre は操作前に控えた座標 */
+/* 所作 → 手先の移動シナリオ。pre は操作前に控えた座標。
+   画面はディーラー目線：下がディーラー（手前）、上がプレイヤー側。ホイールはディーラーの左なので、
+   ボールとホイールまわりは左手、レイアウトとラックは右手で扱う。手は手前（下）から目標へ入る。 */
 function buildMotion(key,arg,pre){
   if(!Dealer.svg)return null;
-  const R=Dealer.rest(),rk=Dealer.rackR,rkL=Dealer.rackL;
-  const P=(x,y)=>({x,y});
+  const R=Dealer.rest(),rk=Dealer.rackR,rkL=Dealer.rackL,s=Dealer.s;
+  const P=(x,y,z)=>z?{x,y,z}:{x,y};
+  const RR=P(R.rx,R.ry),RL=P(R.lx,R.ly);
+  const wheel=()=>{const w=elRect('#wheelWrap');return w?{c:P(w.x+w.w/2,w.y+w.h/2),rad:w.w*0.42}:null;};
   switch(key){
     case 'spin':{
-      const w=elRect('#wheelWrap');if(!w)return null;
-      const c=P(w.x+w.w/2,w.y+w.h/2),rad=w.w*0.42;
-      const at=deg=>P(c.x+Math.cos(deg*Math.PI/180)*rad,c.y+Math.sin(deg*Math.PI/180)*rad);
-      return[{t:0,prop:'ball'},{t:120,r:P(rk.x,rk.y),prop:'ball'},
-        {t:420,r:at(-70),prop:'ball'},{t:620,r:at(-20),prop:'ball'},
-        {t:760,r:at(40),prop:''},{t:1150,r:P(R.rx,R.ry)}];
+      /* 左手でラックの手前からボールを取り、ホイールの手前側の縁に沿わせて回転と逆向きに放つ */
+      const W=wheel();if(!W)return null;
+      const at=deg=>P(W.c.x+Math.cos(deg*Math.PI/180)*W.rad,W.c.y+Math.sin(deg*Math.PI/180)*W.rad);
+      return[{t:0,hold:'l',prop:''},{t:180,l:P(rkL.x,rkL.y)},{t:300,l:P(rkL.x,rkL.y),prop:'ball'},
+        {t:600,l:at(115),prop:'ball'},{t:780,l:at(70),prop:'ball'},
+        {t:900,l:at(25),prop:''},{t:1250,l:RL}];
     }
     case 'noMoreBets':{
+      /* 手のひらを下にして、レイアウトの上を手前で左右に払う（もう置かないで、の合図）。左右の手はそれぞれ自分の側を払う */
       const g=elRect('.lay');if(!g)return null;
-      const y=g.y+g.h*0.35;
-      return[{t:0,open:0},
-        {t:260,r:P(g.x+g.w*0.78,y),l:P(g.x+g.w*0.22,y),open:1},
-        {t:640,r:P(g.x+g.w*0.28,y),l:P(g.x+g.w*0.72,y),open:1},
-        {t:940,r:P(g.x+g.w*0.7,y-14),l:P(g.x+g.w*0.3,y-14),open:1},
-        {t:1250,r:P(R.rx,R.ry),l:P(R.lx,R.ly),open:0}];
+      const y=g.y+g.h*0.66;
+      return[{t:0,rp:'flat',lp:'flat'},
+        {t:280,r:P(g.x+g.w*0.6,y,10),l:P(g.x+g.w*0.4,y,10)},
+        {t:640,r:P(g.x+g.w*0.9,y-8*s,10),l:P(g.x+g.w*0.1,y-8*s,10)},
+        {t:960,r:P(g.x+g.w*0.68,y,8),l:P(g.x+g.w*0.32,y,8)},
+        {t:1280,r:RR,l:RL,rp:'',lp:''}];
     }
     case 'rejectLateBet':{
-      const c=pre.late||ptOf('.lay',0.5,0.8);if(!c)return null;
-      return[{t:0},{t:320,r:P(c.x,c.y-16)},{t:520,r:P(c.x,c.y)},
-        {t:820,r:P(c.x,c.y+54),open:0.5},{t:1150,r:P(R.rx,R.ry),open:0}];
+      /* 締切後のチップを指先で押さえ、客の側（奥）へ押し戻す */
+      const c=pre.late||ptOf('.lay',0.5,0.2);if(!c)return null;
+      return[{t:0},{t:320,r:P(c.x,c.y+16*s)},{t:520,r:P(c.x,c.y)},
+        {t:860,r:P(c.x,c.y-Math.max(40,18*s))},{t:1200,r:RR}];
     }
-    case 'callNumber':
-      return[{t:0,nod:0},{t:240,nod:1},{t:560,nod:0},{t:760,nod:0}];
+    case 'callNumber':{
+      /* 当たり番号をコールしながら、ホイールのポケットを指す */
+      const W=wheel();if(!W)return null;
+      return[{t:0},{t:280,l:P(W.c.x+W.rad*.25,W.c.y+W.rad*.55),lp:'point'},{t:640,l:P(W.c.x+W.rad*.25,W.c.y+W.rad*.5),lp:'point'},{t:900,l:RL,lp:''}];
+    }
     case 'callNoSpin':{
-      /* 宣言してうなずき、ボールのある場所（レイアウト上／ポケット）へ手を運んで拾い、ラックへ持ち帰る */
-      const w=elRect('#wheelWrap');if(!w)return null;
-      const c=P(w.x+w.w/2,w.y+w.h/2),rad=w.w*0.4;
-      const from=pre.stray||P(c.x+rad*0.55,c.y-rad*0.6);
-      return[{t:0,nod:0},{t:220,nod:1},{t:420,nod:0,r:P(from.x,from.y-14)},{t:620,r:P(from.x,from.y)},
-        {t:760,r:P(from.x,from.y),prop:'ball'},{t:1100,r:P((from.x+rk.x)/2,Math.min(from.y,rk.y)-10),prop:'ball'},
-        {t:1350,r:P(rk.x,rk.y),prop:'ball'},{t:1480,r:P(rk.x,rk.y),prop:''},{t:1750,r:P(R.rx,R.ry)}];
+      /* 宣言してから、ボールのある場所（レイアウト上／ポケット）へ手を運んで拾い、ラックへ持ち帰る */
+      const W=wheel();if(!W)return null;
+      const from=pre.stray||P(W.c.x+W.rad*0.55,W.c.y-W.rad*0.6);
+      const h=from.x<Dealer.cx?'l':'r',rack=h==='l'?rkL:rk;
+      const f=(t,p,prop)=>{const o={t,hold:h};o[h]=p;if(prop!==undefined)o.prop=prop;return o;};
+      return[{t:0,hold:h,prop:''},f(380,P(from.x,from.y+16*s)),f(580,P(from.x,from.y)),
+        f(720,P(from.x,from.y),'ball'),f(1080,P((from.x+rack.x)/2,(from.y+rack.y)/2,14),'ball'),
+        f(1330,P(rack.x,rack.y),'ball'),f(1460,P(rack.x,rack.y),''),f(1720,h==='l'?RL:RR)];
     }
     case 'placeDolly':{
       const c=ptOf('.dolly');if(!c)return null;
-      return[{t:0,prop:'dolly'},{t:160,r:P(rk.x,rk.y),prop:'dolly'},
-        {t:520,r:P(c.x,c.y-34),prop:'dolly'},{t:720,r:P(c.x,c.y),prop:'dolly'},
-        {t:860,r:P(c.x,c.y),prop:''},{t:1000,r:P(c.x,c.y-30)},{t:1350,r:P(R.rx,R.ry)}];
+      return[{t:0,prop:''},{t:160,r:P(rk.x,rk.y)},{t:260,r:P(rk.x,rk.y),prop:'dolly'},
+        {t:620,r:P(c.x,c.y+26*s,18),prop:'dolly'},{t:820,r:P(c.x,c.y),prop:'dolly'},
+        {t:960,r:P(c.x,c.y),prop:''},{t:1100,r:P(c.x,c.y+22*s,14)},{t:1420,r:RR}];
     }
     case 'takeFar':case 'takeNear':case 'takeInside':{
+      /* レーキの頭をゾーンの奥に当て、手前へ引き寄せる（2往復）。最後にラックの前へ */
       const z=elRect(ZONE_SEL[pre.zone||'inside']);if(!z)return null;
-      const sweep=fx=>{
-        const far=pullBack(P(z.x+z.w*fx,z.y+z.h+6),34);
-        const near=pullBack(P(z.x+z.w*fx*0.9,z.y-10),34);
-        return[far,near];
-      };
+      const sweep=fx=>[pullBack(P(z.x+z.w*fx,z.y-4),20),pullBack(P(z.x+z.w*fx*0.92,z.y+z.h+8),20)];
       const a=sweep(0.74),b=sweep(0.3);
-      return[{t:0,prop:'rake'},{t:260,r:a[0],prop:'rake'},{t:560,r:a[1],prop:'rake'},
-        {t:740,r:b[0],prop:'rake'},{t:1040,r:b[1],prop:'rake'},
-        {t:1240,r:P(rk.x,rk.y),prop:'rake'},{t:1500,r:P(R.rx,R.ry),prop:''}];
+      return[{t:0,prop:'rake'},{t:280,r:a[0],prop:'rake'},{t:600,r:a[1],prop:'rake'},
+        {t:780,r:b[0],prop:'rake'},{t:1100,r:b[1],prop:'rake'},
+        {t:1300,r:P(rk.x,rk.y-14*s),prop:'rake'},{t:1560,r:RR,prop:''}];
     }
     case 'mucking':
-      return[{t:0,prop:'chips'},
-        {t:220,r:P(rk.x,rk.y+16),l:P(rkL.x,rkL.y+16),prop:'chips'},
-        {t:420,r:P(rk.x,rk.y-4),l:P(rkL.x,rkL.y+12),prop:'chips'},
-        {t:620,r:P(rk.x,rk.y+14),l:P(rkL.x,rkL.y-2),prop:'chips'},
-        {t:820,r:P(rk.x,rk.y-2),l:P(rkL.x,rkL.y+10),prop:''},
-        {t:1150,r:P(R.rx,R.ry),l:P(R.lx,R.ly)}];
+      /* 回収したチップを色ごとに両手で崩して積み直し、ラックの溝へ */
+      return[{t:0,hold:'both',prop:'chips'},
+        {t:220,r:P(rk.x,rk.y-18*s),l:P(rkL.x,rkL.y-18*s),prop:'chips'},
+        {t:420,r:P(rk.x+6*s,rk.y-8*s),l:P(rkL.x-6*s,rkL.y-14*s),prop:'chips'},
+        {t:620,r:P(rk.x,rk.y-14*s),l:P(rkL.x,rkL.y-6*s),prop:'chips'},
+        {t:820,r:P(rk.x,rk.y),l:P(rkL.x,rkL.y),prop:''},
+        {t:1150,r:RR,l:RL,hold:'r'}];
     case 'chipPay':{
+      /* ラックから配当を取り、元のベットの手前（ディーラー側）に置いて客へ押し出す */
       const c=pre.betId?ptOf(`[data-bet="${pre.betId}"]`):null;if(!c)return null;
-      return[{t:0,prop:'chips'},{t:200,r:P(rk.x,rk.y),prop:'chips'},
-        {t:560,r:P(c.x+26,c.y-22),prop:'chips'},{t:760,r:P(c.x+14,c.y+2),prop:'chips'},
-        {t:900,r:P(c.x+14,c.y+2),prop:''},{t:1250,r:P(R.rx,R.ry)}];
+      return[{t:0,prop:''},{t:180,r:P(rk.x,rk.y)},{t:280,r:P(rk.x,rk.y),prop:'chips'},
+        {t:640,r:P(c.x+10*s,c.y+24*s,16),prop:'chips'},{t:840,r:P(c.x+8*s,c.y+6*s),prop:'chips'},
+        {t:980,r:P(c.x+8*s,c.y+6*s),prop:''},{t:1320,r:RR}];
     }
     case 'select':{
       const c=ptOf(`[data-bet="${arg}"]`);if(!c)return null;
-      return[{t:0},{t:300,r:P(c.x,c.y-14)},{t:480,r:P(c.x,c.y-4)},{t:800,r:P(R.rx,R.ry)}];
+      return[{t:0},{t:300,r:P(c.x,c.y+14*s),rp:'point'},{t:480,r:P(c.x,c.y+4),rp:'point'},{t:820,r:RR,rp:''}];
     }
-    case 'cleanHands':{
-      const y=Math.max(Dealer.band*0.42,Dealer.band-56),w=64*Dealer.s;
-      return[{t:0,open:0},
-        {t:340,r:P(Dealer.cx+w,y),l:P(Dealer.cx-w,y),open:1},
-        {t:980,r:P(Dealer.cx+w+8,y-8),l:P(Dealer.cx-w-8,y-8),open:1},
-        {t:1400,r:P(R.rx,R.ry),l:P(R.lx,R.ly),open:0}];
-    }
+    case 'cleanHands':return Dealer.cleanFrames();
     case 'removeDolly':{
       const c=pre.dolly;if(!c)return null;
-      return[{t:0},{t:320,r:P(c.x,c.y+4)},{t:480,r:P(c.x,c.y),prop:'dolly'},
-        {t:700,r:P(c.x,c.y-36),prop:'dolly'},{t:1000,r:P(rk.x,rk.y),prop:'dolly'},
-        {t:1120,r:P(rk.x,rk.y),prop:''},{t:1400,r:P(R.rx,R.ry)}];
+      return[{t:0},{t:320,r:P(c.x,c.y+8*s)},{t:480,r:P(c.x,c.y),prop:'dolly'},
+        {t:720,r:P(c.x,c.y+30*s,16),prop:'dolly'},{t:1020,r:P(rk.x,rk.y),prop:'dolly'},
+        {t:1140,r:P(rk.x,rk.y),prop:''},{t:1420,r:RR}];
     }
   }
   return null;
@@ -1483,7 +1964,7 @@ function layoutHTML(){
     const pick=picks.includes(b.id)?' pick':'';
     const attrs=pick?` data-act="select" data-arg="${b.id}" tabindex="0" role="button"`:'';
     const cls=`chip ${seatClass(b.seat)} ${st}${pick}${inline?' chip-inline':' chip-abs'}`;
-    const pos=inline?'':`style="left:${b.pos.x}%;top:${b.pos.y}%"`;
+    const pos=inline?'':`style="left:${b.pos.x}%;top:${100-b.pos.y}%"`;
     const tip=late?`【締切後に置かれたチップ】${betTitle(b)}`:betTitle(b);
     return `<button type="button" class="${cls}" ${pos} data-bet="${b.id}" title="${esc(tip)}"${attrs}>${b.amount}</button>`;
   };
@@ -1502,23 +1983,25 @@ function layoutHTML(){
   const dm=n=>res===n?dollyMark:'';
   let cells=`<div class="cell cell-zero${wc(0)}">0${dm(0)}</div>`;
   for(let n=1;n<=36;n++){
-    cells+=`<div class="cell cell-num ${isRed(n)?'is-red':'is-black'}${wc(n)}" style="grid-column:${colOf(n)+1};grid-row:${rowOf(n)+1}">${n}${dm(n)}</div>`;
+    cells+=`<div class="cell cell-num ${isRed(n)?'is-red':'is-black'}${wc(n)}" style="grid-column:${colOf(n)+1};grid-row:${3-rowOf(n)}">${n}${dm(n)}</div>`;
   }
   for(let r=0;r<3;r++){
-    cells+=`<div class="cell cell-201" style="grid-row:${r+1}"><span class="label">2:1</span>${colChips[r]}</div>`;
+    cells+=`<div class="cell cell-201" style="grid-row:${3-r}"><span class="label">2:1</span>${colChips[r]}</div>`;
   }
 
   const dz=['1st 12','2nd 12','3rd 12'].map((t,i)=>`<div class="box">${dzChips[i]}<span class="bl">${t}</span></div>`).join('');
   const ou=outDefs.map((d,i)=>`<div class="box ${d[2]}">${outChips[i]}<span class="bl">${d[1]}</span></div>`).join('');
 
   const zc=z=>hlZone===z?' zone-hl':'';
+  /* ディーラー目線：画面の下がディーラー側。ディーラーは3・6・9…の列の側に立つので、手前から 3-6-9／2-5-8／1-4-7、
+     その奥にダズン、一番奥（プレイヤー側）に外側のベット。ホイールはディーラーの左 */
   return `<div class="lay-scroll"><div class="lay">
+    <div class="row-outside${zc('farOutside')}">${ou}</div>
+    <div class="row-dozens${zc('nearOutside')}">${dz}</div>
     <div class="grid-wrap${zc('inside')}">
       <div class="grid-main">${cells}</div>
-      <div class="chip-layer">${chipLayer}${G.flags.noSpin&&G.flags.noSpin.reason==='out'?`<span class="stray-ball" style="left:${G.flags.noSpin.pos.x}%;top:${G.flags.noSpin.pos.y}%"></span>`:''}</div>
+      <div class="chip-layer">${chipLayer}${G.flags.noSpin&&G.flags.noSpin.reason==='out'?`<span class="stray-ball" style="left:${G.flags.noSpin.pos.x}%;top:${100-G.flags.noSpin.pos.y}%"></span>`:''}</div>
     </div>
-    <div class="row-dozens${zc('nearOutside')}">${dz}</div>
-    <div class="row-outside${zc('farOutside')}">${ou}</div>
   </div></div>`;
 }
 
