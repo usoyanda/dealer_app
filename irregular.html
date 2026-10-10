@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1015">
+<title>Dealer Simulator | イレギュラー対応ドリル</title>
+<style>
+:root{
+  --bg:#0B1015;--surface:#17202A;--surface2:#1E2934;--surface3:#263341;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+  --text:#E9EEF3;--text2:#A7B4C1;--text3:#7D8B99;
+  --gold:#D9B25F;--gold2:#F4DA94;--ok:#43C98B;--ng:#FF7062;--warn:#F3BD4E;--info:#82B4FF;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(1200px 520px at 50% -12%,#1B2734 0%,var(--bg) 62%) fixed,var(--bg);color:var(--text);
+  font-family:"BIZ UDPGothic","Meiryo","Hiragino Sans","Yu Gothic UI",sans-serif;font-size:15px;line-height:1.7;padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+a{color:var(--gold2)}
+.topbar{display:flex;align-items:center;gap:12px;padding:8px 16px;padding-top:max(8px,env(safe-area-inset-top));position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,rgba(18,25,33,.97),rgba(11,16,21,.97));border-bottom:1px solid rgba(217,178,95,.22);box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--text);padding:6px 14px;border-radius:999px;cursor:pointer;font-size:13px;text-decoration:none;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn-ghost:hover{border-color:var(--gold)}
+.btn-ghost svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.brand-main{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:21px;background:linear-gradient(180deg,#FBE7B0 0%,#D9B25F 55%,#A9812F 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-sub{margin-left:10px;font-size:13px;color:var(--text2)}
+.bm-sm{display:none}
+.top-right{margin-left:auto;display:flex;gap:8px}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px 40px}
+.btn{border:1.5px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#2A3846,#22303C);color:var(--text);border-radius:12px;padding:10px 16px;cursor:pointer;min-height:46px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:linear-gradient(180deg,#F1D58D 0%,#D9B25F 55%,#B88E3B 100%);border-color:#8E6C26;color:#1C1405;font-weight:bold}
+.btn.big{width:100%;font-size:18px;min-height:56px;border-radius:14px}
+.btn:focus-visible,.choice:focus-visible,.seg button:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+.sec{font-size:12px;letter-spacing:.18em;color:var(--gold);margin:22px 0 8px;font-weight:normal;display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line2)}
+.hero{padding:18px;border-radius:18px;background:radial-gradient(ellipse at 20% 0%,#5A2324 0%,#2E1416 55%,#1A0D0E 100%);border:1px solid rgba(255,112,98,.3);box-shadow:inset 0 0 40px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.45);display:flex;gap:16px;align-items:center}
+.hero svg{flex:none;width:64px;height:64px}
+.hero .en{font-family:Georgia,serif;font-size:11.5px;letter-spacing:.26em;color:rgba(255,184,175,.8)}
+.hero h1{margin:0;font-size:22px;color:#FFD9D3}
+.hero p{margin:4px 0 0;font-size:13.5px;color:#EBD3CF}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;background:#0F151B;border:1px solid var(--line2);border-radius:12px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 2px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1.3}
+.seg button small{display:block;font-size:10.5px;color:var(--text3)}
+.seg button.on{background:linear-gradient(180deg,#30404F,#263442);color:#fff;box-shadow:inset 0 0 0 1px rgba(217,178,95,.55)}
+.seg button.on small{color:var(--gold2)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.st small{display:block;font-size:11px;color:var(--text3)}
+.st b{font-family:Georgia,serif;font-size:20px}
+.st .bar{height:4px;border-radius:2px;background:#0F151B;margin-top:4px;overflow:hidden}
+.st .bar i{display:block;height:100%;background:linear-gradient(90deg,#B88E3B,#F4DA94)}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:13.5px;color:var(--text2);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.opt input{accent-color:var(--gold);width:18px;height:18px}
+/* 問題 */
+.qbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.icon-x{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:rgba(255,255,255,.04);cursor:pointer;font-size:18px;line-height:1;flex:none}
+.qprog{flex:1;display:flex;flex-direction:column;gap:3px}
+.qprog span{font-size:11.5px;color:var(--text2)}
+.qprog .bar{height:6px;border-radius:3px;background:#0F151B;overflow:hidden;border:1px solid var(--line)}
+.qprog .bar i{display:block;height:100%;background:linear-gradient(90deg,#B88E3B,#F4DA94);transition:width .3s}
+.qscore{font-family:Georgia,serif;font-size:18px;color:var(--gold2)}
+.scene{border-radius:16px;padding:14px 16px;background:linear-gradient(180deg,#1C2631,#151D26);border:1px solid var(--line2);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.badge{display:inline-block;font-family:Georgia,serif;font-size:10.5px;letter-spacing:.2em;padding:1px 10px;border-radius:999px;border:1px solid rgba(217,178,95,.5);color:var(--gold2);margin-bottom:6px}
+.badge.rl{border-color:#C9473E;color:#FFB3AA}.badge.bc{border-color:#5E86C6;color:#9DC0F0}.badge.bj{border-color:#43C98B;color:#8FE7BE}.badge.pk{border-color:#B07BE0;color:#D8B9F5}
+.scene h2{margin:0 0 6px;font-size:17px;line-height:1.5}
+.scene .sit{font-size:14px;color:#D7DEE5}
+.scene .ask{margin-top:8px;font-weight:bold;color:var(--gold2);font-size:14px}
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.choice{text-align:left;border:1.5px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#26333F,#1F2A35);border-radius:12px;padding:10px 12px 10px 44px;cursor:pointer;position:relative;font-size:14px;line-height:1.55;min-height:48px}
+.choice::before{content:attr(data-k);position:absolute;left:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);font:bold 12px/22px Georgia,serif;text-align:center;color:var(--text2)}
+.choice:hover:not([disabled]){border-color:var(--gold)}
+.choice[disabled]{cursor:default}
+.choice.right{border-color:var(--ok);background:linear-gradient(180deg,rgba(67,201,139,.2),rgba(67,201,139,.08))}
+.choice.right::before{content:"✓";background:var(--ok);color:#06281A;border-color:var(--ok)}
+.choice.wrong{border-color:var(--ng);background:linear-gradient(180deg,rgba(255,112,98,.2),rgba(255,112,98,.07))}
+.choice.wrong::before{content:"✕";background:var(--ng);color:#2B0905;border-color:var(--ng)}
+.choice.dim{opacity:.5}
+.explain{margin-top:12px;border-radius:14px;padding:12px 14px;background:var(--surface);border:1.5px solid var(--line2);animation:fbin .22s ease-out}
+@keyframes fbin{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
+.explain.ok{border-color:rgba(67,201,139,.6)}.explain.ng{border-color:rgba(255,112,98,.6)}
+.ex-mark{font-size:18px;font-weight:bold}
+.explain.ok .ex-mark{color:var(--ok)}.explain.ng .ex-mark{color:var(--ng)}
+.ex-call{display:inline-block;margin:6px 0 2px;font-family:Georgia,serif;font-size:15px;color:var(--gold2);background:rgba(217,178,95,.08);border:1px solid rgba(217,178,95,.28);border-radius:8px;padding:1px 10px}
+.ex-call small{font-family:"BIZ UDPGothic",sans-serif;color:var(--text2);margin-left:8px;font-size:12px}
+.ex-row{font-size:13.5px;margin-top:6px}
+.ex-row b{color:var(--info);margin-right:6px}
+.ex-row.var b{color:var(--warn)}
+.ex-row.right b{color:var(--ok)}
+.nextbar{position:sticky;bottom:0;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(11,16,21,0),rgba(11,16,21,.95) 30%);margin-top:4px}
+/* 結果 */
+.rhead{text-align:center;padding:18px;border-radius:18px;background:radial-gradient(ellipse at 50% 0%,#1F2B37,#141C24);border:1px solid var(--line2)}
+.rhead .big{font-family:Georgia,serif;font-size:64px;font-weight:bold;line-height:1;color:var(--gold2)}
+.rhead .big small{font-size:24px;color:var(--text2)}
+.rhead p{margin:6px 0 0;color:var(--text2);font-size:13px}
+.rlist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ri{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ng);border-radius:10px;padding:8px 12px;font-size:13px}
+.ri.ok{border-left-color:var(--ok)}
+.ri b{display:block;font-size:13.5px}
+.ri .a{color:var(--text2);font-size:12.5px}
+.ri .a em{font-style:normal;color:#8FE7BE}
+.ractions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.disclaimer{font-size:12px;color:var(--text3);margin-top:16px}
+@media (max-width:600px){
+  .topbar{gap:8px;padding:6px 10px}
+  .btn-ghost{padding:4px 9px;font-size:12px}.btn-ghost .lg{display:none}
+  .brand-main{font-size:15px}.brand-sub{font-size:12px;margin-left:6px}
+  .wrap{padding:10px 10px 30px}
+  .hero{padding:12px;gap:12px}.hero svg{width:48px;height:48px}.hero h1{font-size:19px}.hero p{font-size:12.5px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .scene{padding:11px 12px}.scene h2{font-size:15.5px}.scene .sit{font-size:13.5px}
+  .choice{font-size:13.5px;padding:8px 10px 8px 40px;min-height:44px}
+  .choice::before{left:8px}
+}
+@media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="btn-ghost" href="index.html" aria-label="ホームに戻る">◀<span class="lg"> 目次</span></a>
+  <div><span class="brand-main"><span class="bm-lg">Dealer Simulator</span><span class="bm-sm">DS</span></span><span class="brand-sub">イレギュラー対応</span></div>
+  <div class="top-right"><a class="btn-ghost" id="lnkRules" href="rules.html" aria-label="ルールブック"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v12H8.5A3.5 3.5 0 0 1 5 16.5z"/><path d="M5 16.5A3.5 3.5 0 0 1 8.5 13H19"/></svg><span class="lg">ルールブック</span></a></div>
+</header>
+<main class="wrap" id="app"></main>
+
+<script>
+/*ENGINE_START*/
+/* ===== イレギュラー対応ドリル =====
+   手順どおりに進まない場面（ボールの飛び出し・カードの露出・後賭け・順番飛ばしなど）で、
+   「その場で何をするか」と「なぜそうするか」を選んで覚える。
+   どの場面にも共通する原則は3つ：①手を止める ②独断で札やチップを動かさない（判断が要ればフロア）
+   ③何が起きたかを声に出して全員とカメラに示す。
+   ここに書いた対応は訓練用の一般的な扱い。実際の規定はカジノ・スクールにより異なる。
+   q：{id, g:ゲーム, t:見出し, s:状況, a:問い, c:[正解, 誤答…]（表示時に並べ替える）, call:[英,和], why:理由, v:カジノ差の注記} */
+const GAMES={rl:{name:'ルーレット',en:'ROULETTE',hash:'roulette'},bc:{name:'バカラ',en:'BACCARAT',hash:'baccarat'},bj:{name:'ブラックジャック',en:'BLACKJACK',hash:'blackjack'},pk:{name:'ポーカー',en:'POKER',hash:'poker'}};
+const BANK=[
+/* ---- ルーレット ---- */
+{id:'rl-out',g:'rl',t:'ボールがウィールの外へ飛び出した',s:'スピン中、ボールがウィールの縁を越えて飛び出し、レイアウトの上を転がって止まった。',a:'正しい対応は？',
+ c:['「ノースピン」を宣言してボールを回収し、投げ直す。ベットはそのまま','ボールが止まった場所に一番近い数字を、当選番号としてコールする','ボールを拾ってウィールに戻し、そのまま落ちたポケットを当選番号にする','全員のベットを本人に返して、そのゲームは終わりにする'],
+ call:['No spin.','ノースピンです'],why:'出目はウィールのポケットに落ちて決まる。飛び出した時点でそのスピンは無効。投げ直すことをはっきり宣言し、ベットは次のスピンへそのまま持ち越す。',v:'ノースピン後にベットの変更を認めるかは規定による。'},
+{id:'rl-short',g:'rl',t:'ボールの勢いが足りなかった',s:'投入したボールの勢いが弱く、1周ほどでポケットに落ちてしまった。',a:'どうする？',
+ c:['「ノースピン」を宣言して投げ直す','落ちた番号をそのままコールする','客に投げ直してよいか確認する','次のゲームから強めに投げることにして、このゲームは進める'],
+ call:['No spin.','ノースピンです'],why:'規定の周回に届かないスピンは、出目を狙えた疑いが残る。ディーラーの技術の問題でも、無効にして投げ直すのが公平。',v:'最低周回数はカジノにより異なる（3周以上など）。'},
+{id:'rl-dir',g:'rl',t:'ウィールと同じ向きに投げてしまった',s:'うっかり、ウィールの回転と同じ向きにボールを投げた。ボールは回っている。',a:'どうする？',
+ c:['「ノースピン」を宣言し、ウィールと逆向きに投げ直す','ボールが回っていれば有効なので、そのまま締切を宣言する','締切を早めに宣言して、影響を小さくする','客に事情を説明し、続けるかどうか多数決で決める'],
+ call:['No spin.','ノースピンです'],why:'ボールはウィールと逆向きに投げるのが規定。同じ向きだとボールが跳ねにくく、出目が偏る原因になる。規定外のスピンは無効にする。'},
+{id:'rl-late',g:'rl',t:'締切の直後に置かれたチップ',s:'「ノー・モア・ベット」を宣言した直後、客がストレートにチップを置いた。ボールはまだ回っている。',a:'正しい対応は？',
+ c:['受け付けず、チップを戻して「締切後です」と伝える','ボールがまだ落ちていないので受け付ける','当たったら払い、外れたら回収する','精算のときに考えることにして、そのままにしておく'],
+ call:['No more bets. This one is too late.','締切後ですので、お返しします'],why:'締切の宣言が境目。例外を1回でも作ると「さっきは受けた」という争いになる。結果が見えかけてからの後賭け（パストポスティング）は典型的な不正でもある。',v:'繰り返す客はフロアへ報告する。'},
+{id:'rl-touch',g:'rl',t:'精算中に客がチップへ手を伸ばした',s:'ドリーを置いてハズレを回収している最中、客が当たったストレートのチップを手元へ引き寄せようとした。',a:'どうする？',
+ c:['手を止めて、精算が終わるまでチップに触れないよう伝える','先にその客へ配当を渡して、精算を早く終わらせる','触れたベットは無効として配当しない','気にせず回収を続ける'],
+ call:['Please don\'t touch the chips until the payout is finished.','精算が終わるまでお待ちください'],why:'ドリーがある間は客がチップに触れないのがルール。精算中に動かされると、当たりへの上乗せ（キャッピング）や付け替えと区別できない。'},
+{id:'rl-owner',g:'rl',t:'ベットの持ち主で2人がもめている',s:'現金チップで置かれた$25のスプリットが当たった。2人の客がどちらも自分のベットだと言っている。',a:'どうする？',
+ c:['チップを動かさずにフロアを呼び、判断を任せる','先に言った客に払う','配当を半分ずつ2人に払う','争いになったので、どちらにも払わず回収する'],
+ call:['Floor, please.','フロア、お願いします'],why:'誰のベットかは監視カメラの映像で確認する。ディーラーが裁くと公平性を疑われる。判断が要る場面では、手を止めてフロアを呼ぶのが原則。'},
+{id:'rl-miscall',g:'rl',t:'当選番号を言い間違えた',s:'ボールは28に落ちたが、「29、ブラック」とコールしてしまった。まだドリーは置いていない。',a:'どうする？',
+ c:['すぐに訂正のコールをし直し、28にドリーを置く','コールした29のまま精算する','何も言わずに28へドリーを置く','フロアを呼んで、どちらで精算するか決めてもらう'],
+ call:['Correction. 28, black, even.','訂正します。28、黒、偶数'],why:'回収・配当の前なら、訂正は早いほど影響が小さい。黙って直すと客が混乱し、聞き違えた客との争いの元になる。チップを動かした後に気づいたら、そのときはフロアを呼ぶ。'},
+{id:'rl-object',g:'rl',t:'ウィールの中に異物が入った',s:'スピン中、客の落としたチップがウィールの中に入り込んだ。',a:'どうする？',
+ c:['「ノースピン」を宣言し、異物を取り除いてから投げ直す','ボールが落ちるまで待ち、落ちた番号で精算する','チップを持ち主に返してから、同じスピンを続ける','その客のベットだけを無効にする'],
+ call:['No spin.','ノースピンです'],why:'異物はボールの動きを変える。正常なスピンと言えないので無効にする。'},
+{id:'rl-zero',g:'rl',t:'ボールが0に落ちた',s:'ボールが0のポケットに落ちて止まった。',a:'正しいコールは？',
+ c:['「Zero.」（色・奇偶は言わない）','「Zero, red, even.」','「Zero, black.」','「Zero, even.」'],
+ call:['Zero.','ゼロ'],why:'0は赤でも黒でもなく、奇数でも偶数でもない。アウトサイド（赤黒・奇偶・ハイロー）はすべてハズレになる。誤ったコールはアウトサイドの精算ミスに直結する。',v:'「Zero, green.」と色を付けて呼ぶ店もある。'},
+{id:'rl-paysort',g:'rl',t:'どの当たりから払うか',s:'回収が終わった。当たりは、赤（アウトサイド・2番席）、ストレート（3番席・奥）、スプリット（1番席・手前）。',a:'最初に払うのは？',
+ c:['赤（アウトサイド）','ストレート（倍率が一番高いから）','手前の1番席のスプリット','客に順番を聞いてから払う'],
+ why:'配当は計算が単純なアウトサイドから、インサイドは奥の席から手前へ。手順が毎回同じだと、払い忘れや二重払いが起きにくく、映像でも検証できる。',v:'このアプリの手順。配当の順番はカジノの規定に従う。'},
+/* ---- バカラ ---- */
+{id:'bc-cut',g:'bc',t:'カットカードが出た',s:'最初の4枚を配っている途中で、黄色いカットカードがシューから出てきた。',a:'どうする？',
+ c:['そのゲームは最後まで行い、規定どおりシャッフルへ進む','すぐに配るのを止め、配った札を捨て札にしてから、その場でシャッフルする','カットカードをシューに戻し、シューが空になるまでそのまま配り続ける','そのゲームを無効にしてベットを返し、新しいシューで配り直す'],
+ call:['Last hand.','最後のゲームです'],why:'ゲームの途中で止めると、配った札の扱いでもめる。カットカードはシャッフルの目印なので、いつ区切るかを客に先に知らせて進める。',v:'「次が最後のゲーム」と告知する卓が多い。カットカードの後に何ゲーム配るかはカジノにより異なる。'},
+{id:'bc-expose',g:'bc',t:'配っている途中でカードが表になった',s:'最初の4枚を配る途中、バンカーの2枚目が表向きでテーブルに落ちた。',a:'どうする？',
+ c:['手を止めてフロアを呼び、規定どおりに処理する','見えた札を捨てて、次の札を配る','裏返して何事もなかったように続ける','そのゲームを無効にして、全員のベットを返す'],
+ call:['Floor, please.','フロア、お願いします'],why:'どの札を使うかは勝敗そのものに関わる。ディーラーが独断で札を入れ替えたり捨てたりすると、公平性を疑われる。',v:'露出した札をそのまま使うか、焼き札にするかは規定による。'},
+{id:'bc-bend',g:'bc',t:'絞りでカードが傷んだ',s:'絞っている客がカードを強く折り曲げ、角が少し破れた。',a:'どうする？',
+ c:['注意してフロアへ報告し、規定どおりに扱う','その場で新しいカードと交換してゲームを続ける','そのゲームを無効にしてベットを返す','客のすることなので、そのまま続ける'],
+ why:'折り目や傷は札の目印（マーキング）になり得る。見過ごすと、次のシューで有利な情報として使われる。交換の手順は規定で決まっている。'},
+{id:'bc-natural',g:'bc',t:'3枚目を配る前の確認',s:'2枚ずつ開いた。プレイヤー8、バンカー5。',a:'次の所作は？',
+ c:['ナチュラル。両者とも引かず、プレイヤーの勝ち','バンカーは5なので3枚目を配る','プレイヤーはスタンド、バンカーは引く','両者に3枚目を配って比べる'],
+ call:['Natural 8. Player wins, 8 over 5.','ナチュラル8、プレイヤーの勝ち'],why:'どちらかが2枚で8か9なら、両者とも3枚目は引かない。点数をコールしたら真っ先にナチュラルを確認する。ここで3枚目を配ってしまうのがよくある事故。'},
+{id:'bc-extra',g:'bc',t:'不要な3枚目を配ってしまった',s:'プレイヤー7でスタンド、バンカー6。誤ってバンカーに3枚目を配ってしまった。',a:'どうする？',
+ c:['手を止めてフロアを呼ぶ。札の扱いは規定に従う','その札を捨てて、バンカー6のまま判定する','配った札を使ってバンカーの点数を出す','プレイヤーにも3枚目を配って公平にする'],
+ call:['Floor, please.','フロア、お願いします'],why:'プレイヤーがスタンドしたとき、バンカー6はスタンド。誤って出た札を自分で戻したり使ったりすると、本来どの札が出るべきだったかを検証できなくなる。'},
+{id:'bc-tie',g:'bc',t:'タイのときのチップ',s:'結果はタイ（6対6）。プレイヤーとバンカーにも何人か賭けている。',a:'プレイヤー／バンカーのチップは？',
+ c:['プッシュ。触らずにそのまま','ハズレとして回収する','1:1で配当を払う','半額だけ回収する'],
+ why:'タイのとき、プレイヤー／バンカーのベットは引き分け（プッシュ）。客のチップなので触らない。回収でうっかり持っていくのが典型的なミス。'},
+{id:'bc-floor',g:'bc',t:'カードが床に落ちた',s:'カードを配ろうとしたとき、1枚が手から滑ってテーブルの外の床に落ちた。',a:'どうする？',
+ c:['自分で拾わず、フロアに知らせて回収してもらう','すぐ自分で拾って、そのまま配る','拾って捨て札（ディスカード）に入れる','近くの客に拾ってもらう'],
+ call:['Floor, please.','フロア、お願いします'],why:'ディーラーが卓から目と手を離すと、その間の卓上のチップとカードを守れない。落ちた札を使うかどうかも規定で決まる。'},
+{id:'bc-comm',g:'bc',t:'コミッションを差し引いてと言われた',s:'5%コミッションの卓でバンカーが勝った。$200を賭けた客が「コミッションの$10を引いて、$190だけちょうだい」と言っている。',a:'どうする？',
+ c:['配当は1:1で$200払い、コミッションは相殺せず卓の手順どおり別に処理する','客の希望どおり、コミッションを差し引いた$190を1回で払う','常連の客なので、今回はコミッションを免除して$200を払う','$190を払い、差額の$10はシューが終わったときにまとめて精算する'],
+ call:['Commission, please.','コミッションを頂戴します'],why:'配当とコミッションを混ぜると、客もカメラも「いくら払っていくら取ったか」を確認できない。毎回同じ手順で、配当と徴収を分ける。',v:'コミッションをボックスで管理し、シューの終わりなどにまとめて徴収する卓もある。'},
+{id:'bc-ez',g:'bc',t:'EZバカラのドラゴン7',s:'EZバカラ（ノーコミッション）の卓。バンカーが3枚で合計7、プレイヤー5でバンカーの勝ち。',a:'バンカーのベットは？',
+ c:['プッシュ（返却）','1:1で払う','半額（1:2）で払う','ハズレとして回収する'],
+ why:'EZバカラはコミッションを取らない代わりに、バンカーが3枚で7の勝ち（ドラゴン7）のときバンカーベットをプッシュにする。ルールの違う卓に立ったら、最初にこの条件を確認する。'},
+{id:'bc-callerr',g:'bc',t:'勝敗のコールを間違えた',s:'「Player wins」とコールしたが、点数を見直すとバンカーの勝ちだった。まだ回収はしていない。',a:'どうする？',
+ c:['すぐに訂正のコールをし直してから回収に入る','コールどおりプレイヤーの勝ちで精算する','黙ってバンカーの勝ちで精算する','フロアを呼んでからコールし直す'],
+ call:['Correction. Banker wins, 7 over 5.','訂正します。バンカーの勝ち'],why:'チップを動かす前なら、訂正のコールで済む。黙って直すと客は自分が勝ったと思ったままになり、争いになる。回収・配当に着手した後ならフロアを呼ぶ。'},
+/* ---- ブラックジャック ---- */
+{id:'bj-verbal',g:'bj',t:'客が口頭だけで「ヒット」',s:'3番席の客が、手を動かさずに「ヒット」とだけ言った。',a:'どうする？',
+ c:['カードを出す前に、手の合図をお願いする','言葉で意思が伝わったので、そのまま1枚配る','聞こえなかったふりをして待つ','次の席へ進む'],
+ call:['Hand signal, please.','合図をお願いします'],why:'監視カメラには音声が残らない。合図が映像にあれば「ヒットとは言っていない」という争いを解決できる。'},
+{id:'bj-hole',g:'bj',t:'ホールカードが見えてしまった',s:'2枚目（ホールカード）を配るとき、手が滑ってカードの表が客に見えてしまった。',a:'どうする？',
+ c:['手を止めてフロアを呼び、規定どおりに処理する','見えなかったことにしてゲームを続ける','その札を捨てて、新しい札をホールカードにする','全員のベットを返してゲームを終わりにする'],
+ call:['Floor, please.','フロア、お願いします'],why:'客の判断に影響する情報が出た。ディーラーが勝手に続けたり札を替えたりすると、公平性を欠く。扱いは規定とフロアの判断による。'},
+{id:'bj-skip',g:'bj',t:'配る順番を飛ばした',s:'1周目の配りで、2番席を飛ばして3番席に配ってしまった。',a:'どうする？',
+ c:['手を止めてフロアを呼ぶ','3番席の札を2番席へ移して続ける','そのまま続け、2周目で2番席に2枚配る','全員の札を集めて、自分の判断で配り直す'],
+ call:['Floor, please.','フロア、お願いします'],why:'札を移したり戻したりすると、以降の札の並びが変わる。誰にどの札が行くべきだったかを、規定と映像で判断する。'},
+{id:'bj-cut',g:'bj',t:'カットカードが出た',s:'ラウンドの途中で、シューからカットカードが出てきた。',a:'どうする？',
+ c:['そのラウンドは最後まで配り、終わってからシャッフルする','すぐに中断してシャッフルする','カットカードを戻して、シューが空になるまで配る','そのラウンドを無効にする'],
+ why:'途中でシャッフルすると、配るはずだった札の並びが変わってしまう。カットカードは「このラウンドで終わり」の目印。'},
+{id:'bj-extra',g:'bj',t:'スタンドの客にもう1枚出してしまった',s:'2番席がスタンドの合図をしたのに、ヒットと見間違えてもう1枚配ってしまった。',a:'どうする？',
+ c:['札を戻さず、手を止めてフロアを呼ぶ','その札を次の3番席へ回す','その札を捨て札にして続ける','2番席の手としてそのまま有効にする'],
+ call:['Floor, please.','フロア、お願いします'],why:'その札をどう扱うか（次の席へ回す・焼く）で、以降の全員の手が変わる。規定と映像で判断する。'},
+{id:'bj-bet',g:'bj',t:'配った後に客がベットへチップを足した',s:'2枚ずつ配り終えた後、1番席の客が自分のベットに$25チップを1枚足した。',a:'どうする？',
+ c:['変更は認めず、足したチップを戻してもらう','足した分も含めたベットとして精算する','勝ったときだけ足した分にも配当する','ダブルダウンとして1枚だけ配る'],
+ why:'カードを見た後のベット変更は不正の典型。勝った後に上乗せするキャッピングとも区別できなくなる。合図なしの上乗せはダブルダウンにもならない。',v:'悪質な場合はフロアへ報告する。'},
+{id:'bj-bust',g:'bj',t:'客がバストした',s:'3番席がヒットして合計24になった。',a:'どうする？',
+ c:['その場でチップとカードを回収する','ディーラーの手番が終わるまで残しておく','客がスタンドを合図するのを待つ','ディーラーがバストしたら引き分けにする'],
+ call:['Too many.','バストです'],why:'バストした時点で、ディーラーの結果に関係なく負けが確定する。残しておくと、ディーラーがバストしたときに払ってしまう事故が起きる。'},
+{id:'bj-h17',g:'bj',t:'H17の卓でソフト17',s:'卓の表示は「DEALER HITS SOFT 17」。ディーラーの手はA＋6（ソフト17）。',a:'ディーラーは？',
+ c:['ヒットする','スタンドする','客に聞く','ピークしてから決める'],
+ call:['Dealer soft 17, taking a card.','ディーラーソフト17、1枚引きます'],why:'H17の卓ではソフト17でもヒット。S17の卓ならスタンド。立っている卓の表示を最初に確認する。'},
+{id:'bj-double',g:'bj',t:'ダブルダウンの後に追加を求められた',s:'ダブルダウンの客に1枚配ったら合計12。客がもう1枚ほしいと合図した。',a:'どうする？',
+ c:['ダブルダウンは1枚のみ。追加はできないと伝える','合図があったのでもう1枚配る','ダブルダウンを取り消して、普通にヒットさせる','追加のベットを受け取ってから配る'],
+ why:'ダブルダウンはベットを倍にする代わりに、カードは1枚だけ。合図があっても例外は作らない。横向きに配るのは「1枚のみ」を示すため。'},
+{id:'bj-ins',g:'bj',t:'アップカードがA',s:'ディーラーのアップカードがA。2番席の客はブラックジャック。',a:'最初にすることは？',
+ c:['インシュアランスを募り、BJの客にはイーブンマネーを確認する','すぐにピークして、ディーラーがBJかどうかを先に確かめる','2番席のブラックジャックを3:2で先に払ってから、ほかの席に進む','インシュアランスは募らず、1番席からプレイヤーのアクションを始める'],
+ call:['Insurance is open.','インシュアランスはいかがですか'],why:'インシュアランスとイーブンマネーはピークの前に締める。ピークの後では、ディーラーの手の情報を与えた状態になる。'},
+{id:'bj-splitace',g:'bj',t:'スプリットしたAに追加を求められた',s:'Aのペアをスプリットし、それぞれに1枚ずつ配った。客がもう1枚ほしいと合図した。',a:'どうする？',
+ c:['Aのスプリットは1枚ずつ。追加はできないと伝える','合図があったので、もう1枚配る','10点札が来た手だけ、追加を認める','スプリットを取り消して、1つの手に戻す'],
+ why:'スプリットしたAには1枚ずつしか配らないのが一般的な卓のルール。Aが2枚あれば有利すぎるため、引ける枚数を制限している。',v:'Aのリスプリットや追加を認める卓もある。卓のルールに従う。'},
+/* ---- ポーカー ---- */
+{id:'pk-first',g:'pk',t:'1枚目が表になった',s:'ホールカードを配り始めた1枚目が、表向きでSBの前に落ちた。',a:'どうする？',
+ c:['ミスディール。カードを集めて配り直す','その札を捨てて、次の札をSBに配る','その札は表のままSBに使う','配り終えてから、その札を交換する'],
+ call:['Misdeal.','ミスディールです'],why:'1枚目か2枚目が表になったら配り直しが標準。早い段階の露出はその後の札の並びを推測させる可能性があり、配り直しても進行への影響が小さい。'},
+{id:'pk-two',g:'pk',t:'2枚表になった',s:'配りの途中で、別々の席の2枚が表向きになってしまった。',a:'どうする？',
+ c:['ミスディール。配り直す','2枚とも、配り終えてから交換する','表の札をそれぞれの席にそのまま使う','表になった2枚をバーンにして続ける'],
+ call:['Misdeal.','ミスディールです'],why:'2枚以上の情報が出たゲームは公平に続けられない。'},
+{id:'pk-one',g:'pk',t:'途中の1枚が表になった',s:'配りの途中（1枚目・2枚目ではない）で、4番席への1枚が表になった。他に表の札はない。',a:'どうする？',
+ c:['配り終えてから山の一番上と交換し、表の札は次のバーンに使う','すぐにミスディールにして、ボタンはそのままで全員に配り直す','その札は表のまま4番席の手札として使い、配りを続ける','その場で表の札を捨て札にし、次の札を4番席に配ってから続きを配る'],
+ why:'表の札は全員に見せてから、次のバーンカードに使う。1枚だけなら、その札をゲームから外せば公平を保てる。配り直すより進行への影響が小さい。',v:'TDA・Robert\'s Rulesで一般的な扱い。カードルームの規定が優先。'},
+{id:'pk-flop',g:'pk',t:'フロップを早く開いてしまった',s:'プリフロップのベッティングがまだ終わっていないのに、バーンしてフロップを開いてしまった。',a:'どうする？',
+ c:['フロップを山に戻してシャッフル・カットし、バーンせずに出し直す','そのフロップを有効にしたまま、残りの客のプリフロップのベッティングを続ける','フロップの3枚を捨て札にし、もう一度バーンしてから次の3枚を新しいフロップにする','ミスディールにして、ブラインドを戻してから全員に配り直す'],
+ why:'フロップの3枚をデッキに戻してシャッフルする（バーンカードは卓に残したまま）。カットしたら、バーンせずに新しいフロップを出す。まだ行動していない人に札の情報を与えたので、そのフロップは使えない。'},
+{id:'pk-turn',g:'pk',t:'ターンを早く開いてしまった',s:'フロップのベッティングが終わる前に、ターンの札を開いてしまった。',a:'どうする？',
+ c:['その札を除けてターンを出し直し、リバー前に戻してシャッフルする','その札をそのままターンとして使い、残りのベッティングを済ませてから、バーンしてリバーを出す','ミスディールにして、ブラインドを戻してから全員に配り直す','その札を捨て札にし、ベッティングの後はバーンせずに次の札をターンにして、そのまま続ける'],
+ why:'その札は脇へ除けてベッティングを終え、バーンして次の札をターンにする。リバーの前に除けた札をデッキへ戻してシャッフル・カットし、バーンせずにリバーを出す。見えてしまった札が、そのままボードに使われないようにするため。'},
+{id:'pk-string',g:'pk',t:'何回かに分けてチップを出した',s:'$20のベットに対し、客が宣言せずに$20を出し、相手の顔を見てからさらに$40を足した。',a:'どう扱う？',
+ c:['レイズは認めず、最初の$20（コール）として扱う','2回分を合わせて、$60へのレイズとして認める','最小レイズの$40として扱い、差額は返す','いったん全部戻して、宣言からやり直してもらう'],
+ why:'宣言なしに複数回に分けてチップを出すと、相手の反応を見てから額を決められてしまう。レイズするなら先に宣言するか、1回の動作で出す。'},
+{id:'pk-oversize',g:'pk',t:'大きいチップを1枚だけ出した',s:'$10のベットに直面した客が、何も言わずに$100チップを1枚だけ出した。',a:'どう扱う？',
+ c:['コール扱い（$10）','$100へのレイズ','最小レイズの$20','本人に意図を聞いてから決める'],
+ why:'ベットに直面して、宣言なしに大きいチップ1枚だけを出したらコール。レイズしたいなら、出す前に「レイズ」と宣言する必要がある。',v:'ベットがない状況なら、そのチップの額のベットになる。'},
+{id:'pk-oot',g:'pk',t:'順番の前に客がアクションした',s:'UTGが考えている間に、その次の席の客が「レイズ」と言ってチップを出した。',a:'どうする？',
+ c:['UTGに戻す。先走った宣言は状況が変わらなければ有効が一般的','先走った客のレイズを有効にし、UTGは飛ばして次の席へアクションを進める','順番を守らなかったので、先走った客の手を無効（デッド）にする','UTGに戻し、先走った客の宣言はすべて取り消して自由に選び直してもらう'],
+ call:['Action is on seat 3.','3番席のアクションです'],why:'先に動いた情報で他の客に有利・不利が生まれる。順番を正し、先走った宣言の扱い（拘束するか）はルールとフロアの判断に従う。',v:'アウトオブターンの扱いはカードルームの規定による。'},
+{id:'pk-speak',g:'pk',t:'客が自分の役を言い間違えた',s:'ショーダウンで客が「ツーペア」と言って手を開いたが、実際はボードと合わせてストレートになっている。',a:'どう判定する？',
+ c:['カードで判定する（カード・スピーク）','本人の宣言どおりツーペアとして比べる','言い間違えたので、その手は無効にする','相手の客に判断してもらう'],
+ why:'ショーダウンの勝敗は、宣言ではなく開いたカードで決まる。ディーラーはカードを正しく読んで勝者をコールする。'},
+{id:'pk-button',g:'pk',t:'ボタンの位置が間違っていた',s:'配り終えた直後、ボタンが本来の席から1つずれていたことに気づいた。まだ誰も行動していない。',a:'どうする？',
+ c:['ミスディール。ボタンを正しい席に直して配り直す','このゲームはこのまま進め、次から直す','ブラインドの額だけ直して進める','フロアを呼ばずに、ボタンだけ動かして続ける'],
+ call:['Misdeal.','ミスディールです'],why:'ボタンがずれると、ブラインドを払う人も配りの順番も変わる。行動前に気づけば配り直すのが公平。'},
+{id:'pk-verbal',g:'pk',t:'「レイズ」と言ってコール分だけ出した',s:'$20のベットに対し、客が「レイズ」と宣言してから$20だけを出した。',a:'どうする？',
+ c:['宣言は有効。最小レイズの$40以上を出してもらう','出した額どおり、$20のコールとして扱う','レイズの宣言を取り消して、もう一度選んでもらう','足りない分は気にせず、次の席へ進める'],
+ why:'口頭の宣言には拘束力がある。宣言したら、その宣言に合う額（最小レイズ以上）を出す必要がある。'},
+{id:'pk-chop',g:'pk',t:'チョップで割り切れない',s:'$45のポットを2人で分ける（チョップ）。',a:'払い方は？',
+ c:['$22ずつ。余りの$1はボタンの左から先の勝者へ','$22.50ずつに分けて払う','強い役の人に$23、もう1人に$22','$22ずつ払い、余りの$1はハウスが取る'],
+ why:'割り切れない端数のチップは、ボタンの左から時計回りで先に来る勝者へ渡すのが一般的。毎回同じ決め方にすることで争いを防ぐ。',v:'端数の扱いはカードルームにより異なる。'}
+];
+/*ENGINE_END*/
+
+const STORE='dsim_irr_v1';
+function loadData(){const d={opts:{game:'all',count:10,weak:false},seen:{},sessions:0};try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v){Object.assign(d.opts,v.opts||{});d.seen=v.seen||{};d.sessions=v.sessions||0;}}catch(e){}return d;}
+function saveData(){try{localStorage.setItem(STORE,JSON.stringify(DATA));}catch(e){}}
+let DATA=loadData();
+const S={screen:'home',list:[],i:0,ans:null,order:[],res:[]};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* 効果音（ゲームと同じ鳴らし方。短い2音だけ） */
+const SFX={ctx:null,play(ok){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;this.ctx=this.ctx||new A();const c=this.ctx;if(c.state==='suspended')c.resume();
+  if(!ok&&navigator.vibrate)navigator.vibrate(45);
+  const tone=(f,t,d,type,v)=>{const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02);};
+  const t=c.currentTime+.005;if(ok){tone(988,t,.1,'sine',.045);tone(1480,t+.07,.16,'sine',.04);}else{tone(196,t,.16,'triangle',.07);tone(147,t+.09,.22,'triangle',.06);}}catch(e){}}};
+
+function statFor(g){
+  const qs=BANK.filter(q=>g==='all'||q.g===g);let ok=0,ng=0,seen=0;
+  qs.forEach(q=>{const s=DATA.seen[q.id];if(s){seen++;ok+=s.ok;ng+=s.ng;}});
+  return{n:qs.length,seen,ok,ng,acc:ok+ng?ok/(ok+ng):null};
+}
+function weakList(g){return BANK.filter(q=>(g==='all'||q.g===g)&&DATA.seen[q.id]&&DATA.seen[q.id].lastNg);}
+function renderHome(){
+  const o=DATA.opts;
+  const gs=[['all','すべて']].concat(Object.entries(GAMES).map(([k,v])=>[k,v.name]));
+  const seg=gs.map(([k,n])=>{const st=statFor(k);return `<button class="${o.game===k?'on':''}" data-a="game" data-v="${k}" aria-pressed="${o.game===k}">${n}<small>${st.n}問</small></button>`;}).join('');
+  const stats=Object.entries(GAMES).map(([k,v])=>{const st=statFor(k);return `<div class="st"><small>${v.name}</small><b>${st.acc===null?'—':Math.round(st.acc*100)+'%'}</b><div class="bar"><i style="width:${Math.round(st.seen/st.n*100)}%"></i></div><small>${st.seen}/${st.n}問に挑戦</small></div>`;}).join('');
+  const weak=weakList(o.game).length;
+  $('app').innerHTML=`
+    <section class="hero"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 60 56H4z" fill="#3A1517" stroke="#FF7062" stroke-width="3" stroke-linejoin="round"/><path d="M32 24v16" stroke="#FFD9D3" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="48" r="3.2" fill="#FFD9D3"/></svg>
+      <div><div class="en">IRREGULARITY DRILL</div><h1>イレギュラー対応ドリル</h1><p>手順どおりに進まない場面で、その場で何をするか・なぜそうするかを判断する。原則は「手を止める・独断で動かさない・声に出して示す」。</p></div></section>
+    <h2 class="sec">ゲーム</h2><div class="seg">${seg}</div>
+    <h2 class="sec">問題数</h2><div class="seg">${[[10,'10問'],[20,'20問'],[0,'全問']].map(([n,l])=>`<button class="${o.count===n?'on':''}" data-a="count" data-v="${n}" aria-pressed="${o.count===n}">${l}</button>`).join('')}</div>
+    <label class="opt"><span>前回まちがえた問題だけ（${weak}問）</span><input type="checkbox" data-a="weak"${o.weak&&weak?' checked':''}${weak?'':' disabled'}></label>
+    <div style="margin-top:18px"><button class="btn primary big" data-a="start">スタート ▶</button></div>
+    <h2 class="sec">ゲーム別の正答率</h2><div class="stats">${stats}</div>
+    <p class="disclaimer">ここに書いた対応は訓練用の一般的な扱いです。配当・端数・イレギュラーの扱いはカジノやスクールの規定で異なり、所属先の規定が常に優先します。判断が要る場面で「フロアを呼ぶ」が正解になることが多いのは、ディーラーが独断しないことそのものが重要な所作だからです。</p>`;
+}
+function startDrill(){
+  const o=DATA.opts;
+  let pool=BANK.filter(q=>o.game==='all'||q.g===o.game);
+  if(o.weak){const w=weakList(o.game);if(w.length)pool=w;}
+  /* 未挑戦→前回ミス→その他の順に優先して出す（同じ問題ばかりにならないように） */
+  const pri=q=>{const s=DATA.seen[q.id];return !s?0:s.lastNg?1:2;};
+  pool=shuffle(pool.slice()).sort((a,b)=>pri(a)-pri(b));
+  const n=o.count?Math.min(o.count,pool.length):pool.length;
+  S.list=shuffle(pool.slice(0,n));S.i=0;S.res=[];S.screen='q';nextQ();
+}
+function nextQ(){
+  const q=S.list[S.i];S.ans=null;
+  S.order=shuffle(q.c.map((_,k)=>k));
+  render();window.scrollTo(0,0);
+}
+function renderQ(){
+  const q=S.list[S.i],n=S.list.length,g=GAMES[q.g],ok=S.res.filter(r=>r.ok).length;
+  const done=S.ans!==null;
+  const ch=S.order.map((k,idx)=>{
+    let cls='';if(done){if(k===0)cls=' right';else if(k===S.ans)cls=' wrong';else cls=' dim';}
+    return `<button class="choice${cls}" data-a="pick" data-v="${k}" data-k="${'ABCD'[idx]}"${done?' disabled':''}>${esc(q.c[k])}</button>`;
+  }).join('');
+  let ex='';
+  if(done){
+    const r=S.ans===0;
+    ex=`<div class="explain ${r?'ok':'ng'}" role="status" aria-live="polite">
+      <div class="ex-mark">${r?'✓ 正解':'✕ ちがいます'}</div>
+      ${r?'':`<div class="ex-row right"><b>正しい対応</b>${esc(q.c[0])}</div>`}
+      ${q.call?`<div class="ex-call">${esc(q.call[0])}<small>${esc(q.call[1])}</small></div>`:''}
+      <div class="ex-row"><b>理由</b>${esc(q.why)}</div>
+      ${q.v?`<div class="ex-row var"><b>注意</b>${esc(q.v)}</div>`:''}
+      <div class="ex-row" style="font-size:12px;color:var(--text3)"><a href="rules.html#${GAMES[q.g].hash}">ルールブックで${g.name}のイレギュラーを確認</a></div>
+    </div>
+    <div class="nextbar"><button class="btn primary big" data-a="next">${S.i+1>=n?'結果を見る':'次へ'} ▶</button></div>`;
+  }
+  $('app').innerHTML=`
+    <div class="qbar"><button class="icon-x" data-a="home" aria-label="やめる">×</button>
+      <div class="qprog"><span>${S.i+1} / ${n}</span><div class="bar"><i style="width:${(S.i+(done?1:0))/n*100}%"></i></div></div>
+      <div class="qscore">${ok}<small style="font-size:12px;color:var(--text3)">正解</small></div></div>
+    <div class="scene"><span class="badge ${q.g}">${g.en}</span><h2>${esc(q.t)}</h2><div class="sit">${esc(q.s)}</div><div class="ask">${esc(q.a)}</div></div>
+    <div class="choices">${ch}</div>${ex}`;
+}
+function pick(k){
+  if(S.ans!==null)return;
+  const q=S.list[S.i];S.ans=k;const ok=k===0;
+  const s=DATA.seen[q.id]||{ok:0,ng:0};if(ok)s.ok++;else s.ng++;s.lastNg=!ok;s.at=Date.now();DATA.seen[q.id]=s;saveData();
+  S.res.push({q,ok,given:k});SFX.play(ok);render();
+  const ex=document.querySelector('.explain');if(ex)ex.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderResult(){
+  const n=S.res.length,ok=S.res.filter(r=>r.ok).length;
+  $('app').innerHTML=`<div class="rhead"><div class="big">${ok}<small> / ${n}</small></div><p>${ok===n?'全問正解。原則が身についています。':'まちがえた場面は、理由まで声に出して読み直す。'}</p></div>
+    <h2 class="sec">ふり返り</h2>
+    <div class="rlist">${S.res.map(r=>`<div class="ri${r.ok?' ok':''}"><b>${r.ok?'✓':'✕'} ${esc(r.q.t)}<span style="font-weight:normal;color:var(--text3);font-size:11.5px;margin-left:6px">${GAMES[r.q.g].name}</span></b><div class="a">${r.ok?'':`あなた：${esc(r.q.c[r.given])}<br>`}<em>正しい対応：${esc(r.q.c[0])}</em></div></div>`).join('')}</div>
+    <div class="ractions"><button class="btn" data-a="home">設定に戻る</button><button class="btn primary" data-a="start">もう一度 ▶</button></div>`;
+}
+function render(){
+  $('lnkRules').href='rules.html'+(DATA.opts.game!=='all'?'#'+GAMES[DATA.opts.game].hash:'');
+  if(S.screen==='home')renderHome();else if(S.screen==='q')renderQ();else renderResult();
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,v=el.dataset.v;
+  if(a==='game'){DATA.opts.game=v;saveData();render();}
+  else if(a==='count'){DATA.opts.count=+v;saveData();render();}
+  else if(a==='weak'){DATA.opts.weak=el.checked;saveData();}
+  else if(a==='start')startDrill();
+  else if(a==='pick')pick(+v);
+  else if(a==='next'){S.i++;if(S.i>=S.list.length){S.screen='result';DATA.sessions++;saveData();render();window.scrollTo(0,0);}else nextQ();}
+  else if(a==='home'){S.screen='home';render();window.scrollTo(0,0);}
+});
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='q'||e.ctrlKey||e.metaKey||e.altKey)return;
+  const idx='1234abcd'.indexOf(e.key.toLowerCase());
+  if(idx>=0&&S.ans===null){const b=document.querySelectorAll('.choice')[idx%4];if(b)b.click();}
+  else if(e.key==='Enter'&&S.ans!==null){const b=document.querySelector('[data-a="next"]');if(b)b.click();}
+});
+/* #roulette などで開いたら、そのゲームを選んだ状態にする */
+(function(){const h=location.hash.slice(1);const k=Object.keys(GAMES).find(k=>GAMES[k].hash===h);if(k){DATA.opts.game=k;saveData();}})();
+render();
+</script>
+</body>
+</html>
