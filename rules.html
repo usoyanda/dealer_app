@@ -97,6 +97,8 @@ body.embed main{padding-top:10px}
   .tbl{font-size:12.5px}
 }
 @media (max-width:420px){.bm-lg{display:none}.bm-sm{display:inline}}
+/* 読みやすさ：スマホでもピンチせずに読める大きさ（補助ラベル11.5px以上） */
+.tag{font-size:11.5px}.ph .en{font-size:12px}.call small{font-size:12px}
 </style>
 </head>
 <body>
@@ -530,24 +532,27 @@ document.addEventListener('click',e=>{
 });
 addEventListener('hashchange',fromHash);
 
-/* インサイドベットの置き方の図（17を中心にした3×3） */
+/* インサイドベットの置き方の図（17を中心にした3×3）。ゲームと同じディーラー目線：
+   手前（下）から 3-6-9／2-5-8／1-4-7 の行、その奥（上）にダズン */
 (function(){
   const svg=document.getElementById('rlDiagram');if(!svg)return;
   const RED=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
   const val=(r,c)=>r===0?c*3:r===1?c*3-1:c*3-2;
-  const cw=100,ch=50,x0=60,y0=10,cols=[5,6,7];
+  const cw=100,ch=50,x0=60,y0=10,cols=[5,6,7],top=y0+26;
+  const rowY=r=>top+(2-r)*ch;
   let s='';
+  s+=`<rect x="${x0}" y="${y0}" width="${cw*3}" height="24" fill="rgba(0,0,0,.2)" stroke="rgba(250,247,239,.3)"/><text x="${x0+cw*1.5}" y="${y0+17}" text-anchor="middle" font-size="15" fill="rgba(250,247,239,.75)">ダズン側（外側・客の側）</text>`;
   for(let r=0;r<3;r++)cols.forEach((c,i)=>{const v=val(r,c);
-    s+=`<rect x="${x0+i*cw+1}" y="${y0+r*ch+1}" width="${cw-2}" height="${ch-2}" rx="3" fill="${RED.has(v)?'#B3261E':'#1B1B1B'}" stroke="rgba(250,247,239,.4)"/>`
-      +`<text x="${x0+i*cw+cw/2}" y="${y0+r*ch+ch/2+7}" text-anchor="middle" font-size="20" font-weight="bold" fill="#F4EFE2" font-family="Georgia,serif" opacity=".55">${v}</text>`;});
-  s+=`<rect x="${x0}" y="${y0+ch*3+2}" width="${cw*3}" height="22" fill="rgba(0,0,0,.2)" stroke="rgba(250,247,239,.3)"/><text x="${x0+cw*1.5}" y="${y0+ch*3+17}" text-anchor="middle" font-size="11" fill="rgba(250,247,239,.6)">ダズン側（外側）</text>`;
-  const chip=(x,y,l)=>s+=`<circle cx="${x}" cy="${y}" r="15" fill="#6B3FA0" stroke="#F2D27A" stroke-width="3" stroke-dasharray="4 6.5"/><text x="${x}" y="${y+4.5}" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">${l}</text>`;
-  chip(x0+cw*1.5,y0+ch*1.5,'S');            /* 17 */
-  chip(x0+cw*2,y0+ch*1.5,'Sp');             /* 17-20 */
-  chip(x0+cw*1.5,y0+ch*1,'Sp');             /* 17-18 */
-  chip(x0+cw*1,y0+ch*2,'C');                /* 13-14-16-17 */
-  chip(x0+cw*0.5,y0+ch*3,'St');             /* 13-14-15 */
-  chip(x0+cw*2,y0+ch*3,'6L');               /* 16〜21 */
+    s+=`<rect x="${x0+i*cw+1}" y="${rowY(r)+1}" width="${cw-2}" height="${ch-2}" rx="3" fill="${RED.has(v)?'#B3261E':'#1B1B1B'}" stroke="rgba(250,247,239,.4)"/>`
+      +`<text x="${x0+i*cw+cw/2}" y="${rowY(r)+ch/2+7}" text-anchor="middle" font-size="20" font-weight="bold" fill="#F4EFE2" font-family="Georgia,serif" opacity=".55">${v}</text>`;});
+  s+=`<text x="${x0+cw*1.5}" y="${top+ch*3+18}" text-anchor="middle" font-size="15" fill="rgba(250,247,239,.75)">▼ ディーラー（手前）</text>`;
+  const chip=(x,y,l)=>s+=`<circle cx="${x}" cy="${y}" r="16" fill="#6B3FA0" stroke="#F2D27A" stroke-width="3" stroke-dasharray="4 6.5"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">${l}</text>`;
+  chip(x0+cw*1.5,top+ch*1.5,'S');           /* 17 */
+  chip(x0+cw*2,top+ch*1.5,'Sp');            /* 17-20 */
+  chip(x0+cw*1.5,top+ch*2,'Sp');            /* 17-18 */
+  chip(x0+cw*1,top+ch*1,'C');               /* 13-14-16-17 */
+  chip(x0+cw*0.5,top,'St');                 /* 13-14-15（外側の縁） */
+  chip(x0+cw*2,top,'6L');                   /* 16〜21（外側の縁） */
   svg.innerHTML=s;
 })();
 fromHash();

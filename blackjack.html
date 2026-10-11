@@ -82,6 +82,9 @@ button{font:inherit}
 .seat.clickable,.hand.clickable{cursor:pointer}
 .seat.clickable:hover,.hand.clickable:hover{background:rgba(255,255,255,.09)}
 .seat-no{color:#F1EBDC;font-size:13px;text-align:center;line-height:1.3}
+/* 客のキャラクター：席の一番上。箱の下辺が卓の縁（体は縁の向こう、合図の手は卓の上に出る） */
+.seat-top{display:flex;flex-direction:column;align-items:center;gap:0}
+.seat-cast{display:flex;justify-content:center;margin:-2px 0 1px;min-height:0}
 .seat-no small{display:block;font-size:10.5px;color:rgba(241,235,220,.6)}
 .hands{display:flex;gap:4px;justify-content:center;max-width:100%}
 .hand{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;border-radius:8px;border:1.5px dashed transparent;min-width:0}
@@ -165,57 +168,59 @@ button{font:inherit}
   body{font-size:14px}
   .topbar{flex-wrap:nowrap;gap:8px;padding:6px 10px}
   .brand-main{font-size:16px}.brand-sub{display:none}
-  .meta{margin-left:auto;gap:8px;font-size:11px;flex-wrap:nowrap}
-  .meta b{font-size:13px;margin-left:2px}
+  .meta{margin-left:auto;gap:8px;font-size:12px;flex-wrap:nowrap}
+  .meta b{font-size:14px;margin-left:2px}
   .btn-ghost{padding:4px 8px;font-size:12px;white-space:nowrap}
   .wrap{padding:6px;gap:6px}
   .main-col{gap:6px}
   .felt{min-height:0;padding:6px 4px 8px;border-width:6px;border-bottom:none;border-radius:50% 50% 0 0 / 16% 16% 0 0}
   .felt.has-dealer{padding-bottom:46px}
-  .tbox{width:54px;height:38px;font-size:8px;padding:2px 2px 3px;border-radius:6px;bottom:6px}.tbox b{font-size:9.5px}.tbox i{height:9px}
+  .tbox{width:64px;height:46px;font-size:11.5px;letter-spacing:.02em;padding:2px 2px 3px;border-radius:6px;bottom:6px}.tbox b{font-size:12px}.tbox i{height:8px}
   .felt.has-dealer .tbox{bottom:calc(46px + 4px)}
   #shoeBox{left:4px}#discardBox{right:4px}
   .zone-label{display:none}
   .dealer-zone{gap:2px}
   .cards{min-height:46px;padding:0 4px}
-  .dtotal,.htotal{font-size:11px;min-height:16px;padding:0 6px;line-height:16px}
+  .dtotal,.htotal{font-size:12.5px;min-height:18px;padding:0 6px;line-height:18px}
   .print{margin:2px 0 0}
-  .print-main{font-size:12.5px}
-  .print-sub{font-size:9.5px;line-height:1.3}
+  .print-main{font-size:14px}
+  .print-sub{font-size:11.5px;line-height:1.3}
   .print-ins{display:none}
   .seats{gap:2px;margin-top:0}
   .seat{transform:translateY(calc(var(--dy,0px) * -.3));padding:3px 1px;gap:1px;border-radius:8px}
-  .seat-no{font-size:11px;line-height:1.2}
+  .seat-no{font-size:12.5px;line-height:1.2}
+  .seat-top{flex-direction:row;align-items:center;justify-content:center;gap:3px}
+  .seat-cast{margin:0}
   .hand{padding:2px 1px;gap:1px}
-  .bet-spot{width:34px;height:34px}
-  .chip{width:28px;height:28px;font-size:8px;border-width:3px}
-  .hstatus{font-size:9px;min-height:11px;line-height:1.2}
-  .ins-chip{font-size:9px;padding:0 4px;line-height:1.4}
+  .bet-spot{width:38px;height:38px}
+  .chip{width:33px;height:33px;font-size:10.5px;border-width:3px}
+  .hstatus{font-size:11.5px;min-height:14px;line-height:1.2}
+  .ins-chip{font-size:11px;padding:0 4px;line-height:1.4}
   .seat .signal{display:none}
   .empty-seat{padding:12px 0}
   .shoe-info{position:static;text-align:center;font-size:9.5px;margin-top:2px;color:rgba(250,247,239,.5)}
-  .table-next{left:4px;top:4px;font-size:12.5px;padding:5px 10px;min-height:34px}
+  .table-next{left:4px;top:4px;font-size:13.5px;padding:5px 10px;min-height:36px}
   .caption{padding:5px 10px !important;padding-right:74px !important;min-height:0;border-left-width:3px}
-  .caption .en{font-size:14.5px;line-height:1.3}
-  .caption .ja{font-size:10.5px;line-height:1.35}
-  .cap-voice{font-size:10.5px;padding:2px 7px;right:6px}
+  .caption .en{font-size:16px;line-height:1.3}
+  .caption .ja{font-size:12px;line-height:1.35}
+  .cap-voice{font-size:12px;padding:2px 7px;right:6px}
   .console{padding:7px 8px 8px;border-top-width:3px}
   .phase{display:none}
-  .prompt{font-size:13px;margin:0 0 5px;line-height:1.45}
-  .mob-signal{display:block;font-weight:normal;font-size:12.5px;background:var(--ivory);border-left:3px solid var(--felt);padding:3px 8px;margin-top:4px;border-radius:4px}
+  .prompt{font-size:14.5px;margin:0 0 5px;line-height:1.45}
+  .mob-signal{display:block;font-weight:normal;font-size:13.5px;background:var(--ivory);border-left:3px solid var(--felt);padding:3px 8px;margin-top:4px;border-radius:4px}
   .mob-signal b{color:var(--felt)}
-  .fb{font-size:11.5px;padding:4px 8px;margin-bottom:5px;line-height:1.45}
+  .fb{font-size:12.5px;padding:4px 8px;margin-bottom:5px;line-height:1.45}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}
   .actions.chip-acts{grid-template-columns:1fr 1fr 1.3fr}
-  .act{font-size:12px;padding:4px 5px;min-height:38px;line-height:1.3}
+  .act{font-size:13.5px;padding:4px 5px;min-height:40px;line-height:1.3}
   .tray{gap:4px;padding:6px;justify-content:space-between;margin-bottom:5px;flex-wrap:nowrap}
-  .tray-chip{width:46px;height:46px;font-size:11.5px;border-width:4px;flex:none}
+  .tray-chip{width:48px;height:48px;font-size:12.5px;border-width:4px;flex:none}
   .stack{padding:3px 8px;min-height:36px;margin-bottom:5px;gap:8px}
-  .mini-chip{width:22px;height:22px;font-size:8px;border-width:2px}
-  .stack-total{font-size:12px}.stack-total b{font-size:15px}
-  .summary h3{font-size:13.5px;margin-bottom:2px}
-  .summary ul{margin:2px 0 6px;font-size:12px}
-  .summary p{margin:2px 0 6px;font-size:12.5px}
+  .mini-chip{width:25px;height:25px;font-size:10px;border-width:2px}
+  .stack-total{font-size:13px}.stack-total b{font-size:16px}
+  .summary h3{font-size:15px;margin-bottom:2px}
+  .summary ul{margin:2px 0 6px;font-size:13px}
+  .summary p{margin:2px 0 6px;font-size:13px}
   .summary .stat-table,.summary .stats-label{display:none}
   .next-top{display:none}
   .meta .lg,.btn-ghost .lg,.act .sub{display:none}.meta .sm{display:inline}
@@ -229,7 +234,7 @@ button{font:inherit}
   .htotal{white-space:nowrap}.htotal .sub,.hstatus .sub{display:none}
   .actions.chip-acts{grid-template-columns:1fr 1fr 1.3fr}
   .actions{grid-template-columns:1fr 1fr 1fr}
-  .act{min-height:36px}
+  .act{min-height:40px}
   .log{max-height:none}
 }
 @media (prefers-reduced-motion:reduce){.card.new,.caption.flash .en,.caption.flash .ja{animation:none}}
@@ -1081,6 +1086,545 @@ const ACC_SET_HTML=o=>`<div class="row"><label for="optAccidents">実戦のア�
 @media (max-width:600px){.acc-what{font-size:13px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:11.5px;padding:0 5px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
 document.head.appendChild(st);})();
 /*KIT_END*/
+/*CAST_START*/
+/* ===== 客のキャラクター（共通・4ゲームで同一。直すときは scratchpad の kit/cast.js を直して同期する） =====
+   写真のぬいぐるみの雰囲気を借りたオリジナル。席番号 n には Cast.CHARS[(n-1)%7] を座らせる。
+   Cast.html(席の番号-1 または id, {mood, pose, size, delay}) が1体ぶんの HTML を返す（クリックは遮らない）。 */
+/* cast.js — dealer_app 客キャラ（ぬいぐるみ風）キット
+ * 依存なし・ビルド不要。CAST_CSS を <style> に入れ（Cast.html が初回に自動で入れる）、
+ * Cast.html(who, {mood, pose, size, delay}) が返す HTML 文字列を席に innerHTML で置く。
+ * 箱の下辺 = 卓の縁。箱の幅 = size * Cast.RATIO（1.1）。体は縁で切れて「卓の向こうに座っている」見え方になる。
+ * はみ出し（overflow: visible）：合図（hit/stand/surrender/reach）とダブル・スプリットのチップは
+ * 縁の手前＝卓の上で行うので、下辺より最大で高さの約16%下へ出る。上へはアンテナ・塔の帽子・跳ねる動きで最大約13%。
+ * 合図の手は画面の左側（客の右手）。ダブル／スプリットのチップは画面の右下。
+ * アニメーションは CSS keyframes のみ。位相は絶対時刻から決めるので、innerHTML で描き直しても
+ * 動きが途切れない（delay は席ごとの位相ずらし）。
+ */
+const CAST_CSS = `
+.cast{position:relative;display:inline-block;vertical-align:bottom;line-height:0;flex:none;pointer-events:none;user-select:none;-webkit-user-select:none}
+.cast *{pointer-events:none}
+.cast>svg.cs{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;display:block;fill:none;stroke:none}
+.cast svg.cc{width:170px;height:140px;overflow:hidden;display:inline}
+.cast path,.cast ellipse{stroke-linejoin:round;stroke-linecap:round}
+.cast .cbd{transform-box:fill-box;transform-origin:50% 100%;animation:cast-breathe 3.6s var(--cd,0s) ease-in-out infinite}
+.cast .cey{transform-box:fill-box;transform-origin:50% 50%;animation:cast-blink 4.8s var(--cd,0s) linear infinite}
+.cast.m-happy .cbd{animation:cast-bounce .8s var(--cd,0s) ease-in-out infinite}
+.cast.m-sad .cbd{animation:cast-slump 4.4s var(--cd,0s) ease-in-out infinite}
+.cast.m-think .cbd{animation:cast-tilt 4s var(--cd,0s) ease-in-out infinite}
+.cast.m-surprise .cbd{animation:cast-jump 1.8s var(--cd,0s) ease-out infinite}
+.cast.m-out .cbd{animation:none;transform:translateY(13px)}
+.cast.m-out{filter:grayscale(.85) brightness(.8);opacity:.62}
+.cast.m-happy .cey,.cast.m-surprise .cey,.cast.m-out .cey{animation:none}
+.cast.m-sad .cey{animation-duration:6.4s}
+.cast.p-hit .cz{animation:cast-tap 1.4s var(--cd,0s) ease-in-out infinite}
+.cast.p-hit .czx{animation:cast-tapfx 1.4s var(--cd,0s) linear infinite}
+.cast.p-stand .cz{animation:cast-wave 1.1s var(--cd,0s) ease-in-out infinite}
+.cast.p-surrender .cz{animation:cast-slide 2.2s var(--cd,0s) ease-in-out infinite}
+.cast.p-surrender .czx{animation:cast-line 2.2s var(--cd,0s) ease-in-out infinite}
+.cast.p-double .cz,.cast.p-split .cz{animation:cast-pump 1s var(--cd,0s) ease-in-out infinite}
+.cast.p-cheer .cz{animation:cast-cheer .7s var(--cd,0s) ease-in-out infinite}
+.cast.p-cheer .cz2{animation:cast-cheer .7s calc(var(--cd,0s) + .35s) ease-in-out infinite}
+.cast.p-reach .cz{animation:cast-reach 2.2s var(--cd,0s) ease-in-out infinite}
+.cast.p-squeeze .cz{animation:cast-sq 2.4s var(--cd,0s) ease-in-out infinite}
+.cast.p-squeeze .czx{transform-box:fill-box;transform-origin:100% 0;animation:cast-peel 2.4s var(--cd,0s) ease-in-out infinite}
+.cast .cft{animation:cast-tear 2.4s var(--cd,0s) ease-in infinite}
+.cast .cfd1{animation:cast-dot 1.5s var(--cd,0s) linear infinite}
+.cast .cfd2{animation:cast-dot 1.5s calc(var(--cd,0s) - 1.25s) linear infinite}
+.cast .cfd3{animation:cast-dot 1.5s calc(var(--cd,0s) - 1s) linear infinite}
+.cast .cfp{transform-box:fill-box;transform-origin:50% 100%;animation:cast-pop 1.8s var(--cd,0s) ease-out infinite}
+.cast .cfs{transform-box:fill-box;transform-origin:50% 50%;animation:cast-tw 1.6s var(--cd,0s) ease-in-out infinite}
+.cast .cfs2{animation-delay:calc(var(--cd,0s) - .8s)}
+.cast .cfz{animation:cast-z 2.6s var(--cd,0s) linear infinite}
+@keyframes cast-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.03)}}
+@keyframes cast-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@keyframes cast-bounce{0%,100%{transform:translateY(0) scale(1.03,.97)}45%{transform:translateY(-5px) scale(.98,1.03)}}
+@keyframes cast-slump{0%,100%{transform:translateY(4px) rotate(-2deg)}50%{transform:translateY(5px) rotate(2deg)}}
+@keyframes cast-tilt{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(-4.5deg) translateY(1px)}}
+@keyframes cast-jump{0%,60%,100%{transform:translateY(0) scale(1,1)}8%{transform:translateY(0) scale(1.05,.94)}20%{transform:translateY(-8px) scale(.96,1.05)}32%{transform:translateY(0) scale(1.04,.96)}42%{transform:translateY(0) scale(1,1)}}
+@keyframes cast-tap{0%,50%,100%{transform:translateY(-10px)}20%,30%,70%,80%{transform:translateY(0)}}
+@keyframes cast-tapfx{0%,16%,34%,66%,84%,100%{opacity:.25}20%,30%,70%,80%{opacity:1}}
+@keyframes cast-wave{0%,100%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+@keyframes cast-slide{0%,8%{transform:translateX(0);opacity:1}62%,84%{transform:translateX(34px);opacity:1}94%{transform:translateX(34px);opacity:0}100%{transform:translateX(0);opacity:0}}
+@keyframes cast-line{0%,8%{stroke-dashoffset:34;opacity:1}62%,84%{stroke-dashoffset:0;opacity:1}94%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes cast-pump{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+@keyframes cast-cheer{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@keyframes cast-reach{0%,100%{transform:scale(.86)}50%{transform:scale(1.06)}}
+@keyframes cast-sq{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg)}}
+@keyframes cast-peel{0%,25%,100%{transform:scale(.15);opacity:0}45%,80%{transform:scale(1);opacity:1}}
+@keyframes cast-tear{0%,15%{transform:translateY(-1px);opacity:0}30%{opacity:1}85%{transform:translateY(8px);opacity:.9}100%{transform:translateY(9px);opacity:0}}
+@keyframes cast-dot{0%,100%{opacity:.15}35%,70%{opacity:1}}
+@keyframes cast-pop{0%{transform:scale(.2);opacity:0}12%{transform:scale(1.2);opacity:1}22%,70%{transform:scale(1);opacity:1}85%,100%{transform:scale(.6);opacity:0}}
+@keyframes cast-tw{0%,100%{transform:scale(.3) rotate(0);opacity:0}40%{transform:scale(1) rotate(30deg);opacity:1}75%{transform:scale(.6) rotate(60deg);opacity:0}}
+@keyframes cast-z{0%{transform:translate(0,0);opacity:0}30%{opacity:.9}100%{transform:translate(4px,-7px);opacity:0}}
+`;
+
+const Cast = (() => {
+  'use strict';
+  const RATIO = 1.1;
+  const MOODS = ['idle', 'happy', 'sad', 'think', 'surprise', 'out'];
+  const POSES = ['rest', 'hit', 'stand', 'double', 'split', 'surrender', 'squeeze', 'cheer', 'reach'];
+  const INK = '#1B120E', MOUTH = '#4A1A16', TONGUE = '#F27482', HALO = '#FFF4DE', HOP = ' opacity=".72"';
+  let uid = 0, cssDone = false;
+
+  /* ---------- 図形ヘルパー ---------- */
+  const r1 = n => Math.round(n * 10) / 10;
+  const pt = (x, y) => r1(x) + ' ' + r1(y);
+  const C = (x, y, r) => `M${pt(x - r, y)}a${r1(r)} ${r1(r)} 0 1 0 ${r1(2 * r)} 0a${r1(r)} ${r1(r)} 0 1 0 ${r1(-2 * r)} 0Z`;
+  const E = (x, y, rx, ry) => `M${pt(x - rx, y)}a${r1(rx)} ${r1(ry)} 0 1 0 ${r1(2 * rx)} 0a${r1(rx)} ${r1(ry)} 0 1 0 ${r1(-2 * rx)} 0Z`;
+  const RE = (x, y, rx, ry, deg) => {
+    const a = deg * Math.PI / 180, c = Math.cos(a) * rx, s = Math.sin(a) * rx;
+    return `M${pt(x - c, y - s)}A${r1(rx)} ${r1(ry)} ${deg} 1 0 ${pt(x + c, y + s)}A${r1(rx)} ${r1(ry)} ${deg} 1 0 ${pt(x - c, y - s)}Z`;
+  };
+  const P = (d, fill, stroke, sw, extra) =>
+    `<path d="${d}" fill="${fill || 'none'}"${stroke ? ` stroke="${stroke}" stroke-width="${sw}"` : ''}${extra || ''}/>`;
+  const hash = (i, s) => { const v = Math.sin(i * 12.9898 + s * 78.233) * 43758.5453; return v - Math.floor(v); };
+  // ふわふわの縁：超楕円をなぞり、各区間を外側へ少しふくらませた2次曲線でつなぐ（ぼかしフィルタを使わない毛羽）
+  function blob(cx, cy, rx, ry, o) {
+    o = o || {};
+    const n = o.n || 2, N = o.N || 30, amp = o.amp == null ? 1.3 : o.amp, egg = o.egg || 0, seed = o.seed || 1, e = 2 / n;
+    const pts = [];
+    for (let i = 0; i < N; i++) {
+      const t = i / N * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+      pts.push([cx + Math.sign(c) * Math.pow(Math.abs(c), e) * rx * (1 + egg * s), cy + Math.sign(s) * Math.pow(Math.abs(s), e) * ry]);
+    }
+    let d = `M${pt(pts[0][0], pts[0][1])}`;
+    for (let i = 0; i < N; i++) {
+      const a = pts[i], b = pts[(i + 1) % N], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      const k = amp * (0.5 + hash(i, seed));
+      d += `Q${pt((a[0] + b[0]) / 2 + dy / L * k, (a[1] + b[1]) / 2 - dx / L * k)} ${pt(b[0], b[1])}`;
+    }
+    return d + 'Z';
+  }
+  const heart = (x, y, s) =>
+    `M${pt(x, y + .9 * s)}C${pt(x - .2 * s, y + .62 * s)} ${pt(x - s, y + .2 * s)} ${pt(x - s, y - .3 * s)}` +
+    `C${pt(x - s, y - .85 * s)} ${pt(x - .22 * s, y - .98 * s)} ${pt(x, y - .45 * s)}` +
+    `C${pt(x + .22 * s, y - .98 * s)} ${pt(x + s, y - .85 * s)} ${pt(x + s, y - .3 * s)}` +
+    `C${pt(x + s, y + .2 * s)} ${pt(x + .2 * s, y + .62 * s)} ${pt(x, y + .9 * s)}Z`;
+  const star = (x, y, R, r, n) => {
+    n = n || 5; let d = '';
+    for (let i = 0; i < n * 2; i++) {
+      const a = -Math.PI / 2 + i * Math.PI / n, q = i % 2 ? r : R;
+      d += (i ? 'L' : 'M') + pt(x + Math.cos(a) * q, y + Math.sin(a) * q);
+    }
+    return d + 'Z';
+  };
+  // 手（指つき）：手のひら円 + 指（角度は真上=0、右回り＋）。fingers=[] で丸い手。
+  function handD(fingers, r, hw, L) {
+    r = r || 5.4; hw = hw || 2.3; L = L == null ? 7.5 : L;
+    if (!fingers.length) return C(0, 0, r);
+    const rad = Math.PI / 180, dl = Math.asin(hw / r) / rad;
+    const Q = th => [Math.sin(th * rad) * r, -Math.cos(th * rad) * r];
+    const fs = fingers.slice().sort((a, b) => b - a);
+    let s = '';
+    fs.forEach((ph, i) => {
+      const dir = [Math.sin(ph * rad), -Math.cos(ph * rad)], rb = Q(ph + dl), lb = Q(ph - dl);
+      s += (i ? `A${r} ${r} 0 0 0 ${pt(rb[0], rb[1])}` : `M${pt(rb[0], rb[1])}`) +
+        `L${pt(rb[0] + dir[0] * L, rb[1] + dir[1] * L)}A${hw} ${hw} 0 0 0 ${pt(lb[0] + dir[0] * L, lb[1] + dir[1] * L)}L${pt(lb[0], lb[1])}`;
+    });
+    const f = Q(fs[0] + dl);
+    return s + `A${r} ${r} 0 1 0 ${pt(f[0], f[1])}Z`;
+  }
+
+  /* ---------- キャラクター定義（席1〜7） ---------- */
+  // pal: b=地色 l=ハイライト e=縁の陰 k=輪郭線 paw=手 arm=腕
+  // L(u) は {sil(縁取り用の輪郭), back(体の後ろ), body(体), patch(顔の布), top(鼻など), hold(抱えもの), hat}
+  const CH = [
+    { id: 'beni', name: 'ベニまる', color: '#E2392E',
+      pal: { b: '#E2392E', l: '#FF7C68', e: '#A51C16', k: '#5C100C', paw: '#FFF2E8', arm: '#E2392E' },
+      eyes: { t: 'bead', x: [46, 64], y: 38, r: 3.3, lash: 1 },
+      mouth: { x: 55, y: 49.6, w: 3.4, s: 'open' },
+      rest: [[29, 97], [81, 97]], sh: [[27, 76], [83, 76]], fx: [93, 12],
+      g2: ['#FFFFFF', '#F3EEE9', '#D2C7BF'],
+      L(u) {
+        const body = blob(55, 66, 39, 54, { n: 2.7, egg: .03, amp: 2.1, N: 44, seed: 1 });
+        const ears = C(38, 12.5, 9.5) + C(72, 12.5, 9.5);
+        return {
+          sil: body + ears, body, sheen: 'M22.5 52Q22 32 33 22',
+          patch: P(E(55, 48.6, 10, 7.8), '#FFF7F0', '#E2CBBE', .9, ' stroke-dasharray="1.6 1.3"'),
+          top: P(ears, u.g, this.pal.k, 1.4) + P(C(38.3, 12.8, 6.6) + C(71.7, 12.8, 6.6), '#FFF5EC', '#E2CFC2', .7) +
+            P(heart(38.3, 13.4, 4.1) + heart(71.7, 13.4, 4.1), '#E3343A', '#8E1712', .6) +
+            P(E(55, 45.3, 2.9, 2.1), INK),
+          hold: P(E(55, 85, 25.5, 18), u.g2, '#B9ACA3', 1.2) + P(E(55, 85, 16.5, 11.5), 'none', '#DCD1C8', .8, ' stroke-dasharray="1.8 1.5"') +
+            P(E(55, 83.4, 6.4, 4.6), '#5E5654', '#3A3331', 1)
+        };
+      } },
+    { id: 'moka', name: 'モカ', color: '#6E4129',
+      pal: { b: '#6E4129', l: '#9A6643', e: '#4A2817', k: '#21110A', paw: '#A87450', arm: '#7A4A2E' },
+      eyes: { t: 'bead', x: [43, 67], y: 46.5, r: 3.9 },
+      mouth: { x: 55, y: 55.8, w: 4.2, s: 'open' },
+      rest: [[30, 97], [80, 97]], sh: [[26, 78], [84, 78]], fx: [94, 13],
+      L(u) {
+        const body = blob(55, 62, 38, 50, { n: 2.9, egg: .05, amp: 1.2, N: 34, seed: 2 });
+        const ears = 'M22.5 31Q21.5 17 28.5 9Q34 12.5 40 18.5ZM87.5 31Q88.5 17 81.5 9Q76 12.5 70 18.5Z';
+        return {
+          sil: body + ears, body, sheen: 'M22 52Q21.5 33 31 22.5',
+          back: P(ears, u.g, this.pal.k, 1.4),
+          patch: P(blob(55, 49, 30.5, 22, { n: 2.3, amp: .7, N: 30, seed: 9 }), '#F6E7D2', '#D3BA96', .9, ' stroke-dasharray="1.8 1.4"'),
+          top: P(C(35, 55.5, 4.3) + C(75, 55.5, 4.3), '#EE6E74', null, 0, ' opacity=".9"') + P(C(55, 51.6, 2.7), '#E5473B', '#9A2A20', .7)
+        };
+      } },
+    { id: 'piko', name: 'ピコ', color: '#F6C63C',
+      pal: { b: '#F6C63C', l: '#FFE992', e: '#D6961A', k: '#6A4206', paw: '#F8C83E', arm: '#A9B2BC', armK: '#4A525C', armW: 4.6 },
+      eyes: { t: 'robot', x: [47.5, 62.5], y: 36, rx: 6.3, ry: 8 },
+      mouth: { x: 55, y: 54, w: 9, s: 'line' },
+      rest: [[31, 96], [79, 96]], restArms: 1, sh: [[36, 71], [74, 71]], fx: [93, 10],
+      L(u) {
+        const head = blob(55, 40, 30.5, 29.5, { n: 2, amp: 1, N: 34, seed: 3 });
+        const torso = blob(55, 92, 23, 18, { amp: .8, seed: 11 });
+        return {
+          sil: head + torso + 'M44 14L37 1' + RE(36.5, 0, 6.5, 2.8, -25), body: head, sheen: 'M30 37Q30.5 21 44.5 13.5',
+          back: P(torso, '#EF7B2B', '#7A3A0C', 1.3) + P('M44 14L37 1', 'none', this.pal.k, 5) + P('M44 14L37 1', 'none', '#D8322A', 3.2) +
+            P(RE(36.5, 0, 6.5, 2.8, -25), '#2A2A2E', '#000', .8),
+          top: P(C(55, 46.5, 3.4), '#E8392C', '#7A1A10', .8) + P(C(53.8, 45.3, 1.1), '#fff', null, 0, ' opacity=".85"'),
+          hold: P(heart(55, 85, 13), '#FFFDF7', '#B8ACA2', 1.1) + P(heart(55, 85, 9.6), 'none', '#E0D6CC', .7, ' stroke-dasharray="1.6 1.3"') +
+            P(heart(55, 84.5, 3.6), '#F3818E')
+        };
+      } },
+    { id: 'kurun', name: 'クルン', color: '#3266D3',
+      pal: { b: '#3266D3', l: '#6A9CF5', e: '#1D409C', k: '#0C1A4C', paw: '#79A6F5', arm: '#3266D3' },
+      eyes: { t: 'alien', x: [41.5, 68.5], y: 47, rx: 9.4, ry: 11, rot: 14, c: '#F7A11E' },
+      mouth: { x: 55, y: 63.5, w: 3.4, s: 'small' },
+      rest: [[30, 97], [80, 97]], sh: [[25, 78], [85, 78]], fx: [94, 12],
+      L(u) {
+        const body = blob(55, 60, 35.5, 49, { n: 2.2, egg: .07, amp: 1.3, N: 34, seed: 4 });
+        const ant = 'M56 12.5C55.5 6 48.5 5 48.5 -.5C48.5 -6 55.5 -7.5 59 -4.5C62.5 -1.5 60 3 56.5 2C54 1.2 54.5 -2.2 57 -2';
+        return {
+          sil: body + ant, body, sheen: 'M25.5 46Q25.5 27 39.5 16.5',
+          back: P(ant, 'none', this.pal.k, 5.4) + P(ant, 'none', this.pal.b, 3.3),
+          top: ''
+        };
+      } },
+    { id: 'piyo', name: 'ピヨ吉', color: '#F9D838',
+      pal: { b: '#F9D838', l: '#FFF3A0', e: '#DDA312', k: '#6A4C00', paw: '#FFC23A', arm: '#F9D838' },
+      eyes: { t: 'bead', x: [45, 65], y: 41, r: 3.1 },
+      mouth: { x: 55, y: 51.5, w: 8, s: 'beak' },
+      rest: [[30, 96], [80, 96]], sh: [[24, 76], [86, 76]], fx: [94, 16],
+      L(u) {
+        const body = blob(55, 64, 37, 46, { n: 2.1, egg: .06, amp: 1.3, N: 34, seed: 5 });
+        const tower = 'M50.5 18.5L53 4L57 4L59.5 18.5Z', deck = 'M50.6 4.5h8.8v-4.6h-8.8Z', brim = E(55, 18.5, 9, 2.8);
+        return {
+          sil: body + tower + deck + brim + 'M55 -.5V-6', body, sheen: 'M23 55Q23 35 36 25',
+          patch: P('M19.5 76Q55 82 90.5 76L87.5 91Q55 96 22.5 91Z', '#B9793F', '#6E4318', .9) +
+            P('M21 83.5Q55 89 89 83.5', 'none', '#7E4C22', 11, ' stroke-dasharray="1 2.6" opacity=".45"') +
+            P(C(37, 49, 3.4) + C(73, 49, 3.4), '#FF8A7A', null, 0, ' opacity=".6"'),
+          top: P('M55 67L44.5 61.5Q43 67 44.5 72.5ZM55 67L65.5 61.5Q67 67 65.5 72.5Z', '#DA2A2E', '#6E0E0E', .9) +
+            P(C(55, 67, 2.6), '#B81E22', '#6E0E0E', .8),
+          hat: P(brim, '#DA2A2E', '#6E0E0E', .9) + P(tower, '#EDB848', this.pal.k, .9) +
+            P('M51.6 14L57.2 7.5M58.4 14L52.8 7.5M51.3 16.5h7.4M55 -.5V-6', 'none', '#8E6210', .8) +
+            P(deck, '#DA2A2E', '#6E0E0E', .8) + P(C(55, -6.5, 1.6), '#EDB848', this.pal.k, .7)
+        };
+      } },
+    { id: 'monta', name: 'モンタ', color: '#53311F',
+      pal: { b: '#5A3522', l: '#86532F', e: '#371D10', k: '#160904', paw: '#F3D5B2', arm: '#5A3522' },
+      eyes: { t: 'bead', x: [48, 62], y: 50.5, r: 2.9 },
+      mouth: { x: 55, y: 62, w: 5.4, s: 'smile' },
+      rest: [[35, 97], [75, 97]], pr: [6.4, 5], sh: [[37, 83], [73, 83]], fx: [85, 30], raise: [17, 50], sig: 28,
+      L(u) {
+        const head = blob(55, 53, 25.5, 24, { n: 2, amp: 1.5, N: 30, seed: 6 });
+        const torso = blob(55, 98, 25, 20, { amp: 1.2, seed: 12 });
+        const ears = C(29.5, 55, 8.6) + C(80.5, 55, 8.6);
+        return {
+          sil: head + torso + ears, body: head, sheen: 'M34.5 48Q35.5 37 44.5 31.5',
+          back: P(torso, u.g, this.pal.k, 1.3) + P(ears, u.g, this.pal.k, 1.3) + P(C(30.5, 55, 5.2) + C(79.5, 55, 5.2), '#EDC79E'),
+          patch: P(C(48, 50.5, 8.2) + C(62, 50.5, 8.2) + E(55, 61, 12.5, 8.4), '#F3D5B2'),
+          top: P(C(53.4, 57.6, .9) + C(56.6, 57.6, .9), '#5A3420')
+        };
+      } },
+    { id: 'sasa', name: 'ササ', color: '#3E9B4F',
+      pal: { b: '#F7F4EE', l: '#FFFFFF', e: '#CFC7BA', k: '#2F2B28', paw: '#2A2626', arm: '#2A2626' },
+      eyes: { t: 'panda', x: [45, 65], y: 53 },
+      mouth: { x: 55, y: 62, w: 3.8, s: 'w' },
+      rest: [[33, 97], [77, 97]], sh: [[30, 83], [80, 83]], fx: [93, 18],
+      L(u) {
+        const head = blob(55, 54, 31.5, 27, { n: 2.2, amp: 1.2, N: 34, seed: 7 });
+        const torso = blob(55, 99, 30, 22, { amp: 1, seed: 13 });
+        const ears = C(30, 34, 8.4) + C(80, 34, 8.4);
+        const dome = 'M33.5 37C33.5 20 43.5 13 55 13C66.5 13 76.5 20 76.5 37Q55 41.5 33.5 37Z';
+        let zig = 'M36.5 29.5'; for (let i = 0; i < 10; i++) zig += `l3.7 ${i % 2 ? 3.4 : -3.4}`;
+        return {
+          sil: head + torso + ears + dome + C(55, 12, 3.8), body: head,
+          back: P(ears, '#2A2626', '#000', 1) + P(torso, u.g, this.pal.k, 1.3) +
+            P('M29 80Q55 87 81 80L80 86.5Q55 93.5 30 86.5Z', '#3E9B4F', '#1C5A2A', .9),
+          top: P(E(55, 59.8, 2.7, 1.9), '#2A2626') + P(C(38, 62, 3.2) + C(72, 62, 3.2), '#FF9AA6', null, 0, ' opacity=".55"'),
+          hat: P(dome, '#3E9B4F', '#1C5A2A', 1.1) + P(zig, 'none', '#FFFFFF', 1.7) + P(zig.replace('M36.5 29.5', 'M36.5 33'), 'none', '#E0383E', 1.3) +
+            P(C(55, 12, 3.8), '#FFFFFF', '#B5AC9F', .8)
+        };
+      } }
+  ];
+
+  /* ---------- 目 ---------- */
+  function eyes(ch, mood) {
+    const e = ch.eyes, [xl, xr] = e.x, y = e.y, k = INK;
+    let s = '', outside = '';
+    if (e.t === 'bead') {
+      const r = e.r;
+      if (mood === 'happy') {
+        s = P(`M${pt(xl - r * 1.25, y + r * .5)}Q${pt(xl, y - r * 1.5)} ${pt(xl + r * 1.25, y + r * .5)}M${pt(xr - r * 1.25, y + r * .5)}Q${pt(xr, y - r * 1.5)} ${pt(xr + r * 1.25, y + r * .5)}`, 'none', k, r1(r * .72));
+      } else if (mood === 'out') {
+        s = P(`M${pt(xl - r * 1.2, y)}Q${pt(xl, y + r * 1.1)} ${pt(xl + r * 1.2, y)}M${pt(xr - r * 1.2, y)}Q${pt(xr, y + r * 1.1)} ${pt(xr + r * 1.2, y)}`, 'none', k, r1(r * .6));
+      } else {
+        let dy = 0, dx = 0, rr = r;
+        if (mood === 'think') { dy = r * .55; dx = -r * .15; }
+        if (mood === 'sad') { dy = r * .35; rr = r * .88; }
+        if (mood === 'surprise') { rr = r * .8; s += P(C(xl, y, r * 1.7) + C(xr, y, r * 1.7), '#FFFDF8', k, .9); }
+        s += P(C(xl + dx, y + dy, rr) + C(xr + dx, y + dy, rr), k);
+        s += P(C(xl + dx - rr * .36, y + dy - rr * .38, rr * .36) + C(xr + dx - rr * .36, y + dy - rr * .38, rr * .36), '#FFFFFF');
+        if (mood === 'sad') s += P(`M${pt(xl - r * 1.4, y - r * 1.5)}L${pt(xl + r * 1.1, y - r * 2.3)}M${pt(xr + r * 1.4, y - r * 1.5)}L${pt(xr - r * 1.1, y - r * 2.3)}`, 'none', k, r1(r * .42));
+      }
+      if (e.lash && mood !== 'out') {
+        const q = mood === 'happy' ? .25 : 0;
+        s += P(`M${pt(xl - r * .8, y - r * (.7 - q))}l${r1(-r * .75)} ${r1(-r * .5)}M${pt(xl - r * .2, y - r * (1 - q))}l${r1(-r * .3)} ${r1(-r * .75)}` +
+          `M${pt(xr + r * .8, y - r * (.7 - q))}l${r1(r * .75)} ${r1(-r * .5)}M${pt(xr + r * .2, y - r * (1 - q))}l${r1(r * .3)} ${r1(-r * .75)}`, 'none', k, .9);
+      }
+    } else if (e.t === 'robot') {
+      const rx = e.rx, ry = e.ry;
+      if (mood === 'out') {
+        s = P(`M${pt(xl - rx, y)}Q${pt(xl, y + ry * .8)} ${pt(xl + rx, y)}M${pt(xr - rx, y)}Q${pt(xr, y + ry * .8)} ${pt(xr + rx, y)}`, 'none', k, 1.5);
+      } else {
+        const sc = mood === 'surprise' ? 1.15 : 1;
+        s = P(E(xl, y, rx * sc, ry * sc) + E(xr, y, rx * sc, ry * sc), '#FFFEFA', ch.pal.k, 1.1);
+        if (mood === 'happy') {
+          s += P(`M${pt(xl - rx * .6, y + 2)}Q${pt(xl, y - 5)} ${pt(xl + rx * .6, y + 2)}M${pt(xr - rx * .6, y + 2)}Q${pt(xr, y - 5)} ${pt(xr + rx * .6, y + 2)}`, 'none', k, 1.7);
+        } else {
+          let px = 1.3, py = 1.2, pr = 2.2;
+          if (mood === 'think') { px = 0; py = ry * .55; }
+          if (mood === 'sad') { px = .6; py = ry * .45; pr = 1.9; }
+          if (mood === 'surprise') { px = 0; py = 0; pr = 1.5; }
+          s += P(C(xl + px, y + py, pr) + C(xr - px, y + py, pr), k) + P(C(xl + px - .7, y + py - .8, .6) + C(xr - px - .7, y + py - .8, .6), '#fff');
+          if (mood === 'sad') s += P(`M${pt(xl - rx, y - ry - 1)}L${pt(xl + rx * .7, y - ry - 4)}M${pt(xr + rx, y - ry - 1)}L${pt(xr - rx * .7, y - ry - 4)}`, 'none', ch.pal.k, 1.4);
+        }
+      }
+    } else if (e.t === 'alien') {
+      const rx = e.rx, ry = e.ry, rot = e.rot, oc = e.c, kk = ch.pal.k;
+      if (mood === 'happy' || mood === 'out') {
+        const d = mood === 'happy'
+          ? `M${pt(xl - rx * .8, y + 3)}Q${pt(xl, y - 8)} ${pt(xl + rx * .8, y + 3)}M${pt(xr - rx * .8, y + 3)}Q${pt(xr, y - 8)} ${pt(xr + rx * .8, y + 3)}`
+          : `M${pt(xl - rx * .8, y)}Q${pt(xl, y + 6)} ${pt(xl + rx * .8, y)}M${pt(xr - rx * .8, y)}Q${pt(xr, y + 6)} ${pt(xr + rx * .8, y)}`;
+        s = P(d, 'none', kk, 5.4) + P(d, 'none', oc, 3.2);
+      } else if (mood === 'sad') {
+        // しょんぼり：上まぶたが目尻（外側）へ下がる半月目。sg=1 は左目（外側=左）、-1 は右目。
+        const half = (x, sg) => `M${pt(x - rx * sg, y + 1)}A${rx} ${ry} 0 0 ${sg > 0 ? 0 : 1} ${pt(x + rx * sg, y - 4.5)}Q${pt(x, y - 2.6)} ${pt(x - rx * sg, y + 1)}Z`;
+        s = P(half(xl, 1) + half(xr, -1), oc, kk, 1.4) + P(star(xl - 2, y + 4, 2.4, 1) + star(xr - 2, y + 4, 2.4, 1), '#FFFFFF');
+      } else {
+        const sc = mood === 'surprise' ? 1.12 : 1;
+        s = P(RE(xl, y, rx * sc, ry * sc, rot) + RE(xr, y, rx * sc, ry * sc, -rot), oc, kk, 1.4);
+        let sx = -2.6, sy = -3.4;
+        if (mood === 'think') { sx = -.5; sy = 4.6; }
+        if (mood === 'surprise') { s += P(C(xl, y + 1, 3.4) + C(xr, y + 1, 3.4), kk); sx = -3.6; sy = -4.6; }
+        s += P(star(xl + sx, y + sy, 3.4, 1.45) + star(xr + sx, y + sy, 3.4, 1.45), '#FFFFFF');
+      }
+    } else if (e.t === 'panda') {
+      outside = P(RE(xl, y, 6.8, 9.4, 28) + RE(xr, y, 6.8, 9.4, -28), '#262222');
+      const W = '#FFFFFF';
+      if (mood === 'happy') s = P(`M${pt(xl - 3, y + 1.5)}Q${pt(xl, y - 3.5)} ${pt(xl + 3, y + 1.5)}M${pt(xr - 3, y + 1.5)}Q${pt(xr, y - 3.5)} ${pt(xr + 3, y + 1.5)}`, 'none', W, 1.6);
+      else if (mood === 'out') s = P(`M${pt(xl - 3, y)}Q${pt(xl, y + 3)} ${pt(xl + 3, y)}M${pt(xr - 3, y)}Q${pt(xr, y + 3)} ${pt(xr + 3, y)}`, 'none', W, 1.4);
+      else {
+        let rw = 2.8, pr = 1.6, py = -.6, px = .8;
+        if (mood === 'think') { py = 1.4; px = .2; }
+        if (mood === 'sad') { py = 1; pr = 1.4; }
+        if (mood === 'surprise') { rw = 3.6; pr = 1.3; py = -.4; }
+        s = P(C(xl + .8, y - .8, rw) + C(xr - .8, y - .8, rw), W) + P(C(xl + .8 + px, y + py, pr) + C(xr - .8 - px, y + py, pr), INK);
+        if (mood === 'sad') s += P(`M${pt(xl - 4, y - 7)}L${pt(xl + 2.5, y - 10)}M${pt(xr + 4, y - 7)}L${pt(xr - 2.5, y - 10)}`, 'none', INK, 1.3);
+      }
+    }
+    return outside + `<g class="cey">${s}</g>`;
+  }
+
+  /* ---------- 口 ---------- */
+  function openMouth(x, y, w) {
+    return P(`M${pt(x - w, y)}Q${pt(x, y + w * 1.55)} ${pt(x + w, y)}Q${pt(x, y + w * .3)} ${pt(x - w, y)}Z`, MOUTH, INK, .8) +
+      P(E(x, y + w * .68, w * .45, w * .26), TONGUE);
+  }
+  function mouth(ch, mood) {
+    const m = ch.mouth, { x, y, w } = m;
+    if (m.s === 'beak') {
+      let s = P(E(x, y, w, w * .58), '#F59A23', '#8A4A00', .9);
+      if (mood === 'happy') s += P(E(x, y + .8, w * .62, w * .3), MOUTH) + P(`M${pt(x - w, y - .3)}Q${pt(x, y + 1.2)} ${pt(x + w, y - .3)}`, 'none', '#B25E00', .8);
+      else if (mood === 'surprise') s += P(E(x, y + .5, w * .32, w * .3), MOUTH);
+      else if (mood === 'sad') s += P(`M${pt(x - w * .9, y + 1.5)}Q${pt(x, y - 1)} ${pt(x + w * .9, y + 1.5)}`, 'none', '#B25E00', .9);
+      else s += P(`M${pt(x - w * .95, y - .2)}Q${pt(x, y + 1.8)} ${pt(x + w * .95, y - .2)}`, 'none', '#B25E00', .9);
+      return s;
+    }
+    if (mood === 'happy') return openMouth(x, y, Math.max(w * 1.15, 3.6));
+    if (mood === 'sad') return P(`M${pt(x - w * .8, y + w * .6)}Q${pt(x, y - w * .3)} ${pt(x + w * .8, y + w * .6)}`, 'none', INK, 1.2);
+    if (mood === 'surprise') return P(E(x, y + 1.2, 2.1, 2.7), MOUTH, INK, .8);
+    if (mood === 'think') return P(`M${pt(x - 1.5, y + 1.2)}q1.6 -1.3 3.2 0t3 -.2`, 'none', INK, 1.1);
+    if (mood === 'out') return P(`M${pt(x - 2, y + 1)}h4`, 'none', INK, 1);
+    switch (m.s) {
+      case 'open': return openMouth(x, y, w);
+      case 'line': return P(`M${pt(x - 11, y - 1.5)}Q${pt(x - 1, y + 4.5)} ${pt(x + 10, y - 2.5)}`, 'none', INK, 1.3);
+      case 'small': return P(`M${pt(x - w, y)}Q${pt(x, y + w)} ${pt(x + w, y)}`, 'none', INK, 1.2);
+      case 'smile': return P(`M${pt(x - w, y - .5)}Q${pt(x, y + w * .8)} ${pt(x + w, y - .5)}`, 'none', INK, 1.2);
+      case 'w': return P(`M${pt(x - 4, y)}Q${pt(x - 2, y + 2.6)} ${pt(x, y)}Q${pt(x + 2, y + 2.6)} ${pt(x + 4, y)}`, 'none', INK, 1);
+    }
+    return '';
+  }
+
+  /* ---------- 気分の効果（涙・…・！・きらり・Zz） ---------- */
+  function fx(ch, mood) {
+    const [fx0, fy0] = ch.fx;
+    if (mood === 'sad') {
+      const e = ch.eyes, x = e.x[0] - 1.5, y = e.y + (e.r || e.ry || 6) + 2;
+      return `<path class="cft" d="M${pt(x, y)}C${pt(x + 3.2, y + 4.2)} ${pt(x + 3.8, y + 8)} ${pt(x, y + 9)}C${pt(x - 3.8, y + 8)} ${pt(x - 3.2, y + 4.2)} ${pt(x, y)}Z" fill="#A8E0FF" stroke="#2468A8" stroke-width=".9"/>`;
+    }
+    if (mood === 'think') {
+      return P(E(fx0 - 4, fy0, 13, 8.4) + C(fx0 - 16, fy0 + 10, 2.2), '#FFFDF6', '#3A2A1E', 1, ' opacity=".96"') +
+        [1, 2, 3].map(i => `<path class="cfd${i}" d="${C(fx0 - 4 + (i - 2) * 5.6, fy0, 1.9)}" fill="#2A1C12"/>`).join('');
+    }
+    if (mood === 'surprise') {
+      const x = fx0, y = fy0;
+      return `<path class="cfp" d="M${pt(x - 2.9, y - 12)}h5.8l-1.6 12h-2.6ZM${pt(x - 2.4, y + 4)}a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0Z" fill="#FFD84A" stroke="#4A2E08" stroke-width="1.1"/>`;
+    }
+    if (mood === 'happy') {
+      return `<path class="cfs" d="${star(fx0, fy0, 7, 2, 4)}" fill="#FFE27A" stroke="#7A5A08" stroke-width=".8"/>` +
+        `<path class="cfs cfs2" d="${star(110 - fx0, fy0 + 8, 5.4, 1.6, 4)}" fill="#FFE27A" stroke="#7A5A08" stroke-width=".8"/>`;
+    }
+    if (mood === 'out') {
+      return `<path class="cfz" d="M${pt(fx0 - 6, fy0 + 3)}h6l-6 6.5h6M${pt(fx0 + 2, fy0 - 5)}h4.4l-4.4 4.6h4.4" fill="none" stroke="#E4ECFF" stroke-width="1.6"/>`;
+    }
+    return '';
+  }
+
+  /* ---------- 手・腕・小物 ---------- */
+  function armD(x1, y1, x2, y2, bend) {
+    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1;
+    return `M${pt(x1, y1)}Q${pt(mx - dy / L * bend, my + dx / L * bend)} ${pt(x2, y2)}`;
+  }
+  function arm(ch, x1, y1, x2, y2, bend) {
+    const d = armD(x1, y1, x2, y2, bend || 0), w = ch.pal.armW || 7.5;
+    return P(d, 'none', HALO, w + 4.4, HOP) + P(d, 'none', ch.pal.armK || ch.pal.k, w + 2.6) + P(d, 'none', ch.pal.arm, w);
+  }
+  function hand(ch, x, y, s, fingers, o) {
+    o = o || {};
+    const d = o.flat ? 'M-9 1C-9 -6.5 9 -6.5 9 1A2.25 2.8 0 0 1 4.5 1A2.25 3.5 0 0 1 0 1A2.25 3.5 0 0 1 -4.5 1A2.25 2.8 0 0 1 -9 1Z'
+      : handD(fingers, 5.4, 2.3, o.L);
+    const extra = '';
+    return `<g transform="translate(${pt(x, y)}) scale(${s})">${P(d, HALO, HALO, 3.4, HOP)}${P(d, ch.pal.paw, ch.pal.k, 1.25)}${extra}</g>`;
+  }
+  function paws(ch, pts) {
+    const pr = ch.pr || [7.2, 5.6];
+    const d = pts.map(q => E(q[0], q[1], pr[0], pr[1])).join('');
+    let s = '';
+    if (ch.restArms) pts.forEach(q => { const sh = q[0] < 55 ? ch.sh[0] : ch.sh[1]; s += arm(ch, sh[0], sh[1], q[0], q[1] - 2, 0); });
+    const toes = pts.map(q => `M${pt(q[0] - 2, q[1] + 1.6)}v2.2M${pt(q[0] + 2, q[1] + 1.6)}v2.2`).join('');
+    return s + P(d, HALO, HALO, 3.4, HOP) + P(d, ch.pal.paw, ch.pal.k, 1.3) + P(toes, 'none', ch.pal.k, .8, ' opacity=".55"');
+  }
+  function chip(x, y) {
+    // 2枚重ねのチップ（卓の上・遠近で楕円）
+    const rx = 9.4, ry = 4.6, h = 4.2;
+    return P(`M${pt(x - rx, y - h)}V${r1(y)}A${rx} ${ry} 0 0 0 ${pt(x + rx, y)}V${r1(y - h)}Z`, '#8E1D17', '#3A0A08', .8) +
+      P(`M${pt(x - rx, y - h / 2)}A${rx} ${ry} 0 0 0 ${pt(x + rx, y - h / 2)}`, 'none', '#FFFFFF', 1.4, ' stroke-dasharray="2 2.8"') +
+      P(E(x, y - h, rx, ry), '#D7362C', '#3A0A08', .8) + P(E(x, y - h, rx - 2, ry - 1.2), 'none', '#FFFFFF', 1.3, ' stroke-dasharray="2.2 2.6"');
+  }
+  function card(x, y, rot, extra) {
+    return `<g transform="translate(${pt(x, y)}) rotate(${rot})">` +
+      P('M-6.2 -22h12.4a1.6 1.6 0 0 1 1.6 1.6v18.8a1.6 1.6 0 0 1 -1.6 1.6h-12.4a1.6 1.6 0 0 1 -1.6 -1.6v-18.8a1.6 1.6 0 0 1 1.6 -1.6Z', '#2F58BA', '#FFFFFF', 1.5) +
+      P('M-5 -19.6h10v17h-10Z', 'none', '#9DB8F2', .7) + (extra || '') + '</g>';
+  }
+
+  /* ---------- ポーズ ---------- */
+  // 合図（hit/stand/surrender/reach）は縁の手前＝卓の上（y>100）で行う。はみ出しは最大で箱の高さの約16%。
+  function pose(ch, p) {
+    const [sL, sR] = ch.sh, [, rR] = ch.rest, S = 1.55;
+    const x0 = ch.sig || 24, raise = ch.raise || [13, 38];
+    let body = '', table = '';
+    switch (p) {
+      case 'hit': {
+        // 人差し指で卓をトントン（上下）。接地の瞬間に波紋と火花。
+        const y = 90, x = x0;
+        table = paws(ch, [rR]) +
+          `<g class="czx">${P(E(x, 112, 9.5, 3.2), 'none', HALO, 1.7)}${P(`M${pt(x - 13, 109)}l-4.5 -2.4M${pt(x + 13, 109)}l4.5 -2.4M${pt(x - 11.5, 115.5)}l-4.2 2.4M${pt(x + 11.5, 115.5)}l4.2 2.4`, 'none', HALO, 1.7)}</g>` +
+          `<g class="cz">${arm(ch, sL[0], sL[1], x + 1, y - 4, 3)}${hand(ch, x, y, S, [180], { L: 6.5 })}</g>`;
+        break;
+      }
+      case 'stand': {
+        // 手のひらを下にして水平に振る（左右）。
+        const x = x0 + 8, y = 104;
+        table = paws(ch, [rR]) +
+          P(`M${pt(x - 26, 96.5)}q-4.2 7.5 0 15M${pt(x + 26, 96.5)}q4.2 7.5 0 15M${pt(x - 32, 99)}q-3 5 0 10M${pt(x + 32, 99)}q3 5 0 10`, 'none', HALO, 2.2, ' opacity=".95"') +
+          `<g class="cz">${arm(ch, sL[0], sL[1], x + 2, y - 5, 4)}${hand(ch, x, y, 1.65, [], { flat: 1 })}</g>`;
+        break;
+      }
+      case 'surrender': {
+        // 人差し指で賭け札の手前に横線を引く（左→右）。指先から線が伸びる。
+        const y = 90, xa = x0 - 8;
+        table = paws(ch, [rR]) +
+          `<path class="czx" d="M${pt(xa, 111.6)}h34" fill="none" stroke="${HALO}" stroke-width="2.6" stroke-dasharray="34 40"/>` +
+          `<g class="cz">${arm(ch, sL[0], sL[1], xa + 1, y - 4, 3)}${hand(ch, xa, y, S, [180], { L: 6.5 })}` +
+          P(`M${pt(xa - 12, 86)}h-7M${pt(xa - 13, 92)}h-10M${pt(xa - 12, 98)}h-7`, 'none', HALO, 1.6, ' opacity=".9"') + '</g>';
+        break;
+      }
+      case 'double': case 'split': {
+        // 横にチップを足して、指1本（ダブル）／2本のV（スプリット）を立てる。
+        const f = p === 'double' ? [0] : [-22, 22];
+        body = `<g class="cz">${arm(ch, sL[0], sL[1], raise[0] + 1, raise[1] + 7, -3)}${hand(ch, raise[0], raise[1], 1.45, f, { L: 8.5 })}</g>`;
+        table = paws(ch, [rR]) + chip(96, 109);
+        break;
+      }
+      case 'squeeze': {
+        const top = ch.eyes.y + (ch.eyes.r || ch.eyes.ry || 6) + 2.5, by = top + 22, cx = 55;
+        const pw = C(cx - 10.5, by - 3, 5.2) + C(cx + 11.5, by - 5, 5.2);
+        body = `<g class="cz" style="transform-origin:${cx}px ${r1(by)}px">` +
+          arm(ch, sL[0], sL[1], cx - 10.5, by - 3, 4) + arm(ch, sR[0], sR[1], cx + 11.5, by - 5, -4) +
+          card(cx - 3, by, -11, '') + card(cx + 3.5, by, 9, `<path class="czx" d="M-1.6 -22.6L7.6 -13.4L-1.6 -13.4Z" fill="#FFFFFF" stroke="#8A93A8" stroke-width=".6"/>`) +
+          P(pw, HALO, HALO, 3.2, HOP) + P(pw, ch.pal.paw, ch.pal.k, 1.2) + '</g>';
+        break;
+      }
+      case 'cheer': {
+        body = `<g class="cz" style="transform-origin:${sL[0]}px ${sL[1]}px">${arm(ch, sL[0], sL[1], 13, 35, -4)}${hand(ch, 12, 31, 1.4, [])}</g>` +
+          `<g class="cz2" style="transform-origin:${sR[0]}px ${sR[1]}px">${arm(ch, sR[0], sR[1], 97, 35, 4)}${hand(ch, 98, 31, 1.4, [])}</g>`;
+        break;
+      }
+      case 'reach': {
+        table = paws(ch, [rR]) +
+          `<g class="cz" style="transform-origin:${sL[0]}px ${sL[1]}px">${arm(ch, sL[0], sL[1], 22, 104, 5)}${hand(ch, 21, 108, 1.5, [140, 180, 220], { L: 4.2 })}</g>`;
+        break;
+      }
+      default:
+        table = paws(ch, ch.rest);
+    }
+    return { body, table };
+  }
+
+  /* ---------- 公開API ---------- */
+  function ensureCss() {
+    if (cssDone || typeof document === 'undefined') return;
+    cssDone = true;
+    if (document.getElementById('cast-css')) return;
+    const st = document.createElement('style');
+    st.id = 'cast-css'; st.textContent = CAST_CSS;
+    (document.head || document.documentElement).appendChild(st);
+  }
+  function pick(who) {
+    if (typeof who === 'number') return CH[((who % CH.length) + CH.length) % CH.length];
+    return CH.find(c => c.id === who) || CH[0];
+  }
+  function html(who, opts) {
+    ensureCss();
+    const o = opts || {}, ch = pick(who);
+    const mood = MOODS.includes(o.mood) ? o.mood : 'idle';
+    let ps = POSES.includes(o.pose) ? o.pose : 'rest';
+    if (mood === 'out') ps = 'rest';
+    const size = +o.size || 72, w = r1(size * RATIO);
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() / 1000 : (Date.now() / 1000) % 1e5;
+    const cd = -(now + (+o.delay || 0));
+    const g = 'castg' + (++uid), u = { g: `url(#${g})`, g2: `url(#${g}b)` }, p = ch.pal;
+    let defs = `<radialGradient id="${g}" cx=".36" cy=".27" r=".86"><stop offset="0" stop-color="${p.l}"/><stop offset=".5" stop-color="${p.b}"/><stop offset=".93" stop-color="${p.e}"/></radialGradient>`;
+    if (ch.g2) defs += `<radialGradient id="${g}b" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="${ch.g2[0]}"/><stop offset=".55" stop-color="${ch.g2[1]}"/><stop offset="1" stop-color="${ch.g2[2]}"/></radialGradient>`;
+    const L = ch.L(u), pz = pose(ch, ps);
+    const inner = P(L.sil, HALO, HALO, 5, HOP) + (L.back || '') + P(L.body, u.g, p.k, 1.6) + (L.sheen ? P(L.sheen, 'none', '#FFFFFF', 2.8, ' opacity=".3"') : '') + (L.patch || '') + eyes(ch, mood) +
+      (L.top || '') + mouth(ch, mood) + (L.hold || '') + (L.hat || '') + pz.body + fx(ch, mood);
+    return `<span class="cast c-${ch.id} m-${mood} p-${ps}" style="width:${w}px;height:${size}px;--cd:${cd.toFixed(3)}s" aria-hidden="true">` +
+      `<svg class="cs" viewBox="0 0 110 100" focusable="false"><defs>${defs}</defs>` +
+      `<svg class="cc" x="-30" y="-40" width="170" height="140" viewBox="-30 -40 170 140" overflow="hidden"><g class="cbd">${inner}</g></svg>` +
+      `<g class="ctb">${pz.table}</g></svg></span>`;
+  }
+  return {
+    CHARS: CH.map(c => ({ id: c.id, name: c.name, color: c.color })),
+    MOODS, POSES, RATIO, css: CAST_CSS, html, ensureCss
+  };
+})();
+/*CAST_END*/
 /*DEALER_START*/
 /* ===== ディーラー（共通・4ゲームで同一。直すときは scratchpad の kit/dealer.js を直して同期する） =====
    画面はディーラー目線（一人称）。画面の下がディーラー側（卓の手前の縁とチップラック）、上がプレイヤー側。
@@ -1977,6 +2521,27 @@ function renderMeta(){
   $('meta').innerHTML=`<span><i class="lg">ラウンド</i><i class="sm">R</i><b>${G.roundNo}</b></span><span class="difficulty-pill d${df.level}"><i class="lg">難易度 </i><b>${df.label}</b></span><span><i class="lg">今回の</i>ミス<b>${G.round?G.round.err:0}</b></span><span class="only-lg"><i class="lg">通算</i>正答率<b>${pct}</b></span>`;
 }
 
+/* 客のキャラクターの表情とポーズ。手番の客は合図そのものを体で見せる（合図の読み取りが訓練の対象。
+   EXPERT で合図の名称を伏せても、ポーズは見せる）。勝てば喜び、負ければしょんぼりする */
+function bjCast(i){
+  const s=G.seats[i];
+  if(!s)return{mood:'idle',pose:'rest'};
+  if(G.flags&&G.flags.acc)return{mood:'surprise',pose:'rest'};
+  const ex=G.pending?null:expected(G);
+  const res=s.hands.map(h=>h.status==='bjpaid'?'bj':h.status==='evenpaid'||h.result==='win'?'win':h.status==='bust'||h.status==='surrender'||h.result==='lose'?'lose':h.result==='push'?'push':null);
+  if(G.phase==='play'&&G.turn.s===i){
+    const h=curHand(G);
+    if(ex&&SIG[ex.key]&&h&&h.decision===ex.key)return{mood:'idle',pose:ex.key};
+    if(res.includes('bj'))return{mood:'happy',pose:'cheer'};
+    return{mood:'think',pose:'rest'};
+  }
+  if(res.includes('bj'))return{mood:'happy',pose:'cheer'};
+  if(res.includes('win'))return{mood:'happy',pose:G.phase==='done'?'cheer':'rest'};
+  if(res.length&&res.every(r=>r==='lose'))return{mood:'sad',pose:'rest'};
+  if(res.includes('lose')&&res.every(r=>r==='lose'||r===null)&&G.phase!=='play')return{mood:'sad',pose:'rest'};
+  if(G.phase==='deal'||G.phase==='check'||G.phase==='dealer')return{mood:'think',pose:'rest'};
+  return{mood:'idle',pose:'rest'};
+}
 /* 補助表示（合計点・合図の名称）は、設定がオンでも ADVANCED 以降は伏せる */
 function showTotalsNow(){return G.opts.showTotals&&!currentDifficulty(G).hideTotals;}
 function showSigNamesNow(){return G.opts.showSignalNames&&!currentDifficulty(G).hideSignalNames;}
@@ -1993,7 +2558,11 @@ function renderTable(){
   for(let i=0;i<n;i++){
     const mid=(n-1)/2,d=mid?((i-mid)/mid):0,dy=Math.round((1-d*d)*26);
     const s=G.seats[i],nm=seatName(n,i);
-    const head=`<div class="seat-no">${nm.no}<small>${nm.tag||'&nbsp;'}</small></div>`;
+    // 客のキャラは席番号の上（スマホは横並びにして縦の高さを使わない。4席以上は番号だけ）
+    const phone=matchMedia('(max-width:600px)').matches;
+    const cst=bjCast(i);
+    const castEl=`<div class="seat-cast">${Cast.html(i,{mood:cst.mood,pose:cst.pose,size:phone?38:62,delay:i*.37})}</div>`;
+    const head=`<div class="seat-top">${castEl}<div class="seat-no">${phone&&n>=4?i+1:nm.no}<small>${nm.tag||'&nbsp;'}</small></div></div>`;
     if(!s){seatsHTML+=`<div class="seat" style="--dy:${dy}px">${head}<div class="empty-seat">ベット待ち</div></div>`;continue;}
     const seatActive=G.phase==='play'&&G.turn.s===i;
     const seatClick=G.phase==='deal';
