@@ -390,7 +390,7 @@ button,a,.act,.tray-chip{-webkit-tap-highlight-color:transparent;touch-action:ma
   .coach .cc-sub{display:none}
 }
 /* スマホでは、まだ出していない枠は各額面1つだけ描いて幅を詰める（枚数は「0/4」の表記で伝わる） */
-@media (max-width:600px){.mini-chip.ghost+.mini-chip.ghost{display:none}.fb-more{display:none}.coach{font-size:11px;padding:3px 8px;margin-bottom:5px}.coach summary{font-size:11px}.sg-n{font-size:10px}.mini-chip.g5{margin-right:6px}}
+@media (max-width:600px){.mini-chip.ghost+.mini-chip.ghost{display:none}.fb-more{display:none}.coach{font-size:12.5px;padding:3px 8px;margin-bottom:5px}.coach summary{font-size:12.5px}.sg-n{font-size:11.5px}.mini-chip.g5{margin-right:6px}}
 
 /* チップ内訳ガイド（目標の枚数を薄く描き、出したぶんだけ埋まる） */
 .mini-chip.ghost{background:transparent;box-shadow:none;border:2px dashed rgba(255,255,255,.28) !important;color:rgba(255,255,255,.35) !important;text-shadow:none}
@@ -1078,7 +1078,7 @@ const ACC_SET_HTML=o=>`<div class="row"><label for="optAccidents">実戦のア�
 .acc-hot{outline:3px solid #E0645A !important;outline-offset:2px;box-shadow:0 0 12px rgba(224,100,90,.85) !important}
 @keyframes accfall{from{transform:translate(-50%,-160%) rotate(0);opacity:.2}to{transform:translate(-50%,-50%);opacity:1}}
 .acc-mark.fall{animation:accfall .5s cubic-bezier(.3,1.4,.5,1)}
-@media (max-width:600px){.acc-what{font-size:12px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:9.5px;padding:0 4px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
+@media (max-width:600px){.acc-what{font-size:13px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:11.5px;padding:0 5px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
 document.head.appendChild(st);})();
 /*KIT_END*/
 /*DEALER_START*/
@@ -1116,7 +1116,7 @@ const DEALER_CSS=`.dealer-layer{position:absolute;inset:0;pointer-events:none;z-
 .dealer-layer .dl-chipin{fill:none;stroke:rgba(255,255,255,.75);stroke-width:.5;vector-effect:non-scaling-stroke}
 .dealer-layer .dl-rake{fill:none;stroke-linecap:round}
 .dealer-layer .dl-shape{display:none}
-@media (max-width:600px){.dealer-layer .dl-replay{font-size:10px;padding:2px 8px;right:6px;bottom:4px;max-width:40%}}`;
+@media (max-width:600px){.dealer-layer .dl-replay{font-size:12.5px;padding:3px 10px;right:6px;bottom:4px;max-width:46%}.dealer-layer .dl-replay b{display:none}}`;
 
 const Dealer=(()=>{
   'use strict';
@@ -1742,7 +1742,7 @@ const Dealer=(()=>{
       this.stop();this.layout();
       this.last={frames,label};
       const btn=this.root&&this.root.querySelector('.dl-replay');
-      if(btn){btn.hidden=false;btn.textContent='▶ もう一度：';const b=document.createElement('b');b.textContent=String(label||'');btn.appendChild(b);}
+      if(btn){btn.hidden=false;btn.textContent='▶ もう一度';const b=document.createElement('b');b.textContent='：'+String(label||'');btn.appendChild(b);}
       const seq=this._resolve(frames),end=seq[seq.length-1].t,R0=this._settled(this._poseFromFlat(this.rest()));
       this.busy=true;this._sim=null;
       let prev=null,tm=0;
@@ -2050,7 +2050,7 @@ function renderTable(){
     $('table').appendChild(Dealer.build());
     const btn=Dealer.root.querySelector('.dl-replay');
     btn.hidden=!Dealer.last;
-    if(Dealer.last)btn.innerHTML='▶ もう一度：<b>'+esc(Dealer.last.label||'')+'</b>';
+    if(Dealer.last)btn.innerHTML='▶ もう一度<b>：'+esc(Dealer.last.label||'')+'</b>';
     if(!Dealer.busy)Dealer.reset();
   }else if(Dealer.root&&Dealer.root.parentNode){
     Dealer.stop();Dealer.root.remove();
