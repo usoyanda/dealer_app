@@ -423,6 +423,8 @@ button,a,.act,.tray-chip{-webkit-tap-highlight-color:transparent;touch-action:ma
 /* スマホではヘッダーのボタンをアイコンだけにし、通算正答率は設定パネルに任せて1行に収める */
 @media (max-width:600px){.meta .only-lg{display:none}}
 @media (max-width:520px){.hbtn .hl{display:none}.hbtn{padding-left:6px !important;padding-right:6px !important}.topbar .meta{gap:5px}}
+/* 320px幅（小型のiPhone SE等）：方式ラベルの分だけ溢れるので、ボタンと間隔をさらに詰める */
+@media (max-width:340px){.topbar{gap:2px;padding:6px 4px}.topbar .meta{gap:3px}.hbtn{padding-left:4px !important;padding-right:4px !important}.rule-pill,.difficulty-pill{padding:1px 3px}}
 @media (max-width:340px){.brand-main{display:none}.hbtn{padding-left:5px !important;padding-right:5px !important}}
 .difficulty-pill{background:rgba(217,178,95,.08)}
 
