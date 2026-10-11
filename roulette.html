@@ -1474,7 +1474,7 @@ const Dealer=(()=>{
       const s=this.s,c=this.cfg||{},hw=(+c.rackW||RACK_W)/2;
       const y=this.H-this.band*.5;
       const dx=Math.min((hw+22)*s,this.W*.42);
-      return{lx:this.cx-dx,ly:y,rx:this.cx+dx,ry:y,lz:2,rz:2,open:0,nod:0,prop:'',hold:'r',lift:0};
+      return{lx:this.cx-dx,ly:y,rx:this.cx+dx,ry:y,lz:2,rz:2,open:0,prop:'',hold:'r',lift:0};
     },
     /* ゲーム側で使う基準点 */
     chest(){return{x:this.cx,y:this.H-this.band*.3};},
@@ -1552,7 +1552,7 @@ const Dealer=(()=>{
     /* ---------- タイムライン ---------- */
     _resolve(frames){
       const R=this.rest();
-      let cur={l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,nod:0,prop:'',hold:'r',look:null,lp:'',rp:''};
+      let cur={l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,prop:'',hold:'r',lp:'',rp:''};
       const seq=[];let tPrev=0;
       const ok=q=>q&&isFinite(+q.x)&&isFinite(+q.y);
       const pt=q=>({x:+q.x,y:+q.y,z:+q.z||0});
@@ -1560,15 +1560,15 @@ const Dealer=(()=>{
         if(!f)continue;
         const t=Math.max(tPrev,+f.t||0);tPrev=t;
         cur={l:ok(f.l)?pt(f.l):cur.l,r:ok(f.r)?pt(f.r):cur.r,
-          open:f.open!==undefined?+f.open||0:cur.open,nod:f.nod!==undefined?+f.nod||0:cur.nod,
+          open:f.open!==undefined?+f.open||0:cur.open,
           prop:f.prop!==undefined?(f.prop||''):cur.prop,hold:f.hold!==undefined?(f.hold||'r'):cur.hold,
-          look:f.look!==undefined?f.look:cur.look,lp:f.lp!==undefined?f.lp:cur.lp,rp:f.rp!==undefined?f.rp:cur.rp};
+          lp:f.lp!==undefined?f.lp:cur.lp,rp:f.rp!==undefined?f.rp:cur.rp};
         seq.push(Object.assign({t},cur));
       }
       if(!seq.length)seq.push(Object.assign({t:0},cur));
       const last=seq[seq.length-1];
       const far=Math.max(Math.hypot(last.l.x-R.lx,last.l.y-R.ly),Math.hypot(last.r.x-R.rx,last.r.y-R.ry))/this.s;
-      seq.push({t:last.t+RET+clamp(far*.9,0,340),l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,nod:0,prop:'',hold:last.hold,look:null,lp:'',rp:''});
+      seq.push({t:last.t+RET+clamp(far*.9,0,340),l:{x:R.lx,y:R.ly,z:R.lz},r:{x:R.rx,y:R.ry,z:R.rz},open:0,prop:'',hold:last.hold,lp:'',rp:''});
       /* 手ごとの移動区間：区間ごとに持ち上げの弧と横へのふくらみを付ける（キーフレームの点は必ず通る） */
       const s=this.s,fb=this.feltB-4*s;
       seq.runs={};
@@ -1606,9 +1606,7 @@ const Dealer=(()=>{
       while(i<n-1&&seq[i+1].t<=t)i++;
       const a=seq[i],b=seq[Math.min(i+1,n-1)];
       const span=Math.max(1,b.t-a.t),u=clamp((t-a.t)/span,0,1),e=u*u*(3-2*u);
-      const pose={open:lerp(a.open,b.open,e),nod:lerp(a.nod,b.nod,e),prop:a.prop,hold:a.hold,t};
-      if(a.look&&b.look)pose.look={x:lerp(a.look.x,b.look.x,e),y:lerp(a.look.y,b.look.y,e)};
-      else pose.look=b.look&&u>0?b.look:a.look;
+      const pose={open:lerp(a.open,b.open,e),prop:a.prop,hold:a.hold,t};
       const tan=(k,j)=>{
         if(j<=0||j>=n-1)return{x:0,y:0};
         const p0=seq[j-1][k],p1=seq[j][k],p2=seq[j+1][k];
@@ -1860,11 +1858,11 @@ const Dealer=(()=>{
     _poseFromFlat(p){
       const R=this.rest();p=p||{};
       const kf={l:{x:p.lx!==undefined?+p.lx:R.lx,y:p.ly!==undefined?+p.ly:R.ly,z:p.lz!==undefined?+p.lz:R.lz},r:{x:p.rx!==undefined?+p.rx:R.rx,y:p.ry!==undefined?+p.ry:R.ry,z:p.rz!==undefined?+p.rz:R.rz},
-        open:+p.open||0,nod:+p.nod||0,prop:p.prop||'',hold:p.hold||'r',look:p.look||null,lp:p.lp||'',rp:p.rp||''};
+        open:+p.open||0,prop:p.prop||'',hold:p.hold||'r',lp:p.lp||'',rp:p.rp||''};
       return this._kfPose(kf);
     },
     _kfPose(kf){
-      const pose={open:kf.open,nod:kf.nod,prop:kf.prop,hold:kf.hold,look:kf.look};
+      const pose={open:kf.open,prop:kf.prop,hold:kf.hold};
       ['l','r'].forEach(k=>{
         const carried=kf.prop&&(kf.hold==='both'||(kf.hold||'r')===k),sh=this._shapeKey(kf,k);
         pose[k]={x:kf[k].x,y:kf[k].y,z:kf[k].z||0,lift:0,shape:sh,shapeB:sh,mix:1,prop:carried?kf.prop:'',propA:1};
