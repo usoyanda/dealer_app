@@ -132,14 +132,14 @@ const ICON={
   irr:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 44 40H4z" fill="#3A1517" stroke="#FF7062" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 18v11" stroke="#FFD9D3" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="34.5" r="2.4" fill="#FFD9D3"/></svg>'
 };
 const GAMES=[
-  {id:'roulette',href:'roulette.html',name:'ルーレット',en:'ROULETTE',desc:'ボール投入・締切・コール・ドリー・回収と配当の順番。ノースピンと後賭けへの対応。',key:'dsim_rl_stats',
-   cats:{spin:'スピン・投入',close:'締切宣言',call:'コール・ドリー',take:'回収手順',pay:'配当計算',security:'セキュリティ所作'}},
+  {id:'roulette',href:'roulette.html',name:'ルーレット',en:'ROULETTE',desc:'ボール投入・締切・コール・ドリー・回収と配当の順番。ボールの飛び出し・床への落下など実戦のアクシデントも。',key:'dsim_rl_stats',
+   cats:{spin:'スピン・投入',close:'締切宣言',call:'コール・ドリー',take:'回収手順',pay:'配当計算',security:'セキュリティ所作',accident:'アクシデント対応'}},
   {id:'baccarat',href:'baccarat.html',name:'バカラ',en:'BACCARAT',desc:'配り順・絞りの指名・3枚目の条件表・4つのハウスルール・コミッション計算。',key:'dsim_bc_stats',
-   cats:{deal:'配り手順',squeeze:'スクイーズ',count:'点数計算',draw:'3枚目の判定',call:'コール',take:'回収手順',pay:'配当計算',commission:'コミッション',security:'セキュリティ所作'}},
-  {id:'blackjack',href:'blackjack.html',name:'ブラックジャック',en:'BLACKJACK',desc:'配布・ピークとインシュアランス・合図の読み取り・ディーラーのドロー・3:2の配当。',key:'dsim_bj_stats',
-   cats:{deal:'配布手順',check:'ピーク・インシュアランス',play:'プレイヤー対応',dealer:'ディーラードロー',settle:'精算',pay:'配当計算'}},
+   cats:{deal:'配り手順',squeeze:'スクイーズ',count:'点数計算',draw:'3枚目の判定',call:'コール',take:'回収手順',pay:'配当計算',commission:'コミッション',security:'セキュリティ所作',accident:'アクシデント対応'}},
+  {id:'blackjack',href:'blackjack.html',name:'ブラックジャック',en:'BLACKJACK',desc:'配布・ピークとインシュアランス・合図の読み取り・ディーラーのドロー・3:2の配当。難易度は自動で上がる。',key:'dsim_bj_stats',
+   cats:{deal:'配布手順',check:'ピーク・インシュアランス',play:'プレイヤー対応',dealer:'ディーラードロー',settle:'精算',pay:'配当計算',accident:'アクシデント対応'}},
   {id:'poker',href:'poker.html',name:'ポーカー',en:'POKER',desc:'ボタンとブラインド・アクション順・最小レイズ・サイドポット・レーキ・チョップ。',key:'dsim_pk_stats',
-   cats:{button:'ボタン・ブラインド',deal:'配り順',board:'バーン・ボード',order:'アクション順',ruling:'ベット判定',pot:'ポット計算',showdown:'ショーダウン',rake:'レーキ',pay:'払い出し',security:'セキュリティ所作'}}
+   cats:{button:'ボタン・ブラインド',deal:'配り順',board:'バーン・ボード',order:'アクション順',ruling:'ベット判定',pot:'ポット計算',showdown:'ショーダウン',rake:'レーキ',pay:'払い出し',security:'セキュリティ所作',accident:'アクシデント対応'}}
 ];
 function load(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -173,7 +173,7 @@ function render(){
       <span class="desc">数える（スタック読み）・払う（ピクチャーベット・3:2・コミッション）・出す（最少枚数）を10問／60秒で反復。</span>
       <span class="stat">${chipQ?`<span class="pill"><b>${chipQ}</b> 問</span>`:'<span class="pill new">はじめる</span>'}${bestRank?`<span class="pill">最高ランク <b>${bestRank}</b></span>`:''}</span></span>${ring(chipAcc)}</a>
     <a class="card" href="irregular.html"><span class="tile irr">${ICON.irr}</span><span class="info"><span class="name">イレギュラー対応<small>IRREGULARITY</small></span>
-      <span class="desc">ボールの飛び出し・カードの露出・ミスディール・後賭け…。その場でどうするか、なぜそうするかを判断する。</span>
+      <span class="desc">カードが落ちた・めくれた・ボールが落ちた…。手元の事故にその場でどう動くか、なぜそうするかを判断する。</span>
       <span class="stat">${irrSeen?`<span class="pill"><b>${irrSeen}</b> 場面に挑戦</span>`:'<span class="pill new">はじめる</span>'}</span></span>${ring(irrAcc)}</a>`;
 
   /* おすすめ：まだ触っていないもの→正答率が一番低いカテゴリ→チップ道場 の順に提案する */
@@ -183,8 +183,9 @@ function render(){
   const weakest=stats.filter(s=>s.weak).sort((a,b)=>a.weak.acc-b.weak.acc)[0];
   if(!totalRounds)reco={h:'まずはルーレットで1ラウンド',p:'ボール投入→締切→コール→回収→配当の流れを、ディーラーの手の動きと一緒に見て覚えます。手順そのものが採点の対象です。',href:'roulette.html',go:'ルーレットを始める'};
   else if(weakest&&weakest.weak.acc<.8){
-    const pay=['pay','commission','pot','rake'].includes(weakest.weak.k);
-    reco={h:`${weakest.g.name}の「${esc(weakest.weak.name)}」が正答率${Math.round(weakest.weak.acc*100)}%`,p:pay?'金額のミスは、暗算の分解とチップの出し方を切り離して練習すると早く直ります。チップカウント道場で10問だけ集中してから卓に戻りましょう。':`${weakest.weak.t}回中${weakest.weak.ng}回ミスしています。ルールブックで手順と理由を読み直してから、もう一度実習しましょう。`,
+    const pay=['pay','commission','pot','rake'].includes(weakest.weak.k),acc=weakest.weak.k==='accident';
+    if(acc)reco={h:`${weakest.g.name}の「アクシデント対応」が正答率${Math.round(weakest.weak.acc*100)}%`,p:'事故の後は「手を止める・独断で直さない・声に出してフロアを呼ぶ」。イレギュラー対応ドリルで場面ごとの正解と理由を固めてから、卓に戻りましょう。',href:'irregular.html',go:'イレギュラー対応ドリルへ'};
+    else reco={h:`${weakest.g.name}の「${esc(weakest.weak.name)}」が正答率${Math.round(weakest.weak.acc*100)}%`,p:pay?'金額のミスは、暗算の分解とチップの出し方を切り離して練習すると早く直ります。チップカウント道場で10問だけ集中してから卓に戻りましょう。':`${weakest.weak.t}回中${weakest.weak.ng}回ミスしています。ルールブックで手順と理由を読み直してから、もう一度実習しましょう。`,
       href:pay?'chips.html':weakest.g.href,go:pay?'チップカウント道場へ':`${weakest.g.name}で練習する`};
   }
   else if(untouched)reco={h:`次は${untouched.g.name}に挑戦`,p:`${untouched.g.desc}`,href:untouched.g.href,go:`${untouched.g.name}を始める`};

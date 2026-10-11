@@ -136,7 +136,43 @@ a{color:var(--gold2)}
    ここに書いた対応は訓練用の一般的な扱い。実際の規定はカジノ・スクールにより異なる。
    q：{id, g:ゲーム, t:見出し, s:状況, a:問い, c:[正解, 誤答…]（表示時に並べ替える）, call:[英,和], why:理由, v:カジノ差の注記} */
 const GAMES={rl:{name:'ルーレット',en:'ROULETTE',hash:'roulette'},bc:{name:'バカラ',en:'BACCARAT',hash:'baccarat'},bj:{name:'ブラックジャック',en:'BLACKJACK',hash:'blackjack'},pk:{name:'ポーカー',en:'POKER',hash:'poker'}};
+/* 種類：acc＝手元のアクシデント（カードが落ちた・めくれた・ボールが落ちた等の物理的な事故）、rule＝判定・進行のトラブル */
+const ACC_IDS=new Set(['rl-out','rl-short','rl-object','rl-balldrop','rl-knock','rl-chipfloor','bc-expose','bc-bend','bc-floor','bc-stuck','bc-cutearly','bj-hole','bj-drop','bj-stuck','bj-spill','pk-first','pk-two','pk-one','pk-flop','pk-turn','pk-deckdrop','pk-boxed']);
+const kindOf=q=>ACC_IDS.has(q.id)?'acc':'rule';
+const KINDS=[['acc','手元のアクシデント'],['rule','判定・進行のトラブル'],['all','すべて']];
 const BANK=[
+/* ---- 手元のアクシデント（実習の各ゲームで起こる事故と同じ場面） ---- */
+{id:'rl-balldrop',g:'rl',t:'投入しようとしたボールが床に落ちた',s:'スピンしようとした瞬間、ボールが指から滑って床に落ち、足元へ転がった。',a:'まず何をする？',
+ c:['手を止め、拾わずにフロアを呼ぶ','自分で拾って、すぐにスピンする','予備のボールを自分で出して投げる','近くの客に拾ってもらう'],
+ call:['Floor, please. The ball is on the floor.','フロアお願いします。ボールが床に落ちました'],why:'卓の外に出たボールは、すり替え・細工の可能性があり、点検するまで使えない。床へ手を伸ばす間は卓のチップから目と手が離れ、無防備になる。',v:'ボールの交換・点検の手順はカジノにより異なる。'},
+{id:'rl-knock',g:'rl',t:'回収中に当たりのチップを崩した',s:'インサイドのハズレをレーキで引いていたら、当たり番号の上のチップの山に当たって崩してしまった。',a:'正しい対応は？',
+ c:['手を止め、フロアに映像で元の位置と枚数を確認してもらう','記憶を頼りに、崩れる前の位置と枚数へすぐ戻す','客に元の位置を聞き、言われたとおりに積み直す','崩れた位置のまま、その場所のベットとして配当を払う'],
+ call:['Floor, please. I knocked over a winning bet.','フロアお願いします。当たりのチップを崩してしまいました'],why:'当たりのチップの位置と枚数は配当の根拠。記憶や客の申告では証明できないので、監視カメラの映像で確認してから戻す。',v:'映像確認の手順は店による。'},
+{id:'rl-chipfloor',g:'rl',t:'配当のチップを床に落とした',s:'配当を置こうとして、チップを1枚床に落としてしまった。',a:'どうする？',
+ c:['手を止めて声に出し、フロアの立ち会いで拾う','黙って自分で拾い、そのまま配当として置く','ラックから同額を出し直し、落ちたチップは後で拾う','近くの客に拾ってもらい、受け取って置き直す'],
+ call:['Floor, please. A chip is on the floor.','フロアお願いします。チップが床に落ちました'],why:'卓から外れたチップは「誰のものか」が曖昧になる。拾う動作そのものが持ち出しに見えるので、声に出し、立ち会いのもとで扱う。',v:'拾ってよい範囲（ディーラーの足元のみ等）は店の規定による。'},
+{id:'bc-stuck',g:'bc',t:'シューから札が2枚重なって出た',s:'プレイヤーの1枚目を引いたら、2枚が重なったまま出てきた。',a:'正しい対応は？',
+ c:['手を止めてフロアを呼ぶ','上の1枚を使い、下の1枚をシューへ戻す','2枚とも焼き札にして、次の札を配る','重なった2枚をプレイヤーとバンカーに分ける'],
+ call:['Floor, please. Two cards came out together.','フロアお願いします。カードが2枚重なって出ました'],why:'出てきた札の順番が配りの根拠。どれを使うかをディーラーが選ぶと出目を選んだことになる。止めてフロアの判断を仰ぐ。',v:'2枚目を次の配り先に回すか、焼くかは店の規定による。'},
+{id:'bc-cutearly',g:'bc',t:'配っている途中で札を落としそうになり、2枚見えた',s:'札を滑らせる途中で指から外れ、次の札と一緒に表がちらりと見えた。',a:'どうする？',
+ c:['手を止め、何が見えたかを声に出してフロアを呼ぶ','見えなかったことにして、そのまま最後まで配り続ける','見えた札だけを焼き札にして、黙って次を配る','客に見えたかどうか確認してから扱いを決める'],
+ call:['Floor, please. Cards were exposed.','フロアお願いします。カードが見えました'],why:'見えた事実を隠すと、後から必ず疑われる。ディーラーは処理を決めず、事実を示してフロアを呼ぶ。',v:'露出した札の扱い（使う・焼く）は店の規定による。'},
+{id:'bj-drop',g:'bj',t:'配る札が床に落ちた',s:'2番席に配ろうとした札が手から滑り、床に落ちた。',a:'正しい対応は？',
+ c:['拾わずにフロアを呼ぶ','自分で拾って、そのまま2番席に配る','2番席を飛ばして3番席に配る','近くの客に拾ってもらう'],
+ call:['Floor, please. A card is on the floor.','フロアお願いします。カードが床に落ちました'],why:'床の札は誰かが触れた可能性があり、点検前に使うと結果の正しさを証明できない。順番も崩さない。',v:'落ちた札は焼き札にして同じ席へ次の札、が一般的。'},
+{id:'bj-stuck',g:'bj',t:'札が2枚重なって同じ席に出た',s:'シューから引いた札が2枚重なったまま、1番席の前へ滑っていった。',a:'どうする？',
+ c:['手を止めてフロアを呼ぶ','上の1枚だけ配って、もう1枚はシューへ戻す','2枚とも1番席に渡す','2枚とも次の席に回す'],
+ call:['Floor, please. Two cards came out together.','フロアお願いします。カードが2枚重なって出ました'],why:'2枚目は本来、次の配り先の札。ディーラーが選ぶと出目を選んだことになる。止めて、出た順番どおりに直す。',v:'2枚目をそのまま次の配り先へ回すのが一般的。'},
+{id:'bj-spill',g:'bj',t:'客が飲み物をテーブルにこぼした',s:'ゲーム中に客のグラスが倒れ、飲み物がレイアウトとカードの近くに広がった。',a:'まず何をする？',
+ c:['手を止め、カードとチップを動かさずにフロアを呼ぶ','急いでカードとチップを集めて、レイアウトを拭く','そのゲームを最後まで進めてから、まとめて拭く','濡れないように、客のチップを先に手元へ移す'],
+ call:['Floor, please. We have a spill.','フロアお願いします。飲み物がこぼれました'],why:'慌ててカードやチップを動かすと、ゲームの状態が分からなくなる。状態を保ったまま止め、フロアの判断で処理する。',v:'ゲームを続けるか無効にするかはフロアが決める。'},
+{id:'pk-deckdrop',g:'pk',t:'配っている札が床に落ちた',s:'ホールカードを配る途中、1枚が卓から落ちて床で表になった。',a:'正しい対応は？',
+ c:['露出した札として扱う（何枚目かで処理が決まる）','自分で拾って、何事もなかったようにその席へ配る','その席を飛ばして、次の席から順番どおりに配る','拾った札をデッキの一番下へ戻してから続きを配る'],
+ call:['That card is exposed.','その札は露出扱いです'],why:'床に落ちて見えた札は露出した札と同じ扱い。配り始めの1〜2枚目ならミスディール、それ以外は配りを最後まで続け、配り終えてからその札を一番上の札と交換する。',v:'TDAなどの標準ルールに基づく。店の規定が優先。'},
+{id:'pk-boxed',g:'pk',t:'デッキの中に表向きの札が混ざっていた',s:'配っている途中、デッキの中に1枚だけ表向きの札（ボックスカード）があった。',a:'どうする？',
+ c:['その札は使わずに脇へ置き、次の札を配る','表向きのまま、その席の札としてそのまま配る','ミスディールを宣言して、全員に配り直す','裏返してデッキの一番下へ戻し、続ける'],
+ call:['Boxed card. It will be replaced.','表向きの札が混ざっていました。交換します'],why:'デッキの中で表向きだった札（ボックスカード）は、紙切れ（スクラップ）と同じ扱いで使わないのが標準。脇へ置いたことをフロアに報告する。',v:'扱いは店の規定による。'},
+
 /* ---- ルーレット ---- */
 {id:'rl-out',g:'rl',t:'ボールがウィールの外へ飛び出した',s:'スピン中、ボールがウィールの縁を越えて飛び出し、レイアウトの上を転がって止まった。',a:'正しい対応は？',
  c:['「ノースピン」を宣言してボールを回収し、投げ直す。ベットはそのまま','ボールが止まった場所に一番近い数字を、当選番号としてコールする','ボールを拾ってウィールに戻し、そのまま落ちたポケットを当選番号にする','全員のベットを本人に返して、そのゲームは終わりにする'],
@@ -274,7 +310,7 @@ const BANK=[
 /*ENGINE_END*/
 
 const STORE='dsim_irr_v1';
-function loadData(){const d={opts:{game:'all',count:10,weak:false},seen:{},sessions:0};try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v){Object.assign(d.opts,v.opts||{});d.seen=v.seen||{};d.sessions=v.sessions||0;}}catch(e){}return d;}
+function loadData(){const d={opts:{game:'all',kind:'acc',count:10,weak:false},seen:{},sessions:0};try{const v=JSON.parse(localStorage.getItem(STORE)||'null');if(v){Object.assign(d.opts,v.opts||{});d.seen=v.seen||{};d.sessions=v.sessions||0;}}catch(e){}return d;}
 function saveData(){try{localStorage.setItem(STORE,JSON.stringify(DATA));}catch(e){}}
 let DATA=loadData();
 const S={screen:'home',list:[],i:0,ans:null,order:[],res:[]};
@@ -288,12 +324,13 @@ const SFX={ctx:null,play(ok){try{const A=window.AudioContext||window.webkitAudio
   const tone=(f,t,d,type,v)=>{const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02);};
   const t=c.currentTime+.005;if(ok){tone(988,t,.1,'sine',.045);tone(1480,t+.07,.16,'sine',.04);}else{tone(196,t,.16,'triangle',.07);tone(147,t+.09,.22,'triangle',.06);}}catch(e){}}};
 
+const inKind=q=>(DATA.opts.kind||'acc')==='all'||kindOf(q)===(DATA.opts.kind||'acc');
 function statFor(g){
-  const qs=BANK.filter(q=>g==='all'||q.g===g);let ok=0,ng=0,seen=0;
+  const qs=BANK.filter(q=>(g==='all'||q.g===g)&&inKind(q));let ok=0,ng=0,seen=0;
   qs.forEach(q=>{const s=DATA.seen[q.id];if(s){seen++;ok+=s.ok;ng+=s.ng;}});
   return{n:qs.length,seen,ok,ng,acc:ok+ng?ok/(ok+ng):null};
 }
-function weakList(g){return BANK.filter(q=>(g==='all'||q.g===g)&&DATA.seen[q.id]&&DATA.seen[q.id].lastNg);}
+function weakList(g){return BANK.filter(q=>(g==='all'||q.g===g)&&inKind(q)&&DATA.seen[q.id]&&DATA.seen[q.id].lastNg);}
 function renderHome(){
   const o=DATA.opts;
   const gs=[['all','すべて']].concat(Object.entries(GAMES).map(([k,v])=>[k,v.name]));
@@ -302,7 +339,8 @@ function renderHome(){
   const weak=weakList(o.game).length;
   $('app').innerHTML=`
     <section class="hero"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 60 56H4z" fill="#3A1517" stroke="#FF7062" stroke-width="3" stroke-linejoin="round"/><path d="M32 24v16" stroke="#FFD9D3" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="48" r="3.2" fill="#FFD9D3"/></svg>
-      <div><div class="en">IRREGULARITY DRILL</div><h1>イレギュラー対応ドリル</h1><p>手順どおりに進まない場面で、その場で何をするか・なぜそうするかを判断する。原則は「手を止める・独断で動かさない・声に出して示す」。</p></div></section>
+      <div><div class="en">IRREGULARITY DRILL</div><h1>イレギュラー対応ドリル</h1><p>カードが落ちた・めくれた・ボールが落ちた…。手元の事故に、その場で何をするか・なぜそうするかを判断する。原則は「手を止める・独断で直さない・声に出してフロアを呼ぶ」。</p></div></section>
+    <h2 class="sec">種類</h2><div class="seg">${KINDS.map(([k,n])=>`<button class="${(o.kind||'acc')===k?'on':''}" data-a="kind" data-v="${k}" aria-pressed="${(o.kind||'acc')===k}">${n}</button>`).join('')}</div>
     <h2 class="sec">ゲーム</h2><div class="seg">${seg}</div>
     <h2 class="sec">問題数</h2><div class="seg">${[[10,'10問'],[20,'20問'],[0,'全問']].map(([n,l])=>`<button class="${o.count===n?'on':''}" data-a="count" data-v="${n}" aria-pressed="${o.count===n}">${l}</button>`).join('')}</div>
     <label class="opt"><span>前回まちがえた問題だけ（${weak}問）</span><input type="checkbox" data-a="weak"${o.weak&&weak?' checked':''}${weak?'':' disabled'}></label>
@@ -312,7 +350,7 @@ function renderHome(){
 }
 function startDrill(){
   const o=DATA.opts;
-  let pool=BANK.filter(q=>o.game==='all'||q.g===o.game);
+  let pool=BANK.filter(q=>(o.game==='all'||q.g===o.game)&&inKind(q));
   if(o.weak){const w=weakList(o.game);if(w.length)pool=w;}
   /* 未挑戦→前回ミス→その他の順に優先して出す（同じ問題ばかりにならないように） */
   const pri=q=>{const s=DATA.seen[q.id];return !s?0:s.lastNg?1:2;};
@@ -374,6 +412,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-a]');if(!el)return;
   const a=el.dataset.a,v=el.dataset.v;
   if(a==='game'){DATA.opts.game=v;saveData();render();}
+  else if(a==='kind'){DATA.opts.kind=v;saveData();render();}
   else if(a==='count'){DATA.opts.count=+v;saveData();render();}
   else if(a==='weak'){DATA.opts.weak=el.checked;saveData();}
   else if(a==='start')startDrill();

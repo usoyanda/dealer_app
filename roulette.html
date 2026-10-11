@@ -575,7 +575,46 @@ const ZONE_DESC={farOutside:'赤黒・オッド/イーブン・ロー/ハイ',ne
 const ZONE_ORDER=['farOutside','nearOutside','inside'];
 const OUT_JA={red:'レッド',black:'ブラック',odd:'オッド',even:'イーブン',low:'1-18',high:'19-36'};
 
-const CAT_NAME={spin:'スピン・投入',close:'締切宣言',call:'コール・ドリー',take:'回収手順',pay:'配当計算',security:'セキュリティ所作'};
+const CAT_NAME={spin:'スピン・投入',close:'締切宣言',call:'コール・ドリー',take:'回収手順',pay:'配当計算',security:'セキュリティ所作',accident:'アクシデント対応'};
+/* 実戦のアクシデント（共通の仕組みは KIT の accPlan/accFire/accAct） */
+const ACC_TYPES=['ballOut','shortSpin','ballDrop','chipsKnock'];
+const NOSPIN_RESOLVE=G=>{const F=G.flags;F.noSpin=null;F.noSpinDone=true;F.spun=false;F.closed=false;G.phase='bet';addLog(G,{t:'info',el:'ボールを回収。ベットはそのまま、投げ直します'});};
+const ACC={
+  ballOut:{what:'ボールがウィールの外へ飛び出し、レイアウトの上に落ちた。',
+    why:'出目はポケットで決まるので、外へ出たボールのスピンは無効です。ディーラーが「ノースピン」を宣言してボールを回収し、投げ直します。ベットはそのまま次のスピンへ持ち越します。',
+    right:'「ノースピン」を宣言し、ボールを回収する',call:C('No spin.','ノースピンです'),
+    wrongs:[['黙ってボールを拾い、投げ直す','宣言しないと、客にもカメラにも「無効のスピン」だと伝わらない。ベットの扱いで必ず揉める'],
+      ['ボールが止まった場所に近い番号をコールする','ポケットに入っていないので出目は存在しない。近い番号を当たりにする根拠はない'],
+      ['全員のベットを返して、ゲームを終える','ノースピンはベットをそのまま次のスピンへ持ち越す。返す必要はない'],
+      ['ボールを客に拾ってもらう','客がボールに触れると細工の疑いが消せない。ボールはディーラーが回収する']],
+    ruling:'ノースピン。ベットはそのまま、ノー・モア・ベットからやり直す',resolve:NOSPIN_RESOLVE},
+  shortSpin:{what:'投げたボールが1周ほどでポケットに落ちた（規定の周回に届いていない）。',
+    why:'規定の周回に届かないスピンは、出目を狙えた疑いが残るため無効です。落ちた番号はコールせず、「ノースピン」を宣言して投げ直します。',
+    right:'「ノースピン」を宣言し、投げ直す',call:C('No spin.','ノースピンです'),
+    wrongs:[['落ちた番号をそのままコールする','周回不足のスピンを有効にすると、狙い投げを許すことになる'],
+      ['もう一度回して、落ちた番号と比べる','2回目を回して選ぶ手順は存在しない。宣言してやり直すだけ'],
+      ['全員のベットを返して、ゲームを終える','ノースピンはベットをそのまま持ち越す。返す必要はない'],
+      ['客に有効か無効かを聞く','判定はディーラーの宣言（必要ならフロア）で行う。客の多数決では決めない']],
+    ruling:'ノースピン。ベットはそのまま、ノー・モア・ベットからやり直す',resolve:NOSPIN_RESOLVE},
+  ballDrop:{what:'投入しようとしたボールが手から滑り、床に落ちた。',
+    why:'卓の外に出たボールは、すり替え・細工の可能性があり、点検するまで使えません。床へ手を伸ばす間は卓が無防備にもなります。手を止め、拾わずにフロアを呼びます。',
+    right:'手を止め、拾わずにフロアを呼ぶ',call:C('Floor, please. The ball is on the floor.','フロアお願いします。ボールが床に落ちました'),hand:'l',
+    wrongs:[['自分で拾って、すぐに投げる','床のボールは点検するまで使えない。拾う間、卓のチップから目と手が離れる'],
+      ['予備のボールを自分で出して投げる','ボールの交換もフロアの立ち会いが必要。独断で替えると記録と映像の説明がつかない'],
+      ['近くの客に拾ってもらう','客がボールに触れると細工の疑いが消せない。客に頼むのは厳禁'],
+      ['何も言わずにスピンを続ける','ボールがないのにゲームを進めることはできない。まず声に出して止める']],
+    ruling:'フロアがボールを新しいものに交換（落ちたボールは点検へ）。改めてスピンする',
+    resolve:G=>{G.flags.ballDrop=false;}},
+  chipsKnock:{what:'インサイドのハズレをレーキで回収中、当たりのチップの山に触れて崩してしまった。',
+    why:'当たりのチップの位置と枚数は配当の根拠です。記憶や客の申告では証明できないので、手を止め、フロアに監視カメラの映像で元の位置と枚数を確認してもらいます。',
+    right:'手を止め、フロアに映像の確認を頼む',call:C('Floor, please. I knocked over a winning bet.','フロアお願いします。当たりのチップを崩してしまいました'),
+    wrongs:[['記憶を頼りに元の位置へ戻す','どの位置・何枚だったかは記憶では証明できない。映像で確認するまで触らない'],
+      ['客に聞いて元に戻す','客の申告は利害が絡むので根拠にならない'],
+      ['崩れたままの位置で配当を払う','位置が崩れたままでは、どのベットに何を払うかが確定しない'],
+      ['崩れたチップを回収してしまう','当たりのチップを回収するのは誤り。まず止めて確認する']],
+    ruling:'映像で元の位置と枚数を確認し、フロアの立ち会いで元に戻した。回収を続ける',
+    resolve:G=>{G.flags.knock=null;}}
+};
 const LABEL={
   start:'ラウンド開始（ベットを募る）',
   spin:'ボールを投入する',
@@ -679,6 +718,7 @@ function startRound(G){
     dolly:false,took:{farOutside:false,nearOutside:false,inside:false},mucked:false,cleaned:false};
   G.phase='bet';
   G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[]};
+  G.round.accPlan=accPlan(G,ACC_TYPES);
   const cap=C('Place your bets, please.','お賭けください');setCaption(G,cap);
   addLog(G,{t:'info',el:`ラウンド${G.roundNo}開始（${n}人・ベット${bets.length}件）`,call:cap});
 }
@@ -722,6 +762,7 @@ function callOptions(G){
 
 function expected(G){
   const F=G.flags;
+  if(G.phase!=='idle'&&G.phase!=='done'&&F.acc)return accExpected(G);
   switch(G.phase){
     case 'idle':case 'done':return{key:'start',unscored:true};
     case 'bet':
@@ -729,13 +770,6 @@ function expected(G){
       if(!F.closed)return E('noMoreBets','close','ボールの勢いが落ち、ポケットに落ちる約3周前に「ノー・モア・ベット」と通る声で宣言します。同時に手のひらを下に向けてレイアウトの上を左右に大きく振り、チップの追加・変更を物理的にも視覚的にも遮断します。',C('No more bets.','ノー・モア・ベット、締切です'));
       return null;
     case 'ball':
-      if(F.noSpin){
-        const ns=F.noSpin;
-        const why=ns.reason==='out'
-          ?'ボールがウィールの外へ飛び出しました。出目はポケットで決まるため、このスピンは無効です。「ノースピン」を宣言してボールを回収し、投げ直します。ベットはそのまま次のスピンへ持ち越し、もう一度ノー・モア・ベットを宣言します。'
-          :`ボールが1周ほどで${ns.pocket}のポケットに落ちました。規定の周回に届かないスピンは、出目を狙えた疑いが残るため無効です。落ちた番号はコールせず、「ノースピン」を宣言して投げ直します。`;
-        return E('callNoSpin','security',why,C('No spin.','ノースピンです'),{reason:ns.reason});
-      }
       if(F.lateBet&&!F.lateDone){
         const lb=F.lateBet;
         return E('rejectLateBet','security',`締切後に${lb.seat}番席が${betLabel(lb)}へチップを置こうとしました。締切宣言以降のベットは無効です。チップを本人に戻し、受け付けないことを明確に伝えます。`,C('No more bets. This one is too late.','締切後ですので、こちらはお返しします'));
@@ -796,15 +830,17 @@ function apply(G,ex,amount){
   const done=()=>{setCaption(G,cap);addLog(G,{t:'ok',el:LABEL[ex.key]+(amount!==undefined?`：${fmt$(amount)}`:'')+(extra?` ${extra}`:''),call:cap&&cap.en?cap:null});};
   switch(ex.key){
     case 'start':startRound(G);return;
-    case 'spin':F.spun=true;break;
+    case 'spin':
+      if(accFire(G,'ballDrop')){F.ballDrop=true;done();return;}
+      F.spun=true;break;
     case 'noMoreBets':{
       F.closed=true;done();
       const df=currentDifficulty(G);
-      if(!F.noSpinDone&&G.opts.noSpin!==false&&Math.random()<(df.noSpinChance||0)){
-        const reason=Math.random()<.55?'out':'short';
+      const plan=G.round.accPlan&&G.round.accPlan.type;
+      if(!F.noSpinDone&&(plan==='ballOut'||plan==='shortSpin')&&accFire(G,plan)){
+        const reason=plan==='ballOut'?'out':'short';
         F.noSpin={reason,pocket:WHEEL_ORDER[Math.floor(Math.random()*37)],pos:{x:12+Math.random()*70,y:18+Math.random()*64}};
         G.phase='ball';
-        addLog(G,{t:'info',el:reason==='out'?'ボールがウィールの外へ飛び出しました':`ボールが1周ほどで${F.noSpin.pocket}に落ちました（周回不足）`});
         return;
       }
       landBall(G);
@@ -821,7 +857,9 @@ function apply(G,ex,amount){
       const z=ex.zone,hit=G.bets.filter(b=>b.zone===z&&b.win===false&&!b.collected);
       hit.forEach(b=>{b.collected=true;});
       G.collectedCount+=hit.length;F.took[z]=true;
-      extra=`（${ZONE_NAME[z]} ${hit.length}件）`;break;
+      extra=`（${ZONE_NAME[z]} ${hit.length}件）`;
+      if(z==='inside'){const w=G.bets.find(b=>b.zone==='inside'&&b.win&&b.pos);if(w&&accFire(G,'chipsKnock'))F.knock=w.id;}
+      break;
     }
     case 'mucking':F.mucked=true;extra=`（${G.collectedCount}枚 → ${Math.floor(G.collectedCount/20)}スタック＋${G.collectedCount%20}枚）`;break;
     case 'select':G.payIdx=ex.chosen;return;
@@ -873,6 +911,7 @@ function act(G,key,arg){
   const ex=expected(G);if(!ex)return null;
   if(ex.unscored){if(key==='start'){apply(G,ex);G.lastFb=null;}return null;}
 
+  if(ex.key==='accident'&&key==='accident')return accAct(G,ex,arg);
   if(key!==ex.key){recordErr(G,ex.cat,ex.why);return{cat:ex.cat,ok:false};}
 
   if(ex.key==='callNumber'){
@@ -1080,6 +1119,73 @@ function pulseConsole(ok){
   const el=document.getElementById('console');if(!el)return;
   el.classList.remove('pulse-ok','pulse-ng');void el.offsetWidth;el.classList.add(ok?'pulse-ok':'pulse-ng');
 }
+/* ---- 実戦のアクシデント ----
+   カードが落ちた・めくれた・ボールが落ちた、などの手元の事故に、その場で正しく反応できるかを問う。
+   原則：手を止める／独断で直さない（拾う・戻す・入れ替えない）／声に出してフロアを呼ぶ。
+   ただしミスディール・ノースピンのように、ディーラーが宣言するのが標準のものは宣言が正解。
+   処理の結論はカジノで異なるため「この卓の規定」として示す。
+   ゲーム側は ACC[type]={what,why,right,wrongs:[[選択肢,なぜまずいか],…],ruling,call,hand?,resolve(G)} を定義し、
+   ラウンド開始時に accPlan、事故が起こりうる場面で accFire、expected() の先頭で accExpected、act() で accAct を呼ぶ。 */
+const ACC_RATE={off:0,often:.6};
+function accRate(G){const m=(G.opts&&G.opts.accidents)||'normal';if(m in ACC_RATE)return ACC_RATE[m];return [0,.12,.16,.2,.25][currentDifficulty(G).level]||.12;}
+/* このラウンドで起こすアクシデント（1ラウンドに最大1回）。G.forceAccident（テスト用）があれば必ずそれ */
+function accPlan(G,types){
+  if(G.forceAccident)return types.includes(G.forceAccident)?{type:G.forceAccident,forced:true}:null;
+  return Math.random()<accRate(G)?{type:types[Math.floor(Math.random()*types.length)]}:null;
+}
+/* 事故が起こりうる場面で呼ぶ。計画どおりの種類なら発生させて true（計画は消費） */
+function accFire(G,type,data){
+  const p=G.round&&G.round.accPlan;
+  if(!p||p.type!==type||(G.flags&&G.flags.acc))return false;
+  G.round.accPlan=null;if(p.forced)G.forceAccident=null;
+  const A=ACC[type],n=currentDifficulty(G).level>=3?4:3;
+  const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const opts=shuf([A.right].concat(shuf(A.wrongs.map(w=>w[0])).slice(0,n-1)));
+  G.flags.acc=Object.assign({type,opts},data||{});
+  addLog(G,{t:'err',el:`アクシデント：${A.what}`});
+  return true;
+}
+function accExpected(G){
+  const a=G.flags&&G.flags.acc;if(!a)return null;
+  const A=ACC[a.type];
+  return E('accident','accident',A.why,A.call,{callSet:{right:A.right,opts:a.opts},acc:a.type,what:A.what});
+}
+/* 返り値 {cat,ok}。正解なら字幕に宣言、ログにフロアの裁定を出し、規定どおりに状態を直す */
+function accAct(G,ex,arg){
+  const A=ACC[ex.acc];
+  if(arg!==A.right){
+    const w=A.wrongs.find(x=>x[0]===arg);
+    recordErr(G,'accident',A.why,`その対応はまずい：${w?w[1]:'事故の後は手を止め、独断で直さないのが原則です。'}\n正しくは「${A.right}」。${A.why}`);
+    return{cat:'accident',ok:false};
+  }
+  G.round.ok++;
+  const data=G.flags.acc;G.flags.acc=null;
+  setCaption(G,A.call);
+  addLog(G,{t:'ok',el:`アクシデント対応：${A.right}`,call:A.call});
+  addLog(G,{t:'info',el:`フロアの裁定（この卓の規定）：${A.ruling}`});
+  G.lastFb={t:'ok',text:`正解：${A.right}\nフロアの裁定（この卓の規定）：${A.ruling}`};
+  if(A.resolve)A.resolve(G,data);
+  return{cat:'accident',ok:true};
+}
+/* コンソール：何が起きたか（答えは書かない）と、対応の選択肢（1列） */
+function accConsole(ex){
+  return{prompt:`<span class="acc-what"><b>アクシデント</b>${esc(ex.what)}</span>どう対応しますか？`,
+    actions:ex.callSet.opts.map(o=>`<button class="act acc-opt" data-act="accident" data-arg="${esc(o)}">${esc(o)}</button>`).join('')};
+}
+const ACC_SET_HTML=o=>`<div class="row"><label for="optAccidents">実戦のアクシデント（カード落下・露出・ボール落下など）</label><select id="optAccidents">${[['off','起こさない'],['normal','ときどき（難易度で増える）'],['often','頻繁に（練習用）']].map(v=>`<option value="${v[0]}"${(o.accidents||'normal')===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>`;
+(()=>{if(document.getElementById('acc-css'))return;const st=document.createElement('style');st.id='acc-css';st.textContent=
+`.act.acc-opt{grid-column:1/-1;width:100%;text-align:left;justify-content:flex-start}
+.acc-what{display:block;margin:0 0 6px;padding:6px 10px;border-radius:6px;background:#3B1416;color:#FFE2DD;border-left:4px solid #E0645A;font-weight:normal;line-height:1.5}
+.acc-what b{display:inline-block;margin-right:8px;padding:0 6px;border-radius:4px;background:#E0645A;color:#fff;font-size:.82em;letter-spacing:.06em}
+.acc-mark{position:absolute;z-index:7;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.acc-mark .acc-tag{background:#C43D33;color:#fff;font-size:11px;line-height:1.3;padding:1px 6px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.acc-floorcard{width:30px;height:42px;border-radius:4px;background:repeating-linear-gradient(45deg,#7A1F2B 0 4px,#922E3A 4px 8px);border:2px solid #FAF7EF;transform:rotate(-24deg);box-shadow:0 3px 8px rgba(0,0,0,.6)}
+.acc-floorball{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E9E2CF 55%,#9A9384);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+.acc-hot{outline:3px solid #E0645A !important;outline-offset:2px;box-shadow:0 0 12px rgba(224,100,90,.85) !important}
+@keyframes accfall{from{transform:translate(-50%,-160%) rotate(0);opacity:.2}to{transform:translate(-50%,-50%);opacity:1}}
+.acc-mark.fall{animation:accfall .5s cubic-bezier(.3,1.4,.5,1)}
+@media (max-width:600px){.acc-what{font-size:12px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:9.5px;padding:0 4px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
+document.head.appendChild(st);})();
 /*KIT_END*/
 /* ===================== UI ===================== */
 const STORE_OPTS='dsim_rl_opts',STORE_STATS='dsim_rl_stats';
@@ -1889,6 +1995,8 @@ function buildMotion(key,arg,pre){
       const W=wheel();if(!W)return null;
       return[{t:0},{t:280,l:P(W.c.x+W.rad*.25,W.c.y+W.rad*.55),lp:'point'},{t:640,l:P(W.c.x+W.rad*.25,W.c.y+W.rad*.5),lp:'point'},{t:900,l:RL,lp:''}];
     }
+    case 'accident':if(arg!==undefined&&pre.accType!=='ballOut'&&pre.accType!=='shortSpin')return Dealer.floorFrames(pre.accHand||'r');
+      /* fallthrough：ノースピンは宣言してボールを回収する */
     case 'callNoSpin':{
       /* 宣言してから、ボールのある場所（レイアウト上／ポケット）へ手を運んで拾い、ラックへ持ち帰る */
       const W=wheel();if(!W)return null;
@@ -1943,7 +2051,7 @@ function buildMotion(key,arg,pre){
   }
   return null;
 }
-const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'配当を支払う',select:'支払う対象を選ぶ'});
+const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'配当を支払う',select:'支払う対象を選ぶ',accident:'アクシデント対応'});
 
 function ballAngleFor(num){
   const i=WHEEL_ORDER.indexOf(num),ap=360/WHEEL_ORDER.length;
@@ -1961,7 +2069,7 @@ function layoutHTML(){
   const chipEl=(b,inline)=>{
     const late=b.id==='late';
     const st=late?'late':b.collected?'gone':b.settled?'paid':!reveal?'':b.win===true?'won':b.win===false?'lost':'';
-    const pick=picks.includes(b.id)?' pick':'';
+    const pick=(picks.includes(b.id)?' pick':'')+(G.flags.knock===b.id?' acc-hot':'');
     const attrs=pick?` data-act="select" data-arg="${b.id}" tabindex="0" role="button"`:'';
     const cls=`chip ${seatClass(b.seat)} ${st}${pick}${inline?' chip-inline':' chip-abs'}`;
     const pos=inline?'':`style="left:${b.pos.x}%;top:${100-b.pos.y}%"`;
@@ -2000,7 +2108,7 @@ function layoutHTML(){
     <div class="row-dozens${zc('nearOutside')}">${dz}</div>
     <div class="grid-wrap${zc('inside')}">
       <div class="grid-main">${cells}</div>
-      <div class="chip-layer">${chipLayer}${G.flags.noSpin&&G.flags.noSpin.reason==='out'?`<span class="stray-ball" style="left:${G.flags.noSpin.pos.x}%;top:${100-G.flags.noSpin.pos.y}%"></span>`:''}</div>
+      <div class="chip-layer">${chipLayer}${G.flags.knock?(()=>{const k=G.bets.find(b=>b.id===G.flags.knock);return k&&k.pos?`<span class="acc-mark" style="left:${k.pos.x}%;top:calc(${100-k.pos.y}% - 22px)"><span class="acc-tag">崩れた</span></span>`:'';})():''}${G.flags.noSpin&&G.flags.noSpin.reason==='out'?`<span class="stray-ball" style="left:${G.flags.noSpin.pos.x}%;top:${100-G.flags.noSpin.pos.y}%"></span>`:''}</div>
     </div>
   </div></div>`;
 }
@@ -2062,6 +2170,12 @@ function renderTable(){
   }
   const show=G.opts.showDealer!==false;
   $('table').classList.toggle('has-dealer',show);
+  if(F.ballDrop){
+    /* 床に落ちたボール：ホイールの手前、卓の縁の外に */
+    const t=$('table'),w=elRect('#wheelWrap'),band=show?(parseFloat(getComputedStyle(t).paddingBottom)||40):24;
+    const x=w?w.x+w.w*.8:t.clientWidth*.15,y=t.clientHeight-band*.5;
+    t.insertAdjacentHTML('beforeend',`<div class="acc-mark fall" style="left:${x}px;top:${y}px"><span class="acc-floorball"></span><span class="acc-tag">床に落下</span></div>`);
+  }
   if(show){
     $('table').appendChild(Dealer.build());
     const btn=Dealer.root.querySelector('.dl-replay');
@@ -2153,6 +2267,8 @@ function renderConsole(){
   }else if(G.phase==='idle'){
     prompt='ラウンドを開始して、プレイヤーにベットを促してください。';
     actions=btn('start','ラウンドを開始（お賭けください）','primary');
+  }else if(ex&&ex.key==='accident'){
+    const c=accConsole(ex);prompt=c.prompt;actions=c.actions;
   }else if(ex&&ex.key==='callNumber'){
     prompt='ボールが落ちました。正しいコールを選んでください。<span class="hint">番号・色・奇偶を声に出す場面。</span>';
     actions=ex.callSet.opts.map(o=>btn('callNumber',o,'',o)).join('');
@@ -2179,7 +2295,7 @@ function renderSettings(){
   $('settings').innerHTML=`<h3>設定</h3>
     <div class="row"><label for="optPlayers">プレイヤー人数</label><select id="optPlayers">${[2,3,4].map(n=>`<option value="${n}"${o.players===n?' selected':''}>${n}人</option>`).join('')}</select></div>
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
-    <div class="row"><label for="optNoSpin">ノースピン（ボールの飛び出し・周回不足）を発生させる</label><input type="checkbox" id="optNoSpin"${o.noSpin!==false?' checked':''}></div>
+    ${ACC_SET_HTML(o)}
     <div class="row"><label for="optLate">後賭けを発生させる</label><input type="checkbox" id="optLate"${o.lateBets?' checked':''}></div>
     <div class="row"><label for="optZone">回収エリアを強調表示</label><input type="checkbox" id="optZone"${o.showZoneHints?' checked':''}></div>
     <div class="row"><label for="optDealer">ディーラーを表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
@@ -2222,7 +2338,8 @@ function doAct(key,arg){
     zone:exNow&&exNow.zone?exNow.zone:null,
     late:ptOf('.chip.late'),
     stray:ptOf('.stray-ball'),
-    dolly:ptOf('.dolly')
+    dolly:ptOf('.dolly'),
+    accType:G.flags.acc?G.flags.acc.type:null,accHand:G.flags.acc&&ACC[G.flags.acc.type].hand
   };
   const r=act(G,key,arg);
   if(r){STATS.cats[r.cat][r.ok?'ok':'ng']++;}
@@ -2262,7 +2379,7 @@ document.addEventListener('change',e=>{
   if(id==='optPlayers')G.opts.players=+e.target.value;
   else if(id==='optAdaptive')G.opts.adaptiveDifficulty=e.target.checked;
   else if(id==='optLate')G.opts.lateBets=e.target.checked;
-  else if(id==='optNoSpin')G.opts.noSpin=e.target.checked;
+  else if(id==='optAccidents')G.opts.accidents=e.target.value;
   else if(id==='optZone')G.opts.showZoneHints=e.target.checked;
   else if(id==='optDealer'){G.opts.showDealer=e.target.checked;Dealer.stop();}
   else if(id==='optSpeed')G.opts.dealerSpeed=+e.target.value;

@@ -744,8 +744,36 @@ const RING_NAME={outer:'外周の大枠（プレイヤー／バンカー）',inn
 const DRAGON_TABLE=[[9,30],[8,10],[7,6],[6,4],[5,2],[4,1]];
 function dragonPay(margin){for(const[m,p]of DRAGON_TABLE)if(margin===m)return p;return 0;}
 
-const CAT_NAME={deal:'配り手順',squeeze:'スクイーズ',count:'点数計算',draw:'3枚目の判定',call:'コール',take:'回収手順',pay:'配当計算',commission:'コミッション',security:'セキュリティ所作'};
-const LABEL={
+const CAT_NAME={deal:'配り手順',squeeze:'スクイーズ',count:'点数計算',draw:'3枚目の判定',call:'コール',take:'回収手順',pay:'配当計算',commission:'コミッション',security:'セキュリティ所作',accident:'アクシデント対応'};
+/* 実戦のアクシデント（共通の仕組みは KIT の accPlan/accFire/accAct） */
+const ACC_TYPES=['cardFlip','cardDrop','squeezeTear'];
+const ACC={
+  cardFlip:{what:'最初の4枚を配る途中、1枚が表向きのままテーブルに落ちた。',
+    why:'配りの途中で札が見えてしまったら、手を止めてフロアを呼びます。表になった札をディーラーが勝手に裏返したり捨てたりすると、結果が変わる操作に見え、映像でも説明できません。扱いはフロアが決めます。',
+    right:'手を止めてフロアを呼ぶ',call:C('Floor, please. A card is exposed.','フロアお願いします。カードが表になりました'),
+    wrongs:[['裏返して、何事もなかったように続ける','見えた札を隠すと、全員が見た事実を消すことになる。結果を操作したと疑われる'],
+      ['その札を捨てて、次の札を配る','札を差し替えると出目が変わる。どちらの手に有利かが変わるので独断は厳禁'],
+      ['全員のベットを返して終わりにする','ゲームの無効はフロアが決める。ディーラーが勝手に決めない'],
+      ['客に「この札でいいか」と聞く','客の合意で処理を決めない。決めるのはフロア']],
+    ruling:'露出した札はそのまま使う（表のまま置き、配りを続ける）',resolve:G=>{G.flags.exposedOk=true;}},
+  cardDrop:{what:'シューから引いた札が手から滑り、床に落ちた。',
+    why:'卓の外に出た札は、すり替え・印付けの可能性があり、そのまま使えません。拾いに手を伸ばす間は卓も無防備になります。拾わずに手を止め、フロアを呼びます。',
+    right:'拾わずにフロアを呼ぶ',call:C('Floor, please. A card is on the floor.','フロアお願いします。カードが床に落ちました'),
+    wrongs:[['自分で拾って、そのまま配る','床に落ちた札は誰かが触れた可能性がある。点検前に使うと結果の正しさを証明できない'],
+      ['拾って捨て札に入れ、黙って次を配る','処理の結論はフロアが決める。黙って進めると、客には札を抜いたように見える'],
+      ['近くの客に拾ってもらう','客に札を触らせると細工の疑いが消せない。厳禁'],
+      ['配り終えてから拾う','床の札を放置したまま進めると、どの札が抜けたか分からなくなる。まず止める']],
+    ruling:'落ちた札は焼き札（ゲームから外す）にし、同じ配り先へ次の札を配る',resolve:G=>{G.flags.dropped=null;}},
+  squeezeTear:{what:'絞りの最中に、客が札を強く曲げて角を破ってしまった。',
+    why:'札を傷めた事実は、次以降のゲームで印として使われるおそれがあります。手札の結果は有効のまま、客に扱いを注意し、フロアへ報告して記録してもらいます。',
+    right:'客に扱いを注意し、フロアへ報告する',call:C('Please be careful with the cards. Floor, please.','カードの扱いにご注意ください。フロアお願いします'),
+    wrongs:[['新しい札とその場で交換する','結果が出ている札を差し替えると、勝敗を変えたことになる'],
+      ['そのゲームを無効にする','破れても札の数字は読める。ゲームの無効はディーラーが決めることではない'],
+      ['客のしたことなので何もしない','傷んだ札が残ると、次のゲームで印になる。報告して記録を残す'],
+      ['破れた札をディーラーがポケットにしまう','札を卓から持ち出すのは厳禁。カメラの前に置いたまま、フロアに渡す']],
+    ruling:'結果はそのまま有効。破れた札はこのシューが終わったら交換する',resolve:G=>{G.flags.torn=null;}}
+};
+const LABEL={accident:'アクシデントに対応する',
   start:'ラウンド開始（ベットを募る）',
   noMoreBets:'ノー・モア・ベットを宣言',
   dealPlayer:'プレイヤーへ1枚配る',
@@ -963,6 +991,7 @@ function startRound(G){
     calledResult:false,tookOuter:false,tookInner:false,commDone:false,cleaned:false};
   G.phase='bet';
   G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[],hints:0};
+  G.round.accPlan=accPlan(G,ACC_TYPES);
   if(G.ruleChanged){
     addLog(G,{t:'rule',el:`ハウスルール：${ruleSummary(G.table)}`,
       why:G.table.rule.desc});
@@ -1114,6 +1143,7 @@ function losersIn(G,ring){return G.bets.filter(b=>b.win===false&&!b.push&&!b.col
 
 function expected(G){
   const F=G.flags,T=G.table,df=currentDifficulty(G);
+  if(G.phase!=='idle'&&G.phase!=='done'&&F.acc)return accExpected(G);
   switch(G.phase){
     case 'idle':case 'done':return{key:'start',unscored:true};
 
@@ -1289,13 +1319,23 @@ function apply(G,ex,amount){
     case 'start':startRound(G);return;
     case 'noMoreBets':F.closed=true;break;
     case 'dealPlayer':
-      if(G.phase==='deal'){F.dealt++;extra=`（${F.dealt}枚目）`;}
+      if(G.phase==='deal'){
+        const idx=Math.floor(F.dealt/2);
+        if(accFire(G,'cardDrop')){F.dropped={side:'p',card:G.pCards[idx]};G.pCards[idx]=takeCard(G);done();return;}
+        F.dealt++;extra=`（${F.dealt}枚目）`;
+        if(F.dealt>=2&&accFire(G,'cardFlip'))F.exposed={side:'p',i:idx};
+      }
       else{const c=takeCard(G);G.pCards.push(c);G.p3=cardPoint(c.rank);F.pCard3=true;
         extra=`（${cardText(c)}＝${G.p3}点、合計${handTotal(G.pCards)}）`;
         cap=C(`Player draws ${c.rank}. Player has ${handTotal(G.pCards)}.`,`プレイヤー3枚目 ${cardText(c)}、合計${handTotal(G.pCards)}`);}
       break;
     case 'dealBanker':
-      if(G.phase==='deal'){F.dealt++;extra=`（${F.dealt}枚目）`;}
+      if(G.phase==='deal'){
+        const idx=Math.floor(F.dealt/2);
+        if(accFire(G,'cardDrop')){F.dropped={side:'b',card:G.bCards[idx]};G.bCards[idx]=takeCard(G);done();return;}
+        F.dealt++;extra=`（${F.dealt}枚目）`;
+        if(F.dealt>=2&&accFire(G,'cardFlip'))F.exposed={side:'b',i:idx};
+      }
       else{const c=takeCard(G);G.bCards.push(c);F.bCard3=true;
         extra=`（${cardText(c)}＝${cardPoint(c.rank)}点、合計${handTotal(G.bCards)}）`;
         cap=C(`Banker draws ${c.rank}. Banker has ${handTotal(G.bCards)}.`,`バンカー3枚目 ${cardText(c)}、合計${handTotal(G.bCards)}`);}
@@ -1304,6 +1344,7 @@ function apply(G,ex,amount){
       const cards=ex.side==='p'?G.pCards:G.bCards;
       if(ex.side==='p')F.openedP=true;else F.openedB=true;
       G.squeezer[ex.side]=ex.correct;G.squeezeFlash=ex.side;
+      if(accFire(G,'squeezeTear'))F.torn=ex.side;
       extra=`（${ex.correct}番席が絞る＝${ex.sideJa}側の最高額${fmt$(ex.topAmount)}：${handText(cards)}＝${handTotal(cards)}）`;
       break;
     }
@@ -1383,6 +1424,7 @@ function act(G,key,arg){
   const ex=expected(G);if(!ex)return null;
   if(ex.unscored){if(key==='start'){apply(G,ex);G.lastFb=null;}return null;}
 
+  if(ex.key==='accident'&&key==='accident')return accAct(G,ex,arg);
   if(key!==ex.key){
     recordErr(G,ex.cat,ex.why,`この場面で正しい操作は「${LABEL[ex.key]}」です。${ex.why}`);
     return{cat:ex.cat,ok:false};
@@ -1863,6 +1905,73 @@ function pulseConsole(ok){
   const el=document.getElementById('console');if(!el)return;
   el.classList.remove('pulse-ok','pulse-ng');void el.offsetWidth;el.classList.add(ok?'pulse-ok':'pulse-ng');
 }
+/* ---- 実戦のアクシデント ----
+   カードが落ちた・めくれた・ボールが落ちた、などの手元の事故に、その場で正しく反応できるかを問う。
+   原則：手を止める／独断で直さない（拾う・戻す・入れ替えない）／声に出してフロアを呼ぶ。
+   ただしミスディール・ノースピンのように、ディーラーが宣言するのが標準のものは宣言が正解。
+   処理の結論はカジノで異なるため「この卓の規定」として示す。
+   ゲーム側は ACC[type]={what,why,right,wrongs:[[選択肢,なぜまずいか],…],ruling,call,hand?,resolve(G)} を定義し、
+   ラウンド開始時に accPlan、事故が起こりうる場面で accFire、expected() の先頭で accExpected、act() で accAct を呼ぶ。 */
+const ACC_RATE={off:0,often:.6};
+function accRate(G){const m=(G.opts&&G.opts.accidents)||'normal';if(m in ACC_RATE)return ACC_RATE[m];return [0,.12,.16,.2,.25][currentDifficulty(G).level]||.12;}
+/* このラウンドで起こすアクシデント（1ラウンドに最大1回）。G.forceAccident（テスト用）があれば必ずそれ */
+function accPlan(G,types){
+  if(G.forceAccident)return types.includes(G.forceAccident)?{type:G.forceAccident,forced:true}:null;
+  return Math.random()<accRate(G)?{type:types[Math.floor(Math.random()*types.length)]}:null;
+}
+/* 事故が起こりうる場面で呼ぶ。計画どおりの種類なら発生させて true（計画は消費） */
+function accFire(G,type,data){
+  const p=G.round&&G.round.accPlan;
+  if(!p||p.type!==type||(G.flags&&G.flags.acc))return false;
+  G.round.accPlan=null;if(p.forced)G.forceAccident=null;
+  const A=ACC[type],n=currentDifficulty(G).level>=3?4:3;
+  const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const opts=shuf([A.right].concat(shuf(A.wrongs.map(w=>w[0])).slice(0,n-1)));
+  G.flags.acc=Object.assign({type,opts},data||{});
+  addLog(G,{t:'err',el:`アクシデント：${A.what}`});
+  return true;
+}
+function accExpected(G){
+  const a=G.flags&&G.flags.acc;if(!a)return null;
+  const A=ACC[a.type];
+  return E('accident','accident',A.why,A.call,{callSet:{right:A.right,opts:a.opts},acc:a.type,what:A.what});
+}
+/* 返り値 {cat,ok}。正解なら字幕に宣言、ログにフロアの裁定を出し、規定どおりに状態を直す */
+function accAct(G,ex,arg){
+  const A=ACC[ex.acc];
+  if(arg!==A.right){
+    const w=A.wrongs.find(x=>x[0]===arg);
+    recordErr(G,'accident',A.why,`その対応はまずい：${w?w[1]:'事故の後は手を止め、独断で直さないのが原則です。'}\n正しくは「${A.right}」。${A.why}`);
+    return{cat:'accident',ok:false};
+  }
+  G.round.ok++;
+  const data=G.flags.acc;G.flags.acc=null;
+  setCaption(G,A.call);
+  addLog(G,{t:'ok',el:`アクシデント対応：${A.right}`,call:A.call});
+  addLog(G,{t:'info',el:`フロアの裁定（この卓の規定）：${A.ruling}`});
+  G.lastFb={t:'ok',text:`正解：${A.right}\nフロアの裁定（この卓の規定）：${A.ruling}`};
+  if(A.resolve)A.resolve(G,data);
+  return{cat:'accident',ok:true};
+}
+/* コンソール：何が起きたか（答えは書かない）と、対応の選択肢（1列） */
+function accConsole(ex){
+  return{prompt:`<span class="acc-what"><b>アクシデント</b>${esc(ex.what)}</span>どう対応しますか？`,
+    actions:ex.callSet.opts.map(o=>`<button class="act acc-opt" data-act="accident" data-arg="${esc(o)}">${esc(o)}</button>`).join('')};
+}
+const ACC_SET_HTML=o=>`<div class="row"><label for="optAccidents">実戦のアクシデント（カード落下・露出・ボール落下など）</label><select id="optAccidents">${[['off','起こさない'],['normal','ときどき（難易度で増える）'],['often','頻繁に（練習用）']].map(v=>`<option value="${v[0]}"${(o.accidents||'normal')===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>`;
+(()=>{if(document.getElementById('acc-css'))return;const st=document.createElement('style');st.id='acc-css';st.textContent=
+`.act.acc-opt{grid-column:1/-1;width:100%;text-align:left;justify-content:flex-start}
+.acc-what{display:block;margin:0 0 6px;padding:6px 10px;border-radius:6px;background:#3B1416;color:#FFE2DD;border-left:4px solid #E0645A;font-weight:normal;line-height:1.5}
+.acc-what b{display:inline-block;margin-right:8px;padding:0 6px;border-radius:4px;background:#E0645A;color:#fff;font-size:.82em;letter-spacing:.06em}
+.acc-mark{position:absolute;z-index:7;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.acc-mark .acc-tag{background:#C43D33;color:#fff;font-size:11px;line-height:1.3;padding:1px 6px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.acc-floorcard{width:30px;height:42px;border-radius:4px;background:repeating-linear-gradient(45deg,#7A1F2B 0 4px,#922E3A 4px 8px);border:2px solid #FAF7EF;transform:rotate(-24deg);box-shadow:0 3px 8px rgba(0,0,0,.6)}
+.acc-floorball{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E9E2CF 55%,#9A9384);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+.acc-hot{outline:3px solid #E0645A !important;outline-offset:2px;box-shadow:0 0 12px rgba(224,100,90,.85) !important}
+@keyframes accfall{from{transform:translate(-50%,-160%) rotate(0);opacity:.2}to{transform:translate(-50%,-50%);opacity:1}}
+.acc-mark.fall{animation:accfall .5s cubic-bezier(.3,1.4,.5,1)}
+@media (max-width:600px){.acc-what{font-size:12px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:9.5px;padding:0 4px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
+document.head.appendChild(st);})();
 /*KIT_END*/
 /* ===================== UI ===================== */
 const STORE_OPTS='dsim_bc_opts',STORE_STATS='dsim_bc_stats';
@@ -2736,6 +2845,7 @@ function buildMotion(key,arg,pre){
         F(h,980,P(c.x+dx,c.y+6*s),{prop:''}),{t:1320,r:RR,l:RL}];
     }
     case 'cleanHands':return Dealer.cleanFrames();
+    case 'accident':return Dealer.floorFrames(pre.accType==='cardDrop'&&shoe?side(shoe.x):'r');
     case 'clearCards':{
       /* 両手で手札を寄せてまとめ、ディスカードホルダーへ */
       const dp=pre.pHand||handPt('p'),db=pre.bHand||handPt('b'),dc=ptOf('#discardBox',0.5,0.4);
@@ -2751,7 +2861,7 @@ function buildMotion(key,arg,pre){
   }
   return null;
 }
-const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'配当を支払う',select:'支払う対象を選ぶ'});
+const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'配当を支払う',select:'支払う対象を選ぶ',accident:'フロアを呼ぶ'});
 
 /* ---- テーブル描画 ---- */
 function cardHTML(c,faceUp,cls){
@@ -2768,7 +2878,8 @@ function handHTML(G,side){
   /* 絞った直後の手札だけ、客が札を絞るアニメーションを付ける */
   const sq=G.squeezeFlash===side?' squeezing':'';
   for(let i=0;i<2;i++){
-    if(i<dealtCount)html+=cardHTML(cards[i],opened,'dealt'+sq);
+    const ex=F.exposed&&F.exposed.side===side&&F.exposed.i===i;
+    if(i<dealtCount)html+=cardHTML(cards[i],opened||ex,'dealt'+sq+(ex&&F.acc?' acc-hot':'')+(F.torn===side&&i===0?' acc-hot':''));
     else html+='<div class="card-slot"></div>';
   }
   if(third)html+=cardHTML(cards[2],true,'third dealt');
@@ -2777,7 +2888,7 @@ function handHTML(G,side){
   const name=side==='p'?'PLAYER':'BANKER';
   const sqSeat=G.squeezer[side];
   return `<div class="hand h-${side}${win?' win':''}${F.cleared?' cleared':''}">
-    <div class="hand-cap"><span>${name}${sqSeat?`<small>絞り ${sqSeat}番席</small>`:''}</span>${total===null?'<span class="pend">未オープン</span>':`<b>${total}</b>`}</div>
+    <div class="hand-cap"><span>${name}${sqSeat?`<small>絞り ${sqSeat}番席</small>`:''}${F.exposed&&F.exposed.side===side?'<small>露出</small>':''}${F.torn===side?'<small>角が破れた</small>':''}</span>${total===null?'<span class="pend">未オープン</span>':`<b>${total}</b>`}</div>
     <div class="cards">${html}</div>
   </div>`;
 }
@@ -2968,6 +3079,12 @@ function renderTable(){
     ${G.signOpen?ruleSignHTML(G):''}`;
   const show=G.opts.showDealer!==false;
   $('table').classList.toggle('has-dealer',show);
+  if(G.flags&&G.flags.dropped){
+    /* 床に落ちた札：シューの手前、卓の縁の外に */
+    const t=$('table'),sb=elRect('#shoeBox'),band=show?(parseFloat(getComputedStyle(t).paddingBottom)||40):20;
+    const x=sb?sb.x+sb.w*.3:t.clientWidth*.8,y=t.clientHeight-band*.45;
+    t.insertAdjacentHTML('beforeend',`<div class="acc-mark fall" style="left:${x}px;top:${y}px"><span class="acc-floorcard"></span><span class="acc-tag">床に落下</span></div>`);
+  }
   if(show){
     $('table').appendChild(Dealer.build());
     const btn=Dealer.root.querySelector('.dl-replay');
@@ -3112,6 +3229,8 @@ function renderConsole(){
   }else if(G.phase==='idle'){
     prompt='ラウンドを開始して、プレイヤーにベットを促してください。';
     actions=btn('start','ラウンドを開始（お賭けください）','primary');
+  }else if(ex&&ex.key==='accident'){
+    const c=accConsole(ex);prompt=c.prompt;actions=c.actions;
   }else if(ex&&ex.key==='callTotals'){
     prompt='両者の点数をコールしてください。<span class="hint">10・J・Q・Kは0点、Aは1点。合計は下1桁だけ。</span>';
     actions=ex.callSet.opts.map(o=>btn('callTotals',o,'wide',o)).join('');
@@ -3166,6 +3285,7 @@ function renderSettings(){
     <div class="row"><label for="optChipCoach">チップを出す画面に「チップのコツ」を表示</label><input type="checkbox" id="optChipCoach"${o.showChipCoach!==false?' checked':''}></div>
     <div class="row"><label for="optHints">ドロー条件表のヒントを表示</label><input type="checkbox" id="optHints"${o.showDrawHints!==false?' checked':''}></div>
     <div class="row"><label for="optZone">回収エリアを強調表示</label><input type="checkbox" id="optZone"${o.showZoneHints?' checked':''}></div>
+    ${ACC_SET_HTML(o)}
     <div class="row"><label for="optDealer">ディーラーを表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
     <div class="row"><label for="optSpeed">所作の再生速度</label><select id="optSpeed">${[[1,'標準'],[0.6,'ゆっくり'],[0.35,'とてもゆっくり']].map(v=>`<option value="${v[0]}"${(o.dealerSpeed||1)===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>
     <div class="row"><label for="optSfx">効果音・振動</label><input type="checkbox" id="optSfx"${o.sfx!==false?' checked':''}></div>
@@ -3254,7 +3374,8 @@ function doAct(key,arg){
     group:exNow&&exNow.group?exNow.group:null,
     side:exNow&&exNow.side?exNow.side:null,
     pHand:ptOf('.hand.h-p .cards'),
-    bHand:ptOf('.hand.h-b .cards')
+    bHand:ptOf('.hand.h-b .cards'),
+    accType:G.flags&&G.flags.acc?G.flags.acc.type:null
   };
   /* ルール掲示は felt を覆うため、最初の操作が入った時点で必ず閉じる
      （テーブル上のチップを選ぶ場面でクリックを遮らないように） */
@@ -3306,6 +3427,7 @@ document.addEventListener('change',e=>{
   else if(id==='optZone')G.opts.showZoneHints=e.target.checked;
   else if(id==='optDealer'){G.opts.showDealer=e.target.checked;Dealer.stop();}
   else if(id==='optSpeed')G.opts.dealerSpeed=+e.target.value;
+  else if(id==='optAccidents')G.opts.accidents=e.target.value;
   else if(id==='optSfx')G.opts.sfx=e.target.checked;
   else if(id==='optSpeech'){G.opts.voice=e.target.checked;if(!G.opts.voice&&'speechSynthesis' in window)speechSynthesis.cancel();}
   else return;

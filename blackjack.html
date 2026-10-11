@@ -266,10 +266,6 @@ button,a,.act,.tray-chip{-webkit-tap-highlight-color:transparent;touch-action:ma
 .hbtn svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 /* スマホではヘッダーのボタンをアイコンだけにし、通算正答率は設定パネルに任せて1行に収める */
 @media (max-width:600px){.meta .only-lg{display:none}}
-.difficulty-pill{padding:2px 8px;border:1px solid rgba(201,162,75,.45);border-radius:12px}
-.difficulty-pill b{font-size:12px;letter-spacing:.03em;color:#E3C985}
-.difficulty-pill.d3{border-color:#D28B62}
-.difficulty-pill.d4{border-color:#D46666;background:rgba(150,35,35,.14)}
 @media (max-width:520px){.hbtn .hl{display:none}.hbtn{padding-left:6px !important;padding-right:6px !important}.topbar .meta{gap:5px}}
 @media (max-width:340px){.brand-main{display:none}.hbtn{padding-left:5px !important;padding-right:5px !important}}
 .difficulty-pill{background:rgba(217,178,95,.08)}
@@ -482,7 +478,43 @@ const CHIPS=[100,50,25,10,5,1];
 function minChips(x){const r=[];for(const d of CHIPS){while(x>=d-1e-9){r.push(d);x-=d;}}return r;}
 function chipsText(arr){const m={};arr.forEach(d=>m[d]=(m[d]||0)+1);return CHIPS.filter(d=>m[d]).map(d=>`$${d}×${m[d]}`).join('＋')||'なし';}
 const MAX_HANDS=4;
-const CAT_NAME={deal:'配布手順',check:'ピーク・インシュアランス',play:'プレイヤー対応',dealer:'ディーラードロー',settle:'精算',pay:'配当計算'};
+const CAT_NAME={deal:'配布手順',check:'ピーク・インシュアランス',play:'プレイヤー対応',dealer:'ディーラードロー',settle:'精算',pay:'配当計算',accident:'アクシデント対応'};
+/* 実戦のアクシデント（共通の仕組みは KIT の accPlan/accFire/accAct） */
+const ACC_TYPES=['holeFlip','cardDrop','cardsStuck'];
+const ACC={
+  holeFlip:{what:'ホールカード（ディーラーの2枚目）を配ったら、表向きになってしまった。',
+    why:'ホールカードが見えると、客の判断（ヒットかスタンドか）に影響します。ディーラーが勝手に裏返したり差し替えたりすると、結果を操作したことになるので、手を止めてフロアを呼びます。',
+    right:'手を止めてフロアを呼ぶ',call:C('Floor, please. The hole card is exposed.','フロアお願いします。ホールカードが表になりました'),
+    wrongs:[['見えなかったことにして、裏返して続ける','全員が見た事実を隠すことになる。後で必ず揉める'],
+      ['その札を捨てて、次の札をホールカードにする','札を差し替えると出目が変わる。ディーラーの独断で決めてはいけない'],
+      ['全員のベットを返して終わりにする','ゲームの無効はフロアが決める'],
+      ['客にこのまま続けてよいか聞く','客の合意で処理を決めない。決めるのはフロア']],
+    ruling:'露出したホールカードのまま続行（フロアが記録）',resolve:G=>{}},
+  cardDrop:{what:'客に配ろうとした札が手から滑り、床に落ちた。',
+    why:'卓の外に出た札は、すり替え・印付けの可能性があり、そのまま使えません。拾いに手を伸ばす間は卓も無防備になります。拾わずに手を止め、フロアを呼びます。',
+    right:'拾わずにフロアを呼ぶ',call:C('Floor, please. A card is on the floor.','フロアお願いします。カードが床に落ちました'),
+    wrongs:[['自分で拾って、そのまま配る','床に落ちた札は誰かが触れた可能性がある。点検前に使うと結果の正しさを証明できない'],
+      ['拾って捨て札に入れ、黙って次を配る','処理の結論はフロアが決める。黙って進めると、客には札を抜いたように見える'],
+      ['近くの客に拾ってもらう','客に札を触らせると細工の疑いが消せない。厳禁'],
+      ['その席を飛ばして次の席へ配る','配る順番を崩すと、以降の札がすべてずれる。まず止める']],
+    ruling:'落ちた札は焼き札（捨て札トレイへ）にし、同じ席へ次の札を配る',resolve:G=>{G.flags.dropped=null;G.burned++;}},
+  cardsStuck:{what:'シューから札が2枚重なって出て、同じ席の前に2枚とも滑っていった。',
+    why:'2枚目は本来、次の配り先の札です。その場で手を止め、フロアを呼んで、シューから出た順番どおりに直します。どちらを使うかをディーラーが勝手に選ぶと、出目を選んだことになります。',
+    right:'手を止めてフロアを呼ぶ',call:C('Floor, please. Two cards came out together.','フロアお願いします。カードが2枚重なって出ました'),
+    wrongs:[['上の1枚だけ配って、もう1枚はシューへ戻す','シューから出た札は戻せない。出た順番が崩れる'],
+      ['2枚とも次の席に回す','その席の札を飛ばすことになり、以降の順番がすべてずれる'],
+      ['その席に2枚とも渡す','1周目で2枚配ると、手札の枚数と順番が崩れる'],
+      ['2枚とも捨てて、配り直す','ディーラーの判断で札を捨てると、結果を変えたことになる']],
+    ruling:'1枚目はその席へ、2枚目はシューの順どおり次の配り先へ',resolve:G=>{const st=G.flags.stuck;G.flags.stuck=null;if(!st)return;placeDeal(G,st.c1);placeDeal(G,st.c2);}}
+};
+/* 配り先（dealSeq の現在位置）へ1枚置いて、配りを1つ進める */
+function placeDeal(G,c){
+  if(G.dealIdx>=G.dealSeq.length)return;
+  const t=G.dealSeq[G.dealIdx];
+  if(t==='dUp'||t==='dDown')G.dealer.cards.push(c);else G.seats[+t.slice(1)].hands[0].cards.push(c);
+  G.dealIdx++;
+  if(G.dealIdx>=G.dealSeq.length){G.phase='check';addLog(G,{t:'info',el:'配布完了'});}
+}
 const SIG={
   hit:{name:'ヒット',text:'指でテーブルを軽く叩く'},
   stand:{name:'スタンド',text:'手のひらを下に向けて横に振る'},
@@ -490,7 +522,7 @@ const SIG={
   split:{name:'スプリット',text:'ベットと同額のチップを横に置き、指を2本立てる'},
   surrender:{name:'サレンダー',text:'「サレンダー」と宣言し、ベットの後ろを指で横になぞる'}
 };
-const LABEL={start:'ラウンド開始',closeBets:'ベット締切',burn:'バーンカードを1枚捨てる',deal:'カード配布',offerIns:'インシュアランスを募る',payEven:'イーブンマネーを支払う',peek:'ホールカードを確認（ピーク）',reveal:'ホールカードを開く',collectIns:'インシュアランスを回収',payIns:'インシュアランスを支払う',toPlayers:'プレイヤーのアクションへ進む',hit:'ヒット（1枚配る）',stand:'スタンド（次の手へ）',double:'ダブルダウン（1枚のみ配る）',split:'スプリット（手を分ける）',surrender:'サレンダー（半額回収）',bust:'バスト（回収）',payBJ:'ブラックジャック配当を支払う',dealerHit:'ディーラーがヒット',dealerEnd:'ドロー終了（精算へ）',select:'精算する手を選択',pay:'支払う（1:1）',collect:'回収する',push:'プッシュ（据え置き）'};
+const LABEL={accident:'アクシデントに対応する',start:'ラウンド開始',closeBets:'ベット締切',burn:'バーンカードを1枚捨てる',deal:'カード配布',offerIns:'インシュアランスを募る',payEven:'イーブンマネーを支払う',peek:'ホールカードを確認（ピーク）',reveal:'ホールカードを開く',collectIns:'インシュアランスを回収',payIns:'インシュアランスを支払う',toPlayers:'プレイヤーのアクションへ進む',hit:'ヒット（1枚配る）',stand:'スタンド（次の手へ）',double:'ダブルダウン（1枚のみ配る）',split:'スプリット（手を分ける）',surrender:'サレンダー（半額回収）',bust:'バスト（回収）',payBJ:'ブラックジャック配当を支払う',dealerHit:'ディーラーがヒット',dealerEnd:'ドロー終了（精算へ）',select:'精算する手を選択',pay:'支払う（1:1）',collect:'回収する',push:'プッシュ（据え置き）'};
 const RANK_EN={A:'aces','2':'twos','3':'threes','4':'fours','5':'fives','6':'sixes','7':'sevens','8':'eights','9':'nines','10':'tens',J:'jacks',Q:'queens',K:'kings'};
 
 function C(en,ja){return{en,ja};}
@@ -529,6 +561,7 @@ function startRound(G){
   G.dealIdx=0;G.phase='bet';G.flags={insOffered:false,evenPaid:false,peeked:false,insResolved:false,dealerBJ:false};
   G.turn={s:0,h:0};G.settle=null;G.pending=null;G.lastCard=0;
   G.round={no:G.roundNo,ok:0,err:0,errors:[],notes:[]};
+  G.round.accPlan=accPlan(G,ACC_TYPES);
   const cap=C('Place your bets, please.','ベットをお願いします');setCaption(G,cap);
   addLog(G,{t:'info',el:`ラウンド${G.roundNo}開始（${G.seats.length}人・${G.rule}・難易度${df.label}）${df.ruleMix?' この卓のルールは毎回変わります。プリントを確認してください':''}`,call:cap});
 }
@@ -580,6 +613,7 @@ function insPayTotal(G){return G.seats.reduce((a,s)=>a+s.ins*2,0);}
 
 function expected(G){
   const up=G.dealer.cards[0];
+  if(G.phase!=='idle'&&G.phase!=='done'&&G.flags.acc)return accExpected(G);
   switch(G.phase){
     case 'idle':case 'done':return{key:'start',unscored:true};
     case 'bet':return E('closeBets','deal','全員のベットが揃ったら、カードを配る前にベットの締め切りを宣言します。これ以降のベット変更は受け付けません。',C('No more bets.','ベットを締め切ります'));
@@ -701,10 +735,14 @@ function apply(G,ex,amount){
     case 'closeBets':G.phase='deal';break;
     case 'burn':draw(G);G.burned++;G.needBurn=false;G.lastCard=0;done();return;
     case 'deal':{
-      const t=ex.arg,c=draw(G);
-      if(t==='dUp'||t==='dDown')G.dealer.cards.push(c);else G.seats[+t.slice(1)].hands[0].cards.push(c);
-      G.dealIdx++;
-      if(G.dealIdx>=G.dealSeq.length){G.phase='check';addLog(G,{t:'info',el:'配布完了'});}
+      const t=ex.arg;
+      if(t!=='dUp'&&t!=='dDown'){
+        if(accFire(G,'cardDrop')){G.flags.dropped=draw(G);G.lastCard=0;return;}
+        if(accFire(G,'cardsStuck')){G.flags.stuck={t,c1:draw(G),c2:draw(G)};G.lastCard=0;return;}
+      }
+      const c=draw(G);
+      if(t==='dDown'&&accFire(G,'holeFlip'))G.dealer.holeExposed=true;
+      placeDeal(G,c);
       return;
     }
     case 'offerIns':{
@@ -791,6 +829,7 @@ function act(G,key,arg){
   }
   const ex=expected(G);if(!ex)return null;
   if(ex.unscored){if(key==='start'){apply(G,ex);G.lastFb=null;}return null;}
+  if(ex.key==='accident'&&key==='accident')return accAct(G,ex,arg);
   if(key===ex.key&&(ex.arg===undefined||ex.arg===arg)){
     G.round.ok++;
     if(ex.amount!==undefined){
@@ -974,6 +1013,73 @@ function pulseConsole(ok){
   const el=document.getElementById('console');if(!el)return;
   el.classList.remove('pulse-ok','pulse-ng');void el.offsetWidth;el.classList.add(ok?'pulse-ok':'pulse-ng');
 }
+/* ---- 実戦のアクシデント ----
+   カードが落ちた・めくれた・ボールが落ちた、などの手元の事故に、その場で正しく反応できるかを問う。
+   原則：手を止める／独断で直さない（拾う・戻す・入れ替えない）／声に出してフロアを呼ぶ。
+   ただしミスディール・ノースピンのように、ディーラーが宣言するのが標準のものは宣言が正解。
+   処理の結論はカジノで異なるため「この卓の規定」として示す。
+   ゲーム側は ACC[type]={what,why,right,wrongs:[[選択肢,なぜまずいか],…],ruling,call,hand?,resolve(G)} を定義し、
+   ラウンド開始時に accPlan、事故が起こりうる場面で accFire、expected() の先頭で accExpected、act() で accAct を呼ぶ。 */
+const ACC_RATE={off:0,often:.6};
+function accRate(G){const m=(G.opts&&G.opts.accidents)||'normal';if(m in ACC_RATE)return ACC_RATE[m];return [0,.12,.16,.2,.25][currentDifficulty(G).level]||.12;}
+/* このラウンドで起こすアクシデント（1ラウンドに最大1回）。G.forceAccident（テスト用）があれば必ずそれ */
+function accPlan(G,types){
+  if(G.forceAccident)return types.includes(G.forceAccident)?{type:G.forceAccident,forced:true}:null;
+  return Math.random()<accRate(G)?{type:types[Math.floor(Math.random()*types.length)]}:null;
+}
+/* 事故が起こりうる場面で呼ぶ。計画どおりの種類なら発生させて true（計画は消費） */
+function accFire(G,type,data){
+  const p=G.round&&G.round.accPlan;
+  if(!p||p.type!==type||(G.flags&&G.flags.acc))return false;
+  G.round.accPlan=null;if(p.forced)G.forceAccident=null;
+  const A=ACC[type],n=currentDifficulty(G).level>=3?4:3;
+  const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const opts=shuf([A.right].concat(shuf(A.wrongs.map(w=>w[0])).slice(0,n-1)));
+  G.flags.acc=Object.assign({type,opts},data||{});
+  addLog(G,{t:'err',el:`アクシデント：${A.what}`});
+  return true;
+}
+function accExpected(G){
+  const a=G.flags&&G.flags.acc;if(!a)return null;
+  const A=ACC[a.type];
+  return E('accident','accident',A.why,A.call,{callSet:{right:A.right,opts:a.opts},acc:a.type,what:A.what});
+}
+/* 返り値 {cat,ok}。正解なら字幕に宣言、ログにフロアの裁定を出し、規定どおりに状態を直す */
+function accAct(G,ex,arg){
+  const A=ACC[ex.acc];
+  if(arg!==A.right){
+    const w=A.wrongs.find(x=>x[0]===arg);
+    recordErr(G,'accident',A.why,`その対応はまずい：${w?w[1]:'事故の後は手を止め、独断で直さないのが原則です。'}\n正しくは「${A.right}」。${A.why}`);
+    return{cat:'accident',ok:false};
+  }
+  G.round.ok++;
+  const data=G.flags.acc;G.flags.acc=null;
+  setCaption(G,A.call);
+  addLog(G,{t:'ok',el:`アクシデント対応：${A.right}`,call:A.call});
+  addLog(G,{t:'info',el:`フロアの裁定（この卓の規定）：${A.ruling}`});
+  G.lastFb={t:'ok',text:`正解：${A.right}\nフロアの裁定（この卓の規定）：${A.ruling}`};
+  if(A.resolve)A.resolve(G,data);
+  return{cat:'accident',ok:true};
+}
+/* コンソール：何が起きたか（答えは書かない）と、対応の選択肢（1列） */
+function accConsole(ex){
+  return{prompt:`<span class="acc-what"><b>アクシデント</b>${esc(ex.what)}</span>どう対応しますか？`,
+    actions:ex.callSet.opts.map(o=>`<button class="act acc-opt" data-act="accident" data-arg="${esc(o)}">${esc(o)}</button>`).join('')};
+}
+const ACC_SET_HTML=o=>`<div class="row"><label for="optAccidents">実戦のアクシデント（カード落下・露出・ボール落下など）</label><select id="optAccidents">${[['off','起こさない'],['normal','ときどき（難易度で増える）'],['often','頻繁に（練習用）']].map(v=>`<option value="${v[0]}"${(o.accidents||'normal')===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>`;
+(()=>{if(document.getElementById('acc-css'))return;const st=document.createElement('style');st.id='acc-css';st.textContent=
+`.act.acc-opt{grid-column:1/-1;width:100%;text-align:left;justify-content:flex-start}
+.acc-what{display:block;margin:0 0 6px;padding:6px 10px;border-radius:6px;background:#3B1416;color:#FFE2DD;border-left:4px solid #E0645A;font-weight:normal;line-height:1.5}
+.acc-what b{display:inline-block;margin-right:8px;padding:0 6px;border-radius:4px;background:#E0645A;color:#fff;font-size:.82em;letter-spacing:.06em}
+.acc-mark{position:absolute;z-index:7;transform:translate(-50%,-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px}
+.acc-mark .acc-tag{background:#C43D33;color:#fff;font-size:11px;line-height:1.3;padding:1px 6px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.acc-floorcard{width:30px;height:42px;border-radius:4px;background:repeating-linear-gradient(45deg,#7A1F2B 0 4px,#922E3A 4px 8px);border:2px solid #FAF7EF;transform:rotate(-24deg);box-shadow:0 3px 8px rgba(0,0,0,.6)}
+.acc-floorball{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#E9E2CF 55%,#9A9384);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+.acc-hot{outline:3px solid #E0645A !important;outline-offset:2px;box-shadow:0 0 12px rgba(224,100,90,.85) !important}
+@keyframes accfall{from{transform:translate(-50%,-160%) rotate(0);opacity:.2}to{transform:translate(-50%,-50%);opacity:1}}
+.acc-mark.fall{animation:accfall .5s cubic-bezier(.3,1.4,.5,1)}
+@media (max-width:600px){.acc-what{font-size:12px;padding:4px 8px;margin-bottom:4px}.acc-mark .acc-tag{font-size:9.5px;padding:0 4px}.acc-floorcard{width:20px;height:28px}.acc-floorball{width:10px;height:10px}}`;
+document.head.appendChild(st);})();
 /*KIT_END*/
 /*DEALER_START*/
 /* ===== ディーラー（共通・4ゲームで同一。直すときは scratchpad の kit/dealer.js を直して同期する） =====
@@ -1834,10 +1940,11 @@ function buildMotion(key,arg,pre){
       const c=ptOf('.dealer-zone .cards');return c?wave(c,18*s):null;
     }
     case 'cleanHands':return Dealer.cleanFrames();
+    case 'accident':return Dealer.floorFrames('r');
   }
   return null;
 }
-const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'チップを払う・回収する',deal:'カードを配る'});
+const MOTION_LABEL=Object.assign({},LABEL,{chipPay:'チップを払う・回収する',deal:'カードを配る',accident:'フロアを呼ぶ'});
 /* ===== UI ===== */
 const STORE_OPTS='dsim_bj_opts',STORE_STATS='dsim_bj_stats';
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d;}catch(e){return d;}}
@@ -1854,7 +1961,7 @@ function cardHTML(c,o){
   o=o||{};const nw=c.id===G.lastCard?' new':'';
   if(o.back)return `<div class="card back${nw}" aria-label="裏向きのカード"></div>`;
   const red=c.s==='♥'||c.s==='♦';
-  return `<div class="card${red?' red':''}${o.side?' side':''}${nw}" aria-label="${c.s}${c.r}"><span class="cr">${c.r}</span><span class="cs">${c.s}</span></div>`;
+  return `<div class="card${red?' red':''}${o.side?' side':''}${o.hot?' acc-hot':''}${nw}" aria-label="${c.s}${c.r}"><span class="cr">${c.r}</span><span class="cs">${c.s}</span></div>`;
 }
 function totalLabel(cards,h){
   if(!cards.length)return '';
@@ -1878,7 +1985,7 @@ function showSigNamesNow(){return G.opts.showSignalNames&&!currentDifficulty(G).
 function renderTable(){
   const ex=G.pending?null:expected(G);
   const dc=G.dealer.cards;
-  const dCards=dc.map((c,i)=>i===1&&!G.dealer.holeUp?cardHTML(c,{back:true}):cardHTML(c)).join('');
+  const dCards=dc.map((c,i)=>i===1&&!G.dealer.holeUp&&!G.dealer.holeExposed?cardHTML(c,{back:true}):cardHTML(c,{hot:i===1&&G.dealer.holeExposed&&G.flags.acc})).join('');
   let dTotal='';
   if(showTotalsNow()&&dc.length)dTotal=G.dealer.holeUp?totalLabel(dc):`アップ ${totalLabel([dc[0]])}`;
   const rule=G.phase==='idle'?G.opts.rule:G.rule;
@@ -1898,7 +2005,8 @@ function renderTable(){
       const active=(seatActive&&G.turn.h===j)||(sq&&sq.s===i&&sq.h===j);
       const handClick=G.phase==='settle'&&!G.pending;
       const resolved=['bust','bjpaid','settled','evenpaid','surrender'].includes(h.status);
-      const cards=h.cards.map((c,ci)=>cardHTML(c,{side:h.doubled&&ci===h.cards.length-1})).join('');
+      const st2=G.flags.stuck&&G.flags.stuck.t===`s${i}`&&j===0?[G.flags.stuck.c1,G.flags.stuck.c2].map(c=>cardHTML(c,{hot:true})).join(''):'';
+      const cards=h.cards.map((c,ci)=>cardHTML(c,{side:h.doubled&&ci===h.cards.length-1})).join('')+st2;
       let st='';
       if(h.status==='bust')st='バスト（回収済み）';
       else if(h.status==='bjpaid')st=`BJ ${fmt$(h.paid)} 支払済み`;
@@ -1934,6 +2042,12 @@ function renderTable(){
     <div class="tbox disc" id="discardBox" title="捨て札トレイ（ディーラーの右）">DISCARD<i style="width:${Math.max(6,Math.min(76,Math.round((G.decks*52-G.shoe.length)/(G.decks*52)*76)))}%"></i><b>バーン ${G.burned}</b></div>`;
   const show=G.opts.showDealer!==false;
   $('table').classList.toggle('has-dealer',show);
+  if(G.flags&&G.flags.dropped){
+    /* 床に落ちた札：シューの手前、卓の縁の外に */
+    const t=$('table'),sb=elRect('#shoeBox'),band=show?(parseFloat(getComputedStyle(t).paddingBottom)||40):20;
+    const x=sb?sb.x+sb.w*.7:t.clientWidth*.15,y=t.clientHeight-band*.45;
+    t.insertAdjacentHTML('beforeend',`<div class="acc-mark fall" style="left:${x}px;top:${y}px"><span class="acc-floorcard"></span><span class="acc-tag">床に落下</span></div>`);
+  }
   if(show){
     $('table').appendChild(Dealer.build());
     const btn=Dealer.root.querySelector('.dl-replay');
@@ -1982,7 +2096,10 @@ function renderConsole(){
   const P={idle:'待機中',bet:'ベット受付',deal:'カード配布',check:'アップカードの確認',play:'プレイヤーのアクション',dealer:'ディーラーのターン',settle:'精算',done:'ラウンド終了'};
   let prompt='',actions='';
   const fb=G.lastFb?fbHTML(G.lastFb):'';
-  if(G.pending){
+  const exA=G.pending?null:expected(G);
+  if(exA&&exA.key==='accident'){
+    const c=accConsole(exA);prompt=c.prompt;actions=c.actions;
+  }else if(G.pending){
     const p=G.pending,sum=p.chips.reduce((a,b)=>a+b,0),verb=p.ex.amountLabel==='回収する金額'?'回収':'支払い';
     prompt=`${verb}のチップを出してください`;
     /* 出したチップは額面ごと・5枚区切りで表示。「内訳を先に表示」がオンなら最少枚数の内訳を薄く描く */
@@ -2047,6 +2164,7 @@ function renderSettings(){
     <div class="row"><label for="optAdaptive">ラウンドごとに難易度を上げる</label><input type="checkbox" id="optAdaptive"${o.adaptiveDifficulty!==false?' checked':''}></div>
     <div class="row"><label for="optDealer">ディーラーの所作を表示</label><input type="checkbox" id="optDealer"${o.showDealer!==false?' checked':''}></div>
     <div class="row"><label for="optSpeed">所作の再生速度</label><select id="optSpeed">${[[1,'標準'],[0.6,'ゆっくり'],[0.35,'とてもゆっくり']].map(v=>`<option value="${v[0]}"${(o.dealerSpeed||1)===v[0]?' selected':''}>${v[1]}</option>`).join('')}</select></div>
+    ${ACC_SET_HTML(o)}
     <div class="row"><label for="optTotals">合計点を表示</label><input type="checkbox" id="optTotals"${o.showTotals?' checked':''}></div>
     <div class="row"><label for="optSig">合図の名称を表示</label><input type="checkbox" id="optSig"${o.showSignalNames?' checked':''}></div>
     <div class="row"><label for="optChipPlan">チップの内訳（最少枚数）を先に表示</label><input type="checkbox" id="optChipPlan"${o.showChipPlan!==false?' checked':''}></div>
@@ -2083,7 +2201,7 @@ function motionPre(){
   if(G.phase==='play'&&G.seats[G.turn.s])hand=`s${G.turn.s}h${G.turn.h}`;
   if(ex&&ex.key==='payEven'){const i=G.seats.findIndex(x=>x.even);if(i>=0)hand=`s${i}h0`;}
   if(G.phase==='settle'&&G.settle){const q=G.settle.queue[G.settle.idx];if(q)hand=`s${q.s}h${q.h}`;}
-  return{exKey:ex?ex.key:null,hand,
+  return{exKey:ex?ex.key:null,hand,accType:G.flags&&G.flags.acc?G.flags.acc.type:null,
     handPt:hand?ptOf(`${handSel(hand)} .cards`):null,betPt:hand?ptOf(`${handSel(hand)} .bet-spot`):null,
     insPt:ptOf('.ins-chip'),ins:[...document.querySelectorAll('#table .ins-chip')].map(e=>ptOf(e))};
 }
@@ -2135,6 +2253,7 @@ document.addEventListener('change',e=>{
   else if(id==='optAdaptive')G.opts.adaptiveDifficulty=e.target.checked;
   else if(id==='optDealer')G.opts.showDealer=e.target.checked;
   else if(id==='optSpeed')G.opts.dealerSpeed=+e.target.value;
+  else if(id==='optAccidents')G.opts.accidents=e.target.value;
   else if(id==='optSig')G.opts.showSignalNames=e.target.checked;
   else if(id==='optChipPlan')G.opts.showChipPlan=e.target.checked;
   else if(id==='optChipCoach')G.opts.showChipCoach=e.target.checked;
