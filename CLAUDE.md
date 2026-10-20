@@ -63,6 +63,8 @@ GitHub Pages で公開しており、ファイル単体をダウンロードし�
   各ゲームは `ACC[type]={what,why,right,wrongs,ruling,call,resolve}` を持つ。テスト用に `G.forceAccident='<type>'`。
 - `/*CAST_START*/`〜`/*CAST_END*/`：客のキャラクター（`Cast`、DEALER ブロックの直前）。ぬいぐるみ風の7体で、席 n には `Cast.CHARS[(n-1)%7]`
   （1番席＝赤いくま。ゲームが変わっても同じ）。`Cast.html(n-1,{mood,pose,size,delay})` が1体分の HTML を返す。
+  **キャラクターは完全なオリジナルにする**（アプリストアでの配布が前提。実在のキャラクター・商品のぬいぐるみに似た造形、
+  固有の意匠＝特徴的な帽子・耳の形・持ち物・配色の組み合わせは使わない。動物＋単純な小物にとどめる）。
   mood は `idle/happy/sad/think/surprise/out`、pose は `rest/hit/stand/double/split/surrender/squeeze/cheer/reach`。
   箱の下端が卓の縁（合図の手は少し下へ、帽子は少し上へはみ出す）。CSS アニメーションのみで、描き直しても動きが途切れない。`pointer-events:none`。
 - どれも4ファイルで同じ内容にそろえる。1つ直したら残り3つにも同じ変更を入れる（scratchpad の kit/ の同期スクリプトを使う）。
