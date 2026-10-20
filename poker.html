@@ -326,8 +326,10 @@ button{font:inherit}
   .cast-seat{position:relative;display:flex;align-items:flex-end}
   .cast-no{font-style:normal;position:absolute;right:-6px;bottom:-2px;width:18px;height:18px;border-radius:50%;background:#20302A;border:1.5px solid rgba(250,247,239,.7);color:#FAF7EF;font-size:12px;font-weight:bold;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif}
   .cast-no.on{border-color:var(--brass);box-shadow:0 0 0 2px rgba(201,162,75,.6)}
-  .cast-bub{top:auto;bottom:4px;font-size:12px;padding:1px 6px}
-  .cast-bub.to-r{left:calc(100% + 12px)}.cast-bub.to-l{right:calc(100% + 2px)}
+  .cast-bub{top:calc(100% + 1px);bottom:auto;left:50%;right:auto;transform:translateX(-50%);font-size:12px;padding:1px 6px;max-width:38vw;overflow:hidden;text-overflow:ellipsis}
+  .cast-bub.to-r,.cast-bub.to-l{left:50%;right:auto}
+  .cast-bub.b-l{left:-4px;transform:none}
+  .cast-bub.b-r{left:auto;right:-4px;transform:none}
   .table-next{right:8px;top:8px;font-size:13px;padding:5px 10px}
   .rule-sign-box{padding:10px 14px;border-width:2px;max-width:94%}
   .rs-cap{font-size:11.5px;letter-spacing:.16em}.rs-name{font-size:19px}.rs-ja{font-size:12.5px;line-height:1.45}.rs-desc{font-size:12px;margin-top:4px;line-height:1.45}
@@ -3490,7 +3492,10 @@ function tableSvgHTML(G,ex){
     const mobAllin=TBL.mob&&p&&p.allin&&!out&&p.stack<=0;
     if(TBL.mob&&p){
       const sText=mobAllin?'ALL-IN':fmt$(p.stack);
-      st={x:mobLabelX(b.x,b.y+62,sText.length*(mobAllin?13.5:11)+6),y:b.y+62};
+      /* 両脇の席（1番・6番）は、札の位置が席番号の真下に来るため、持ち点を札の上（席番号の上）に逃がす。
+         FOLD は札が無いときしか出ないので、下のままでよい */
+      const side=s===1||s===SEATS,sy=side?b.y-34:b.y+62;
+      st={x:mobLabelX(b.x,sy,sText.length*(mobAllin?13.5:11)+6),y:sy};
       sm={x:mobLabelX(b.x,b.y+102,out?52:82),y:b.y+102};
     }else if(p){
       /* PC：持ち点・状態は札の真下に積む（外周の内側へずらすと、両脇の席で札と横に並んで重なる） */
@@ -3587,7 +3592,12 @@ function pkCast(G,s){
   if(p.allin)return{mood:'surprise',pose:'rest'};
   return{mood:'idle',pose:'rest'};
 }
-function castBub(c,s){return c.say?`<span class="cast-bub ${s<=3?'to-r':'to-l'}">${esc(c.say)}</span>`:'';}
+function castBub(c,s){
+  /* PC は卓の外周なので横（卓の外側）へ、スマホは帯に並んでいるので真下へ出す（CSS 側で切り替え）。
+     端の席は吹き出しが卓からはみ出すので、内側そろえにする */
+  const edge=s===1?' b-l':s===SEATS?' b-r':'';
+  return c.say?`<span class="cast-bub ${s<=3?'to-r':'to-l'}${edge}">${esc(c.say)}</span>`:'';
+}
 function castLayerHTML(G,ex){
   if(!G.players.length)return '';
   let h='';
