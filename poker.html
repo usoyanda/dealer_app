@@ -293,6 +293,8 @@ button{font:inherit}
 .pc.flip{animation:cflip .4s ease-out}
 @keyframes cdeal{0%{transform:translate(-9cqw,-14cqw) rotate(-16deg);opacity:0}100%{transform:none;opacity:1}}
 .pc.dealt{animation-delay:var(--dd,0s);animation-fill-mode:both}
+.pcards.draw{z-index:4}
+.pc.draw-win{box-shadow:0 0 0 3px var(--brass),0 4px 10px rgba(0,0,0,.5)}
 @keyframes cflip{0%{transform:scaleX(.1)}100%{transform:none}}
 .bet-chip,.pot-chip{pointer-events:none;width:max(24px,5.4cqw);height:max(24px,5.4cqw);font-size:max(9px,1.9cqw);border-width:2px;cursor:default}
 .pot-chip{background:#3A2A20;border-color:var(--brass);flex-direction:column;line-height:1.05;width:max(30px,7cqw);height:max(30px,7cqw)}
@@ -315,6 +317,44 @@ button{font:inherit}
 .ch-1{background:#F2F2EE;color:#222 !important;border-color:#7A7A7A !important}
 .ch-5{background:#B83A3A}.ch-25{background:#2E7D4F}.ch-100{background:#1C1C1C}.ch-500{background:#6B3FA0}
 @media (min-width:761px){.table-wrap{max-width:720px}}
+/* PC（幅900px以上・高さ600px以上）はページをスクロールさせない。
+   左にテーブル（残りの領域に収まる最大サイズへ自動で縮む）、右に字幕・コンソール・ログを縦に積む。
+   コンソールは本文だけが内側でスクロールし、操作ボタンは常に下に見える。
+   （卓と字幕・コンソールを縦に積むと卓が潰れて席ボタンが重なるため、左右に分ける） */
+@media (min-width:900px) and (min-height:600px){
+  html,body{height:100%;overflow:hidden}
+  body{display:flex;flex-direction:column;height:100vh}
+  .topbar{flex:none}
+  .wrap{flex:1;min-height:0;width:100%;max-width:none;padding:10px 16px 12px;gap:10px 12px;
+    grid-template-columns:minmax(0,1fr) 380px;grid-template-rows:auto minmax(0,1.5fr) minmax(0,1fr)}
+  .main-col{display:contents}
+  .felt{grid-column:1;grid-row:1 / span 3;min-height:0;padding:10px 12px 12px;gap:8px}
+  .table-slot{flex:1 1 0;min-height:0;container-type:size;display:flex;justify-content:center;align-items:center}
+  .has-cast .table-slot{padding-top:58px}
+  .table-wrap{flex:none;margin:0;max-width:none;width:min(100cqw,calc(100cqh * 1060 / 620))}
+  .has-cast .table-wrap{margin-top:0}
+  .table-foot{flex:none}
+  .caption{grid-column:2;grid-row:1;min-height:0}
+  .console{grid-column:2;grid-row:2;min-height:0;overflow:hidden;display:flex;flex-direction:column;padding:12px 14px 14px}
+  .con-body{flex:1 1 auto;min-height:0;overflow:auto}
+  /* 操作エリアは常に見せる。チップトレイで高さが足りない画面では、トレイの玉を小さくして収める */
+  .con-foot{flex:0 0 auto;min-height:0;max-height:74%;overflow:auto;padding-top:8px}
+  .tray{gap:8px;padding:10px;margin-bottom:8px}
+  .tray-chip{width:54px;height:54px;border-width:4px}
+  .stack{min-height:46px;padding:6px 10px;margin-bottom:8px}
+  .log{grid-column:2;grid-row:3;position:static;align-self:stretch;min-height:0;height:100%;max-height:none;overflow:auto}
+  /* チップを出す場面：ログを畳んで、トレイと確定ボタンを必ず画面内に収める */
+  body.is-pending .wrap{grid-template-rows:auto minmax(0,1fr) 0}
+  body.is-pending .log{display:none}
+}
+@media (min-width:900px) and (min-height:600px) and (max-height:779px){
+  .wrap{grid-template-rows:auto minmax(0,1.8fr) minmax(0,1fr)}
+  .tray-chip{width:44px;height:44px;font-size:12.5px;border-width:3px}
+  .tray{gap:6px;padding:8px}
+  .caption{padding-top:5px;padding-bottom:5px}
+}
+@media (min-width:1280px) and (min-height:600px){.wrap{grid-template-columns:minmax(0,1fr) 420px}}
+@media (min-width:1700px) and (min-height:600px){.wrap{grid-template-columns:minmax(0,1fr) 460px}}
 /* ===== スマホ：選択肢まで1画面に収める圧縮レイアウト =====
    文字はピンチしなくても読める大きさ（本文14px・ボタン13px・補助12px前後）を下限にし、
    縦の高さは「並べ方」で稼ぐ（チップを出す場面の3ボタンを1行・短い金額の選択肢を2列・手札一覧を3列）。 */
@@ -879,8 +919,23 @@ function startRound(G){
   G.stakes.cap=rnd(df.caps);
   const T=G.stakes;
 
-  /* ボタン：初回は高いカードを引いた席（ここでは抽選）、以降は必ず1つ時計回り */
-  G.buttonTarget=G.button==null?rint(1,SEATS):nxt(G.button);
+  /* ボタン：初回は各席に1枚ずつ配って一番強い札の席（札は卓に表向きで見せる）、以降は必ず1つ時計回り。
+     同じ数字のときはスート（♠＞♥＞♦＞♣）で決める。SUITS は強い順に並んでいるので添字が小さいほど強い */
+  if(G.button==null){
+    const d=newDeck(),cards=[];
+    for(let i=0;i<SEATS;i++)cards.push(d.pop());
+    const si=c=>SUITS.findIndex(x=>x.m===c.suit.m);
+    let win=0;
+    for(let i=1;i<SEATS;i++){
+      const a=cards[i],b=cards[win];
+      if(a.v>b.v||(a.v===b.v&&si(a)<si(b)))win=i;
+    }
+    G.draw=cards.map((c,i)=>({seat:i+1,card:c}));
+    G.buttonTarget=win+1;
+  }else{
+    G.draw=null;
+    G.buttonTarget=nxt(G.button);
+  }
 
   /* 席と持ち点。ショートスタックを混ぜて、オールインとサイドポットの場面を作る */
   const nShort=rint(df.shorts[0],df.shorts[1]);
@@ -1308,10 +1363,17 @@ function expected(G){
     case 'button':{
       if(!F.moved){
         const first=G.button==null;
+        const dw=G.draw||[];
+        const dwTxt=dw.map(x=>`${x.seat}番席 ${cardText(x.card)}`).join('／');
+        const winCard=dw.find(x=>x.seat===G.buttonTarget);
         const why=first
-          ?`最初のゲームでは、各席に1枚ずつ配って最も高いカードを引いた席にボタンを置きます（今回の抽選結果は${G.buttonTarget}番席）。ボタンは「今回の最後に配られる席＝ディーラー役」の目印で、以降は毎ゲーム1つずつ時計回りに動かします。`
+          ?`最初のゲームでは、各席に1枚ずつ表向きに配り、最も強い札を引いた席にボタンを置きます（ハイカード）。`
+            +`今回は ${dwTxt}。一番強いのは${G.buttonTarget}番席の${winCard?cardText(winCard.card):''}なので、ボタンは${G.buttonTarget}番席です。`
+            +`同じ数字が出たときはスートで決めます（♠＞♥＞♦＞♣）。この札は配り直す前に回収します。`
+            +`ボタンは「今回の最後に配られる席＝ディーラー役」の目印で、以降は毎ゲーム1つずつ時計回りに動かします。`
           :`ボタンは毎ゲーム、時計回りに1つ隣の席へ動かします。前回は${G.button}番席だったので、今回は${G.buttonTarget}番席です。ボタンが動くことで、SB・BB・アクション順という不利な位置が全員に公平に回ります。動かし忘れるとブラインドを払う人が狂い、後から必ず揉めます。`;
-        return E('moveButton','button',why,C(`Button to seat ${G.buttonTarget}.`,`ボタンは${G.buttonTarget}番席へ`),{correct:G.buttonTarget});
+        return E('moveButton','button',why,C(`Button to seat ${G.buttonTarget}.`,`ボタンは${G.buttonTarget}番席へ`),
+          {correct:G.buttonTarget,talk:first&&dw.length?`ハイカードの抽選：${dwTxt}`:null});
       }
       G.phase='blinds';return expected(G);
     }
@@ -1469,7 +1531,7 @@ function apply(G,ex,amount){
     call:cap&&cap.en?cap:null});};
   switch(ex.key){
     case 'start':startRound(G);return;
-    case 'moveButton':G.button=ex.correct;F.moved=true;extra=`（${ex.correct}番席）`;break;
+    case 'moveButton':G.button=ex.correct;F.moved=true;G.draw=null;extra=`（${ex.correct}番席）`;break;
     case 'selectSB':F.sb=true;extra=`（${ex.correct}番席）`;break;
     case 'selectBB':F.bb=true;extra=`（${ex.correct}番席）`;break;
     case 'shuffleCut':F.shuffled=true;break;
@@ -3524,7 +3586,7 @@ function tableSvgHTML(G,ex){
       if(tag){
         /* 両脇の席は持ち点を席番号の上へ逃がしているので、SB／BB の札はさらにその上に置く（重ならないように） */
         const sideTag=TBL.mob&&(s===1||s===SEATS);
-        const tg=sideTag?{x:mobLabelX(b.x,b.y-82,20),y:b.y-82}:seatPt(s,FR.tag,TBL.mob?(s<=3?-.4:.4):.36);
+        const tg=sideTag?{x:mobLabelX(b.x,b.y-96,20),y:b.y-96}:seatPt(s,FR.tag,TBL.mob?(s<=3?-.4:.4):.36);
         seats+=`<text class="seat-tag" x="${tg.x.toFixed(1)}" y="${((sideTag?tg.y:tg.y)+(TBL.mob&&!sideTag?13:sideTag?0:5)).toFixed(1)}">${tag}</text>`;
       }
     }
@@ -3642,6 +3704,14 @@ function overlayHTML(G,ex){
     const q=seatPt(p.seat,FR.bet);
     h+=`<div class="chip chip-abs bet-chip ${seatClass(p.seat)}${String(p.bet).length>=4?' d4':''}" style="${pct(q)}" data-bet="${p.seat}">${p.bet}</div>`;
   });
+  /* 初回のボタン決め：各席に1枚ずつ表向きの札（ハイカードの抽選） */
+  if(G.draw&&G.phase==='button'){
+    G.draw.forEach(x=>{
+      /* 席を選ぶ目印（seat-pick）はカードの位置に出るので、抽選の札はその内側（卓の中央寄り）に置く */
+      const q=seatPt(x.seat,FR.cards*(TBL.mob?.68:.66));
+      h+=`<div class="pcards n1 draw" data-draw="${x.seat}" style="${pct(q)}">${cardHTML(x.card,true,x.seat===G.buttonTarget?'draw-win':'')}</div>`;
+    });
+  }
   /* ホールカード（配った順に1枚ずつ飛ばす：席→カード番号→遅れ の対応表を作る） */
   const dly={};
   if(anim.holeSeq&&anim.holeSeq.length){
@@ -3744,10 +3814,12 @@ function renderTable(){
   $('table').innerHTML=`
     ${G.phase==='done'?`<button class="act primary table-next" data-act="start">次のラウンドへ ▶</button>`:''}
     ${TBL.mob?castBandHTML(G,ex):''}
-    <div class="table-wrap" style="aspect-ratio:${TBL.W}/${TBL.H}">
-      ${tableSvgHTML(G,ex)}
-      ${TBL.mob?'':`<div class="cast-layer">${castLayerHTML(G,ex)}</div>`}
-      <div class="chip-layer">${overlayHTML(G,ex)}</div>
+    <div class="table-slot">
+      <div class="table-wrap" style="aspect-ratio:${TBL.W}/${TBL.H}">
+        ${tableSvgHTML(G,ex)}
+        ${TBL.mob?'':`<div class="cast-layer">${castLayerHTML(G,ex)}</div>`}
+        <div class="chip-layer">${overlayHTML(G,ex)}</div>
+      </div>
     </div>
     <div class="table-foot">
       <span class="zone-tag">${G.roundNo?esc(`${gameName(G.game)}／${fmt$(G.stakes.sb)}・${fmt$(G.stakes.bb)}／${rakeRuleText(G.stakes)}`):'6人掛け・ノーリミット・ポット比率レーキ'}</span>
@@ -3981,7 +4053,8 @@ function streetJa(s){return s==='pre'?'プリフロップ':s==='flop'?'フロッ
 function promptFor(G,ex){
   const F=G.flags;
   switch(ex.key){
-    case 'moveButton':return['ディーラーボタンを動かす席を選んでください。','前回の席から時計回り（番号が増える向き）に1つ隣。初回は抽選結果の席。'];
+    case 'moveButton':return[G.draw?'一番強い札を引いた席はどこですか。（ハイカードでボタンを決める）':'ディーラーボタンを動かす席を選んでください。',
+      G.draw?'卓の札を見て選ぶ。同じ数字ならスート（♠＞♥＞♦＞♣）で決める。':'前回の席から時計回り（番号が増える向き）に1つ隣。'];
     case 'selectSB':return['スモールブラインドの席はどこですか。','ボタンの左隣＝時計回りで1つ先。'];
     case 'selectBB':return['ビッグブラインドの席はどこですか。','SBのさらに左隣。'];
     case 'shuffleCut':return['ブラインドが出そろいました。デッキを準備してください。','シャッフル→ボックス→カット。'];
@@ -4021,10 +4094,13 @@ function renderConsole(){
       const narrow=window.matchMedia('(max-width:600px)').matches;
       coach=`<details class="coach"${withPlan&&!narrow&&!(p.errs>0)?' open':''}><summary>チップのコツ${withPlan?'':'<span class="cc-sub">（内訳は伏せています）</span>'}</summary><ul>${chipCoach(p.ex.amount,p.ex.chipInfo,withPlan).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></details>`;
     }
-    actions=`${coach}<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
+    /* 「チップのコツ」は読みもの＝本文側へ。操作エリアにはトレイと確定ボタンだけを残す
+       （操作エリアは常に見えている必要があるため、高さを食うものを入れない） */
+    extra=coach;
+    actions=`<div class="tray">${CHIPS.slice().reverse().map(d=>`<button class="tray-chip ch-${d}" data-act="chip" data-arg="${d}" aria-label="$${d}チップを1枚出す">$${d}</button>`).join('')}</div>
       <div class="stack"><div class="stack-row">${stack}</div><div class="stack-total">合計 <b>${fmt$(sum)}</b>／${p.chips.length}枚</div></div>
       <div class="actions pay3">${btn('chipUndo','1枚戻す')}${btn('chipClear','すべて戻す')}${btn('chipPay','確定する','primary wide')}</div>`;
-    if(G.opened&&G.phase!=='bet')extra=handsListHTML(G);
+    if(G.opened&&G.phase!=='bet')extra=handsListHTML(G)+extra;
   }else if(G.phase==='done'){
     const r=G.round;
     const errs=r.errors.length?`<ul>${r.errors.map(e=>`<li>【${CAT_NAME[e.cat]}】${esc(e.why)}</li>`).join('')}</ul>`:'<p>ミスなし。全手順を正しく進行できました。</p>';
@@ -4057,7 +4133,12 @@ function renderConsole(){
       if(G.opened)extra=handsListHTML(G)+extra;
     }
   }
-  $('console').innerHTML=`<div class="phase">${PHASE_NAME[G.phase]||''}${G.phase==='bet'&&G.bet?`（${streetJa(G.bet.street)}）`:''}</div>${G.phase==='done'&&!G.pending?prompt:`<div class="prompt">${prompt}</div>`}${fb}${extra}${G.pending?actions:(G.phase==='done'?'':actions)}`;
+  /* PCで1画面に収めるため、本文（解説・内訳）と操作エリア（ボタン・チップトレイ）を分ける。
+     本文だけが内側でスクロールし、操作エリアは常に見える */
+  const act=G.pending?actions:(G.phase==='done'?'':actions);
+  $('console').innerHTML=`<div class="con-body"><div class="phase">${PHASE_NAME[G.phase]||''}${G.phase==='bet'&&G.bet?`（${streetJa(G.bet.street)}）`:''}</div>`
+    +`${G.phase==='done'&&!G.pending?prompt:`<div class="prompt">${prompt}</div>`}${fb}${extra}</div>`
+    +(act?`<div class="con-foot">${act}</div>`:'');
 }
 
 function renderLog(){
@@ -4114,6 +4195,8 @@ function renderSettings(){
 
 function render(){
   EXNOW=G.pending?null:expected(G);
+  /* チップを出す場面では、PCの1画面レイアウトでログを畳んで操作エリアの高さを確保する */
+  document.body.classList.toggle('is-pending',!!G.pending);
   renderMeta();renderTable();renderCaption();renderConsole();renderLog();
 }
 
