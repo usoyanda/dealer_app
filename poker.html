@@ -292,6 +292,7 @@ button{font:inherit}
 .pc.dealt{animation:cdeal .34s cubic-bezier(.2,1.1,.4,1)}
 .pc.flip{animation:cflip .4s ease-out}
 @keyframes cdeal{0%{transform:translate(-9cqw,-14cqw) rotate(-16deg);opacity:0}100%{transform:none;opacity:1}}
+.pc.dealt{animation-delay:var(--dd,0s);animation-fill-mode:both}
 @keyframes cflip{0%{transform:scaleX(.1)}100%{transform:none}}
 .bet-chip,.pot-chip{pointer-events:none;width:max(24px,5.4cqw);height:max(24px,5.4cqw);font-size:max(9px,1.9cqw);border-width:2px;cursor:default}
 .pot-chip{background:#3A2A20;border-color:var(--brass);flex-direction:column;line-height:1.05;width:max(30px,7cqw);height:max(30px,7cqw)}
@@ -731,13 +732,13 @@ function whyBeats(a,b){
 function difficultyFor(roundNo){
   const r=Math.max(1,roundNo||1);
   if(r<=2)return{level:1,label:'BASIC',blinds:[[5,10]],step:5,stackBB:[20,60],stackUnit:50,shorts:[0,0],shortUnit:5,
-    allin:0,illegal:0,askNext:'first',opts:3,chop:.2,maxRaises:2,foldP:.3,rates:[.05],caps:[10],board:true};
+    allin:0,illegal:0,opts:3,chop:.2,maxRaises:2,foldP:.3,rates:[.05],caps:[10],board:true};
   if(r<=5)return{level:2,label:'STANDARD',blinds:[[10,20]],step:10,stackBB:[20,50],stackUnit:100,shorts:[0,1],shortUnit:10,
-    allin:.04,illegal:.25,askNext:'raise',opts:4,chop:.3,maxRaises:3,foldP:.28,rates:[.05],caps:[15],board:true};
+    allin:.04,illegal:.25,opts:4,chop:.3,maxRaises:3,foldP:.28,rates:[.05],caps:[15],board:true};
   if(r<=9)return{level:3,label:'ADVANCED',blinds:[[25,50]],step:5,stackBB:[15,45],stackUnit:25,shorts:[1,2],shortUnit:5,
-    allin:.1,illegal:.3,askNext:'all',opts:4,chop:.3,maxRaises:3,foldP:.28,rates:[.05,.1],caps:[20,25],board:false};
+    allin:.1,illegal:.3,opts:4,chop:.3,maxRaises:3,foldP:.28,rates:[.05,.1],caps:[20,25],board:false};
   return{level:4,label:'EXPERT',blinds:[[25,50],[50,100]],step:5,stackBB:[15,40],stackUnit:25,shorts:[2,3],shortUnit:1,
-    allin:.16,illegal:.35,askNext:'all',opts:4,chop:.35,maxRaises:4,foldP:.25,rates:[.05,.1],caps:[15,20,30],board:false};
+    allin:.16,illegal:.35,opts:4,chop:.35,maxRaises:4,foldP:.25,rates:[.05,.1],caps:[15,20,30],board:false};
 }
 function currentDifficulty(G){return G.opts.adaptiveDifficulty===false?difficultyFor(1):difficultyFor(G.roundNo);}
 
@@ -780,6 +781,7 @@ const LABEL={accident:'アクシデントに対応する',
   selectBB:'ビッグブラインドの席を指す',
   shuffleCut:'シャッフル＆カット',
   dealHole:'ホールカードを配る',
+  dealRest:'残りのホールカードを配る',
   nextActor:'次にアクションする席を指す',
   ruling:'宣言の判定',
   confirmCall:'コール額の確認',
@@ -800,6 +802,8 @@ const LABEL={accident:'アクシデントに対応する',
   clearCards:'カードを片付ける（次ゲームへ）'
 };
 const SEAT_KEYS=['moveButton','selectSB','selectBB','dealHole','nextActor','showFirst','payTo'];
+/* ホールカードを1枚配るたびの間隔（ms）。まとめ配りのアニメと所作の両方で使う */
+const DEAL_STEP=230;
 const MC_KEYS=['ruling','confirmCall','callPot','callSide','pickWinner'];
 
 /* ===== 金額計算のコツ ===== */
@@ -1002,12 +1006,12 @@ function aiDecide(G,p){
   if(canRaise&&!sticky&&r<df.foldP+.22)return mkRaise(false);
   return{type:'call'};
 }
+/* 次にアクションする席を聞くのは「判断が要る場面」だけにする。
+   ストリートの最初（誰から始めるか＝プリフロップはUTG、フロップ以降はSB側から）だけ指してもらい、
+   そのあと時計回りに1つ進むだけの場面は自動で送る（手数を減らしてテンポを保つため）。
+   飛ばした席がある場合は、なぜ飛ばしたかを解説に残す。 */
 function askNext(G,info){
-  const df=currentDifficulty(G),B=G.bet;
-  if(df.askNext==='all')return true;
-  if(B.count===0)return true;
-  if(df.askNext==='raise')return B.prevRaise||info.skipped.some(x=>x.why!=='行動済みでベット額も揃っている');
-  return false;
+  return G.bet.count===0;
 }
 
 /* 宣言の判定（有効なレイズ／フルレイズ未満のオールイン／最小額に満たない不正な宣言） */
@@ -1098,6 +1102,11 @@ function betStep(G){
     const p=pl(G,info.seat);
     B.cur={seat:info.seat,info,ev:aiDecide(G,p),stage:'next',ask:false};
     B.cur.ask=askNext(G,info);
+    /* プリフロップの途中でフロップを早出ししてしまう事故は、1人でも動いたあとの手番の頭で起こす
+       （席を指す場面を減らしたので、席を指したときではなく手番が回った時点で判定する） */
+    if(B.street==='pre'&&B.count>=1&&!G.board.length&&accFire(G,'boardEarly')){
+      G.earlyFlop=G.plan.board.slice(0,3);G.burned++;G.deckUsed+=4;return expected(G);
+    }
   }
   const c=B.cur,p=pl(G,c.seat);
   if(c.stage==='next'){
@@ -1112,7 +1121,10 @@ function betStep(G){
         +'フォールド済み・オールイン済みの席は行動しません。順番を飛ばしたり戻したりすると、先に見た人の情報で有利になる人が出るため、必ず指差しで席を確認してから促します。';
       return E('nextActor','order',why,C(`Action on seat ${c.seat}.`,`${c.seat}番席、アクションです`),{correct:c.seat});
     }
+    /* 席を指さずに自動で送った場合も、宣言はログに残す（指した場合は act 側で残す）。
+       フォールド・チェックはこのあと行動そのものをログに出すので、宣言は重ねない */
     c.stage='declare';
+    if(c.ev.type!=='fold'&&c.ev.type!=='check')addLog(G,{t:'info',el:`${c.seat}番席の宣言：「${evText(G,p,c.ev)}」`});
   }
   const ev=c.ev;
   if(ev.type==='fold'||ev.type==='check'){
@@ -1315,12 +1327,17 @@ function expected(G){
 
     case 'deal':{
       const total=G.holeN*SEATS;
-      if(F.dealt<total){
-        const seat=((G.sbSeat-1+F.dealt)%SEATS)+1,lap=Math.floor(F.dealt/SEATS)+1;
-        const why=`ホールカードは、SB（${G.sbSeat}番席）から時計回りに1枚ずつ、全員に行き渡るまで配ります。これを${G.holeN}周（${G.game==='omaha'?'オマハは4枚':'ホールデムは2枚'}）繰り返します。`
-          +`${lap}周目の${(F.dealt%SEATS)+1}枚目は${seat}番席。ボタンが最後に受け取る形になり、1枚ずつ配るのは、デッキの偏りや「配りすぎ」の抜き取りを防ぐためです。カードは裏向きのまま、各席の前へ滑らせます。`;
-        return E('dealHole','deal',why,C(F.dealt===0?'Cards.':'',F.dealt===0?'配ります':''),{correct:seat});
+      if(F.dealt===0){
+        const why=`ホールカードは、SB（${G.sbSeat}番席）から時計回りに1枚ずつ、全員に行き渡るまで${G.holeN}周（${G.game==='omaha'?'オマハは4枚':'ホールデムは2枚'}）配ります。`
+          +`配り始めはブラインドを出した席からで、ボタンが最後に受け取ります。1枚ずつ回すのは、デッキの偏りや「配りすぎ」の抜き取りを防ぐためです。`
+          +`配り始めの席（${G.sbSeat}番席）を指すと、そこから時計回りに${total}枚、裏向きのまま続けて配ります。`;
+        return E('dealHole','deal',why,C('Cards.','配ります'),{correct:G.sbSeat});
       }
+      if(F.dealt<total)
+        return E('dealRest','deal',
+          `露出の処理が済みました。配りは止めたところから再開し、時計回りに残り${total-F.dealt}枚を配り切ります。`
+          +(F.expSwap?'配り終えてから、表になった札を脇へ置いて交換します。':'途中で止めたままにすると、どこまで配ったか分からなくなります。'),
+          null);
       if(F.expSwap){
         /* 途中で露出した札：配り終えたので、全員に見せて脇へ置き、一番上の札と交換する */
         const x=F.expSwap,p=pl(G,x.seat),old=p.cards[x.k];
@@ -1445,19 +1462,22 @@ function apply(G,ex,amount){
     case 'selectSB':F.sb=true;extra=`（${ex.correct}番席）`;break;
     case 'selectBB':F.bb=true;extra=`（${ex.correct}番席）`;break;
     case 'shuffleCut':F.shuffled=true;break;
-    case 'dealHole':{
-      const p=pl(G,ex.correct),k=p.cards.length;
-      p.cards.push(G.plan.hole[ex.correct][k]);F.dealt++;G.deckUsed++;
-      if(F.dealt<=2&&accFire(G,'firstExposed'))F.expCard={seat:ex.correct,k};
-      else if(F.dealt>=3&&F.dealt<G.holeN*SEATS&&accFire(G,'midExposed'))F.expCard={seat:ex.correct,k};
-      extra=`（${F.dealt}枚目→${ex.correct}番席）`;
-      if(F.dealt>1)cap=null;
+    case 'dealHole':case 'dealRest':{
+      const total=G.holeN*SEATS,seq=[],from=F.dealt;
+      while(F.dealt<total){
+        const seat=((G.sbSeat-1+F.dealt)%SEATS)+1,p=pl(G,seat),k=p.cards.length;
+        p.cards.push(G.plan.hole[seat][k]);F.dealt++;G.deckUsed++;seq.push(seat);
+        if(F.dealt<=2&&accFire(G,'firstExposed')){F.expCard={seat,k};break;}
+        if(F.dealt>=3&&F.dealt<total&&accFire(G,'midExposed')){F.expCard={seat,k};break;}
+      }
+      G.dealSeq=seq;
+      extra=`（${from+1}〜${F.dealt}枚目／${total}枚）`;
+      if(ex.key==='dealRest')cap=null;
       break;
     }
     case 'nextActor':{
       const c=B.cur;c.stage='declare';
-      if(B.street==='pre'&&B.count>=1&&!G.board.length&&accFire(G,'boardEarly')){G.earlyFlop=G.plan.board.slice(0,3);G.burned++;G.deckUsed+=4;}
-      addLog(G,{t:'info',el:`${c.seat}番席の宣言：「${evText(G,pl(G,c.seat),c.ev)}」`});
+      if(c.ev.type!=='fold'&&c.ev.type!=='check')addLog(G,{t:'info',el:`${c.seat}番席の宣言：「${evText(G,pl(G,c.seat),c.ev)}」`});
       break;
     }
     case 'confirmCall':{
@@ -3450,9 +3470,10 @@ function fitTable(){
 fitTable();
 function pct(q){return `left:${(q.x/TBL.W*100).toFixed(2)}%;top:${(q.y/TBL.H*100).toFixed(2)}%`;}
 
-function cardHTML(c,faceUp,cls,size){
-  if(!faceUp)return `<div class="pc ${size||''} back ${cls||''}"><span class="r">?</span></div>`;
-  return `<div class="pc ${size||''} ${c.suit.c} ${cls||''}"><span class="r">${c.rank}</span><span class="s">${c.suit.m}</span></div>`;
+function cardHTML(c,faceUp,cls,size,style){
+  const st=style?` style="${style}"`:'';
+  if(!faceUp)return `<div class="pc ${size||''} back ${cls||''}"${st}><span class="r">?</span></div>`;
+  return `<div class="pc ${size||''} ${c.suit.c} ${cls||''}"${st}><span class="r">${c.rank}</span><span class="s">${c.suit.m}</span></div>`;
 }
 function cardSpan(c){return `<span class="${c.suit.c==='red'?'rd':'bk'}">${cardText(c)}</span>`;}
 
@@ -3596,12 +3617,27 @@ function overlayHTML(G,ex){
     const q=seatPt(p.seat,FR.bet);
     h+=`<div class="chip chip-abs bet-chip ${seatClass(p.seat)}${String(p.bet).length>=4?' d4':''}" style="${pct(q)}" data-bet="${p.seat}">${p.bet}</div>`;
   });
-  /* ホールカード */
+  /* ホールカード（配った順に1枚ずつ飛ばす：席→カード番号→遅れ の対応表を作る） */
+  const dly={};
+  if(anim.holeSeq&&anim.holeSeq.length){
+    const left={},seen={};
+    anim.holeSeq.forEach(sx=>{left[sx]=(left[sx]||0)+1;});
+    anim.holeSeq.forEach((sx,i)=>{
+      const pp=pl(G,sx);if(!pp)return;
+      seen[sx]=(seen[sx]||0)+1;
+      const idx=pp.cards.length-left[sx]+seen[sx]-1;
+      (dly[sx]=dly[sx]||{})[idx]=i*DEAL_STEP;
+    });
+  }
   G.players.forEach(p=>{
     if(p.folded||!p.cards.length)return;
     const q=seatPt(p.seat,FR.cards),up=G.opened;
     const xe=G.flags.expCard;
-    const cs=p.cards.map((c,i)=>{const exp=xe&&xe.seat===p.seat&&xe.k===i;return cardHTML(c,up||exp,(anim.hole===p.seat&&i===p.cards.length-1?'dealt':(anim.open&&up?'flip':''))+(exp?' acc-hot':''));});
+    const cs=p.cards.map((c,i)=>{
+      const exp=xe&&xe.seat===p.seat&&xe.k===i;
+      const d=dly[p.seat]&&dly[p.seat][i]!==undefined?dly[p.seat][i]:null;
+      return cardHTML(c,up||exp,(d!==null?'dealt':(anim.open&&up?'flip':''))+(exp?' acc-hot':''),'',d!==null?`--dd:${d}ms`:'');
+    });
     h+=`<div class="pcards n${G.holeN}" data-cards="${p.seat}" style="${pct(q)}">${cs.join('')}</div>`;
     if(xe&&xe.seat===p.seat&&G.flags.acc)h+=`<span class="acc-mark" style="left:${(q.x/TBL.W*100).toFixed(2)}%;top:calc(${(q.y/TBL.H*100).toFixed(2)}% - 30px)"><span class="acc-tag">露出</span></span>`;
   });
@@ -3783,9 +3819,20 @@ function buildMotion(key,arg,pre){
         {t:980,l:P(a.x-d*.4,a.y),r:P(b.x+d*.4,b.y),prop:'cards'},{t:1250,l:a,r:b,prop:'cards'},
         {t:1600,r:RR,l:RL,open:0,prop:''}];
     }
-    case 'dealHole':{
-      const c=seatCards(+arg);if(!c||!deck)return null;
-      return carry(deck,c,'card',hand(c.x),180);
+    case 'dealHole':case 'dealRest':{
+      /* 配った席を順に回る。デッキから1枚とって、その席の前へ滑らせるのを繰り返す */
+      const seq=(G.dealSeq||[]).slice();if(!seq.length||!deck)return null;
+      const h=hand(deck.x),fr=[{t:0,prop:'',hold:h},{t:140,hold:h,[h]:P(deck.x,deck.y)}];
+      let t=140;
+      seq.forEach(sx=>{
+        const c=seatCards(sx);if(!c)return;
+        fr.push({t:t+70,hold:h,[h]:P(deck.x,deck.y),prop:'card'});
+        fr.push({t:t+DEAL_STEP*.72,hold:h,[h]:P(c.x,c.y+10*s),prop:'card'});
+        fr.push({t:t+DEAL_STEP*.86,hold:h,[h]:P(c.x,c.y+10*s),prop:''});
+        t+=DEAL_STEP;
+      });
+      fr.push({t:t+120,r:RR,l:RL,open:0,prop:''});
+      return fr;
     }
     case 'burn':{
       if(!deck||!burnP)return null;
@@ -3888,6 +3935,7 @@ function actionKeys(G,ex){
   if(!ex)return[];
   switch(G.phase){
     case 'shuffle':return['shuffleCut'];
+    case 'deal':return ex.key==='dealRest'?['dealRest']:[];
     case 'endbet':return uncalledInfo(G)&&!G.flags.retDone?['returnUncalled','gather']:['gather'];
     case 'street':return['burn','dealFlop','dealTurn','dealRiver'];
     case 'runout':return['openHands'];
@@ -3910,7 +3958,8 @@ function promptFor(G,ex){
     case 'selectSB':return['スモールブラインドの席はどこですか。','ボタンの左隣＝時計回りで1つ先。'];
     case 'selectBB':return['ビッグブラインドの席はどこですか。','SBのさらに左隣。'];
     case 'shuffleCut':return['ブラインドが出そろいました。デッキを準備してください。','シャッフル→ボックス→カット。'];
-    case 'dealHole':return[`次にカードを配る席は？（${F.dealt+1}／${G.holeN*SEATS}枚目）`,`SB（${G.sbSeat}番席）から時計回りに1枚ずつ、${G.holeN}周。`];
+    case 'dealHole':return[`ホールカードを配り始める席は？（全${G.holeN*SEATS}枚）`,`SB（${G.sbSeat}番席）から時計回りに1枚ずつ、${G.holeN}周。席を指すと最後まで配ります。`];
+    case 'dealRest':return[`配りを再開してください。（残り${G.holeN*SEATS-F.dealt}枚）`,'止めたところから時計回りに配り切る。'];
     case 'nextActor':return[`${streetJa(G.bet.street)}：次にアクションする席を指してください。`,'フォールド・オールイン済みの席は飛ばす。時計回り。'];
     case 'ruling':return['この宣言をどう判定しますか。','最小レイズ先＝現在の最高額＋直前の増分。オールインは例外。'];
     case 'confirmCall':return['コール額はいくらですか。','コール額＝最高額−その席がすでに出した額。'];
@@ -4091,7 +4140,7 @@ function doAct(key,arg){
   const dealtBefore=G.flags.dealt,boardBefore=G.board.length,openedBefore=G.opened;
   const r=act(G,key,arg);
   if(r&&r.ok){
-    if(key==='dealHole')G.anim={hole:+arg};
+    if(key==='dealHole'||key==='dealRest')G.anim={holeSeq:G.dealSeq||[]};
     else if(G.board.length>boardBefore)G.anim={boardFrom:boardBefore};
     else if(G.opened&&!openedBefore)G.anim={open:true};
   }
